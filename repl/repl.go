@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/odas0r/b/lexer"
-	"github.com/odas0r/b/token"
+	"github.com/odas0r/yail/lexer"
+	"github.com/odas0r/yail/token"
 )
 
 const PROMPT = "\n>> "

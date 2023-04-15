@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"github.com/odas0r/b/token"
+	"github.com/odas0r/yail/token"
 )
 
 type Lexer struct {

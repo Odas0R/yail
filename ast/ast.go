@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/odas0r/b/token"
+	"github.com/odas0r/yail/token"
 )
 
 type Node interface {

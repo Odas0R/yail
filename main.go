@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/user"
 
-	"github.com/odas0r/b/repl"
+	"github.com/odas0r/yail/repl"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Hello %s!, welcome to B programming language!", user.Username)
+	fmt.Printf("Hello %s!, welcome to YAIL programming language!", user.Username)
 	fmt.Printf("Feel free to type in commands")
 
 	repl.Start(os.Stdin, os.Stdout)

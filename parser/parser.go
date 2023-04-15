@@ -1,9 +1,9 @@
 package parser
 
 import (
-  "github.com/odas0r/b/ast"
-  "github.com/odas0r/b/lexer"
-  "github.com/odas0r/b/token"
+  "github.com/odas0r/yail/ast"
+  "github.com/odas0r/yail/lexer"
+  "github.com/odas0r/yail/token"
 )
 
 type Parser struct {
