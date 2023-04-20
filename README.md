@@ -24,6 +24,7 @@ according to the syntax) sentences in a language. The most common notational
 formats are Backus-Naur Form (BNF) or Extended Backus-Naur Form (EBNF).
 
 Example of BNF, EcmaScript:
+
 ```text
 PrimaryExpression ::= "this"
                     | ObjectLiteral
@@ -75,8 +76,47 @@ A recursive descent parser, which works from the top down, is often recommended
 for newcomers to parsing, since 31 it closely mirrors the way we think about
 ASTs and their construction.
 
-The parser produces an AST.
+The goal of the parser is to produce an AST.
 
+# To solve operations +, -, / etc...
 
+We need to use a top down operator precedence (or: PRATT PARSING).
 
+> Looking at all these different forms of expressions it becomes clear that we
+> need a really good approach to parse them correctly and in an understandable
+> and extendable way. Our old 47approach of deciding what to do based on the
+> current token won’t get us very far - at least not without wanting to tear
+> our hair out. And that is where Vaughan Pratt comes in.
 
+The parsing approach described by all three, which is called Top Down Operator Precedence
+Parsing, or Pratt parsing, was invented as an alternative to parsers based on context-free gram-
+mars and the Backus-Naur-Form.
+
+**Terminology**:
+
+- A `prefix` operator is an operator “in front of” its operand. Example: `--5`.
+- A `postfix` operator is an operator “after” its operand. Example: `foobar++`.
+- An `infix` operator sits between its operands, like this: `5 * 8`.
+
+# We're writing a Pratt Parser
+
+Pratt parser’s main idea is the association of parsing functions (which Pratt calls “semantic
+code”) with token types. Whenever this token type is encountered, the parsing functions are
+called to parse the appropriate expression and return an AST node that represents it. Each
+token type can have up to two parsing functions associated with it, depending on whether the
+token is found in a prefix or an infix position.
+
+This is very neat when doing operations like +,<,>,/,- ...
+
+But how does it work?
+
+Well, in more simpler terms, it creates the AST Nodes via recursion, based on
+the `token` types. It will get the current token type and execute the parser
+for that expression.
+
+Pratt doesn’t use a Parser structure and doesn’t pass around methods defined on `*Parser`. He
+also doesn’t use maps and, of course, he didn’t use Go. His paper predates the release of Go by
+36 years. And then there are naming differences: what we call prefixParseFns are “nuds” (for
+“null denotations”) for Pratt. infixParseFns are “leds” (for “left denotations”).
+
+**CHECK PAGE 69 for better understanding**

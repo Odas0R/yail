@@ -14,8 +14,9 @@ func main() {
 		panic(err)
 	}
 
+	fmt.Printf("%s\n", repl.YAIL)
 	fmt.Printf("Hello %s!, welcome to YAIL programming language!", user.Username)
-	fmt.Printf("Feel free to type in commands")
+	fmt.Printf(" Feel free to type in commands")
 
 	repl.Start(os.Stdin, os.Stdout)
 }
