@@ -65,13 +65,13 @@ func New(l *lexer.Lexer) *Parser {
 	p.prefixParseFns = make(map[token.TokenType]prefixParserFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupExpression)
 	p.registerPrefix(token.IF, p.parseIfStatement)
-	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -109,10 +109,8 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
-	case token.LET:
-		return p.parseLetStatement()
-	case token.RETURN:
-		return p.parseReturnStatement()
+	case token.INT, token.FLOAT, token.BOOL:
+		return p.parseVarOrVectorDeclaration()
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -120,42 +118,126 @@ func (p *Parser) parseStatement() ast.Statement {
 
 // ---------------------- parsers ----------------------
 
-func (p *Parser) parseLetStatement() *ast.LetStatement {
-	stmt := &ast.LetStatement{Token: p.curToken}
+func (p *Parser) parseVarOrVectorDeclaration() ast.Statement {
+	vd := &ast.VarDeclaration{Token: p.curToken}
 
+	// Expect the variable name
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
+	vd.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
-	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	if p.peekTokenIs(token.LBRACKET) {
+		return p.parseVectorDeclaration(vd)
+	}
 
-	if !p.expectPeek(token.ASSIGN) {
+	var value ast.Expression
+	if p.peekTokenIs(token.ASSIGN) {
+		p.nextToken()
+		p.nextToken()
+		value = p.parseExpression(LOWEST)
+	} else {
+		value = p.defaultValueForType(vd.Token.Type)
+	}
+	vd.Value = value
+
+	// Expect the semicolon
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return vd
+}
+
+func (p *Parser) parseVectorDeclaration(vard *ast.VarDeclaration) *ast.VectorDeclaration {
+	vd := &ast.VectorDeclaration{
+		Token: vard.Token,
+		Name:  vard.Name,
+	}
+
+	// Expect the '[' token
+	if !p.expectPeek(token.LBRACKET) {
 		return nil
 	}
 
-	p.nextToken()
+	// Parse the sizeExpression expression
+	if !p.peekTokenIs(token.RBRACKET) {
+		p.nextToken()
+		vd.Size = p.parseExpression(LOWEST)
+	} else {
+		vd.Size = &ast.IntegerLiteral{Token: token.Token{Type: token.INT, Literal: "1"}, Value: 1}
+	}
 
-	stmt.Value = p.parseExpression(LOWEST)
+	// Expect the ']' token
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
 
+	// Parse the values if '=' is found
+	if p.peekTokenIs(token.ASSIGN) {
+		p.nextToken()
+
+		// Expect the '{' token
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+
+		vd.Values = p.parseExpressionList()
+
+		// Expect the '}' token
+		if !p.expectPeek(token.RBRACE) {
+			return nil
+		}
+	} else {
+		sizeLiteral, ok := vd.Size.(*ast.IntegerLiteral)
+		if ok {
+			vd.Values = make([]ast.Expression, sizeLiteral.Value)
+			for i := 0; i < int(sizeLiteral.Value); i++ {
+				vd.Values[i] = p.defaultValueForType(vd.Token.Type)
+			}
+		} else {
+			// TODO: Evaluate the size expression and check the value
+			// Evaluate the size expression to ensure it's not greater than 0
+		}
+	}
+
+	// Expect the semicolon
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
-	return stmt
+	return vd
 }
 
-func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
-	stmt := &ast.ReturnStatement{Token: p.curToken}
+func (p *Parser) parseExpressionList() []ast.Expression {
+	expressions := []ast.Expression{}
 
+	if p.peekTokenIs(token.RBRACE) {
+		return expressions
+	}
 	p.nextToken()
+	expressions = append(expressions, p.parseExpression(LOWEST))
 
-	stmt.ReturnValue = p.parseExpression(LOWEST)
-
-	if p.peekTokenIs(token.SEMICOLON) {
+	for p.peekTokenIs(token.COMMA) {
 		p.nextToken()
+		p.nextToken()
+		expressions = append(expressions, p.parseExpression(LOWEST))
 	}
 
-	return stmt
+	return expressions
+}
+
+func (p *Parser) defaultValueForType(tokenType token.TokenType) ast.Expression {
+	switch tokenType {
+	case token.INT:
+		return &ast.IntegerLiteral{Token: token.Token{Type: token.INT, Literal: "0"}, Value: 0}
+	case token.FLOAT:
+		return &ast.FloatLiteral{Token: token.Token{Type: token.FLOAT, Literal: "0"}, Value: 0}
+	case token.BOOL:
+		return &ast.Boolean{Token: token.Token{Type: token.FALSE, Literal: "false"}, Value: false}
+	default:
+		return nil
+	}
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
@@ -213,6 +295,21 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit.Value = value
 
 	return lit
+}
+
+func (p *Parser) parseFloatLiteral() ast.Expression {
+	fl := &ast.FloatLiteral{Token: p.curToken}
+
+	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as float", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	fl.Value = value
+
+	return fl
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {

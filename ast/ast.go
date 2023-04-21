@@ -53,27 +53,27 @@ func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
-type LetStatement struct {
-	Token token.Token // the token.LET token
-	Name  *Identifier
-	Value Expression
+type VarDeclaration struct {
+	Token token.Token // The token.INT, token.FLOAT, or token.BOOL token
+	Name  *Identifier // The variable name (e.g., x, y, or z)
+	Value Expression  // The value assigned to the variable, can be nil
 }
 
-func (ls *LetStatement) statementNode()       {}
-func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
-func (ls *LetStatement) String() string {
+func (vd *VarDeclaration) statementNode()       {}
+func (vd *VarDeclaration) TokenLiteral() string { return vd.Token.Literal }
+func (vd *VarDeclaration) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(ls.TokenLiteral() + " ")
-	out.WriteString(ls.Name.String())
+	out.WriteString(vd.TokenLiteral()) // Use TokenLiteral() directly
+	out.WriteString(" ")
+	out.WriteString(vd.Name.String())
 	out.WriteString(" = ")
 
-	if ls.Value != nil {
-		out.WriteString(ls.Value.String())
+	if vd.Value != nil {
+		out.WriteString(vd.Value.String())
 	}
 
 	out.WriteString(";")
-
 	return out.String()
 }
 
@@ -122,6 +122,61 @@ func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 
+type FloatLiteral struct {
+	Token token.Token
+	Value float64
+}
+
+func (fl *FloatLiteral) expressionNode()      {}
+func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
+func (fl *FloatLiteral) String() string       { return fl.Token.Literal }
+
+type VectorDeclaration struct {
+	Token  token.Token  // The token.INT token
+	Name   *Identifier  // The variable name (e.g., x, y, or z)
+	Size   Expression   // The size of the vector, can be integer or expression
+	Values []Expression // The values assigned to the vector, can be nil or an array of expressions
+}
+
+func (vd *VectorDeclaration) statementNode()       {}
+func (vd *VectorDeclaration) TokenLiteral() string { return vd.Token.Literal }
+func (vd *VectorDeclaration) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("int ")
+	out.WriteString(vd.Name.String())
+	out.WriteString("[")
+
+	if vd.Size != nil {
+		out.WriteString(vd.Size.String())
+	}
+
+	out.WriteString("]")
+
+	if len(vd.Values) > 0 {
+		out.WriteString(" = {")
+		for i, value := range vd.Values {
+			out.WriteString(value.String())
+			if i < len(vd.Values)-1 {
+				out.WriteString(", ")
+			}
+		}
+		out.WriteString("}")
+	}
+
+	out.WriteString(";")
+	return out.String()
+}
+
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode()      {}
+func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
+func (b *Boolean) String() string       { return b.Token.Literal }
+
 type PrefixExpression struct {
 	Token    token.Token // the prefix token, e.g. !
 	Operator string
@@ -161,15 +216,6 @@ func (ie *InfixExpression) String() string {
 
 	return out.String()
 }
-
-type Boolean struct {
-	Token token.Token
-	Value bool
-}
-
-func (b *Boolean) expressionNode()      {}
-func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
-func (b *Boolean) String() string       { return b.Token.Literal }
 
 type BlockStatement struct {
 	Token      token.Token // the '{' token
@@ -270,3 +316,21 @@ type StringLiteral struct {
 func (sl *StringLiteral) expressionNode()      {}
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
+
+type StructDefinition struct {
+	Token     token.Token
+	Name      *Identifier
+	FieldList []*Field
+}
+
+type Field struct {
+	Token token.Token
+	Name  *Identifier
+	Type  Expression
+}
+
+type StructLiteral struct {
+	Token  token.Token
+	Name   *Identifier
+	Fields map[string]Expression
+}
