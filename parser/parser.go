@@ -109,7 +109,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
-	case token.INT, token.FLOAT, token.BOOL:
+	case token.TYPE_INT, token.TYPE_FLOAT, token.TYPE_BOOL:
 		return p.parseVarOrVectorDeclaration()
 	default:
 		return p.parseExpressionStatement()
@@ -229,11 +229,11 @@ func (p *Parser) parseExpressionList() []ast.Expression {
 
 func (p *Parser) defaultValueForType(tokenType token.TokenType) ast.Expression {
 	switch tokenType {
-	case token.INT:
+	case token.TYPE_INT:
 		return &ast.IntegerLiteral{Token: token.Token{Type: token.INT, Literal: "0"}, Value: 0}
-	case token.FLOAT:
+	case token.TYPE_FLOAT:
 		return &ast.FloatLiteral{Token: token.Token{Type: token.FLOAT, Literal: "0"}, Value: 0}
-	case token.BOOL:
+	case token.TYPE_BOOL:
 		return &ast.Boolean{Token: token.Token{Type: token.FALSE, Literal: "false"}, Value: false}
 	default:
 		return nil

@@ -45,25 +45,25 @@ structs {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.INT, "int"},
+		{token.TYPE_INT, "int"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 
-		{token.INT, "int"},
+		{token.TYPE_INT, "int"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 
-		{token.FLOAT, "float"},
+		{token.TYPE_FLOAT, "float"},
 		{token.IDENT, "pi"},
 		{token.ASSIGN, "="},
 		{token.FLOAT, "3.14"},
 		{token.SEMICOLON, ";"},
 
-		{token.BOOL, "bool"},
+		{token.TYPE_BOOL, "bool"},
 		{token.IDENT, "z"},
 		{token.ASSIGN, "="},
 		{token.TRUE, "true"},
@@ -71,10 +71,10 @@ structs {
 
 		{token.IDENT, "add"},
 		{token.LPAREN, "("},
-		{token.INT, "int"},
+		{token.TYPE_INT, "int"},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
-		{token.INT, "int"},
+		{token.TYPE_INT, "int"},
 		{token.IDENT, "y"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
@@ -97,7 +97,7 @@ structs {
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
 
-		{token.INT, "int"},
+		{token.TYPE_INT, "int"},
 		{token.IDENT, "x"},
 		{token.LBRACKET, "["},
 		{token.INT, "1"},
@@ -155,7 +155,7 @@ structs {
 		{token.LBRACE, "{"},
 		{token.IDENT, "point2D"},
 		{token.LBRACE, "{"},
-		{token.FLOAT, "float"},
+		{token.TYPE_FLOAT, "float"},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
 		{token.IDENT, "y"},

@@ -11,6 +11,10 @@ const (
 	BOOL   = "BOOL"  // bool z
 	STRING = "STRING"
 
+	TYPE_INT   = "_INT"
+	TYPE_FLOAT = "_FLOAT"
+	TYPE_BOOL  = "_BOOL"
+
 	STRUCTS  = "STRUCTS"
 	ACCESSOR = "."
 
@@ -62,9 +66,9 @@ var keywords = map[string]TokenType{
 	"structs": STRUCTS,
 
 	// Types
-	"int":   INT,
-	"float": FLOAT,
-	"bool":  BOOL,
+	"int":   TYPE_INT,
+	"float": TYPE_FLOAT,
+	"bool":  TYPE_BOOL,
 }
 
 func LookupIdent(ident string) TokenType {
