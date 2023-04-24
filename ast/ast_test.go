@@ -9,8 +9,8 @@ import (
 func TestVarDeclarationString(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{
-			&VarDeclaration{
-				Token: token.Token{Type: token.INT, Literal: "int"},
+			&VarStatement{
+				Token: token.Token{Type: token.IDENT, Literal: "int"},
 				Name: &Identifier{
 					Token: token.Token{Type: token.IDENT, Literal: "myVar"},
 					Value: "myVar",
@@ -31,8 +31,8 @@ func TestVarDeclarationString(t *testing.T) {
 func TestVectorDeclarationString(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{
-			&VectorDeclaration{
-				Token: token.Token{Type: token.INT, Literal: "int"},
+			&VectorStatement{
+				Token: token.Token{Type: token.IDENT, Literal: "int"},
 				Name: &Identifier{
 					Token: token.Token{Type: token.IDENT, Literal: "myVec"},
 					Value: "myVec",
@@ -68,6 +68,104 @@ func TestVectorDeclarationString(t *testing.T) {
 	}
 
 	if program.String() != "int myVec[5] = {1, 2, 3, 4, 5};" {
+		t.Errorf("program.String() wrong. got=%q", program.String())
+	}
+}
+
+func TestStructDefinitionString(t *testing.T) {
+	program := &Program{
+		Statements: []Statement{
+			&StructsDefinition{
+				Token: token.Token{Type: token.STRUCTS, Literal: "structs"},
+				Structs: []*StructLiteral{
+					{
+						Token: token.Token{Type: token.IDENT, Literal: "point2D"},
+						Attributes: []*Attribute{
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "x"},
+									Value: "x",
+								},
+							},
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "y"},
+									Value: "y",
+								},
+							},
+						},
+					},
+					{
+						Token: token.Token{Type: token.IDENT, Literal: "point3D"},
+						Attributes: []*Attribute{
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "x"},
+									Value: "x",
+								},
+							},
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "y"},
+									Value: "y",
+								},
+							},
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "z"},
+									Value: "z",
+								},
+							},
+						},
+					},
+					{
+						Token: token.Token{Type: token.IDENT, Literal: "pointND"},
+						Attributes: []*Attribute{
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "x"},
+									Value: "x",
+								},
+								IsVector: true,
+							},
+						},
+					},
+					{
+						Token: token.Token{Type: token.IDENT, Literal: "pointNDSize"},
+						Attributes: []*Attribute{
+							{
+								Token: token.Token{Type: token.IDENT, Literal: "float"},
+								Name: &Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "x"},
+									Value: "x",
+								},
+								IsVector: true,
+								Size: &IntegerLiteral{
+									Token: token.Token{Type: token.INT, Literal: "5"},
+									Value: 5,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	want := `structs {
+	point2D { float x, float y; };
+	point3D { float x, float y, float z; };
+	pointND { float x[]; };
+	pointNDSize { float x[5]; };
+}`
+
+	if program.String() != want {
 		t.Errorf("program.String() wrong. got=%q", program.String())
 	}
 }

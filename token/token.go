@@ -5,15 +5,11 @@ const (
 	EOF     = "EOF"
 
 	// Identifiers + literals
-	IDENT  = "IDENT" // add, foobar, x, y, ...
+	IDENT  = "IDENT" // add, foobar, x, y, int, float, bool, string
 	INT    = "INT"   // 1343456
 	FLOAT  = "FLOAT" // 1.343456
 	BOOL   = "BOOL"  // bool z
 	STRING = "STRING"
-
-	TYPE_INT   = "_INT"
-	TYPE_FLOAT = "_FLOAT"
-	TYPE_BOOL  = "_BOOL"
 
 	STRUCTS  = "STRUCTS"
 	ACCESSOR = "."
@@ -65,10 +61,10 @@ var keywords = map[string]TokenType{
 	"else":    ELSE,
 	"structs": STRUCTS,
 
-	// Types
-	"int":   TYPE_INT,
-	"float": TYPE_FLOAT,
-	"bool":  TYPE_BOOL,
+	// Types -- I don't think we need these, but I'm leaving them here for now
+	// "int":   TYPE_INT,
+	// "float": TYPE_FLOAT,
+	// "bool":  TYPE_BOOL,
 }
 
 func LookupIdent(ident string) TokenType {

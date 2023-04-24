@@ -38,6 +38,7 @@ if (5 < 10) {
 
 structs {
 	point2D { float x, y; };
+	pointND { float x[5]; };
 }
 `
 
@@ -45,25 +46,25 @@ structs {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.TYPE_INT, "int"},
+		{token.IDENT, "int"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 
-		{token.TYPE_INT, "int"},
+		{token.IDENT, "int"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 
-		{token.TYPE_FLOAT, "float"},
+		{token.IDENT, "float"},
 		{token.IDENT, "pi"},
 		{token.ASSIGN, "="},
 		{token.FLOAT, "3.14"},
 		{token.SEMICOLON, ";"},
 
-		{token.TYPE_BOOL, "bool"},
+		{token.IDENT, "bool"},
 		{token.IDENT, "z"},
 		{token.ASSIGN, "="},
 		{token.TRUE, "true"},
@@ -71,10 +72,10 @@ structs {
 
 		{token.IDENT, "add"},
 		{token.LPAREN, "("},
-		{token.TYPE_INT, "int"},
+		{token.IDENT, "int"},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
-		{token.TYPE_INT, "int"},
+		{token.IDENT, "int"},
 		{token.IDENT, "y"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
@@ -97,7 +98,7 @@ structs {
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
 
-		{token.TYPE_INT, "int"},
+		{token.IDENT, "int"},
 		{token.IDENT, "x"},
 		{token.LBRACKET, "["},
 		{token.INT, "1"},
@@ -155,10 +156,20 @@ structs {
 		{token.LBRACE, "{"},
 		{token.IDENT, "point2D"},
 		{token.LBRACE, "{"},
-		{token.TYPE_FLOAT, "float"},
+		{token.IDENT, "float"},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
 		{token.IDENT, "y"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
+		{token.IDENT, "pointND"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "float"},
+		{token.IDENT, "x"},
+		{token.LBRACKET, "["},
+		{token.INT, "5"},
+		{token.RBRACKET, "]"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},

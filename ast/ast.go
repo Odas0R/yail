@@ -53,48 +53,27 @@ func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
-type VarDeclaration struct {
-	Token token.Token // The token.INT, token.FLOAT, or token.BOOL token
+type VarStatement struct {
+	Token token.Token // The token.TYPE_INT, token.TYPE_FLOAT, or token.TYPE_BOOL token
 	Name  *Identifier // The variable name (e.g., x, y, or z)
 	Value Expression  // The value assigned to the variable, can be nil
 }
 
-func (vd *VarDeclaration) statementNode()       {}
-func (vd *VarDeclaration) TokenLiteral() string { return vd.Token.Literal }
-func (vd *VarDeclaration) String() string {
+func (vs *VarStatement) statementNode()       {}
+func (vs *VarStatement) TokenLiteral() string { return vs.Token.Literal }
+func (vs *VarStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(vd.TokenLiteral()) // Use TokenLiteral() directly
+	out.WriteString(vs.TokenLiteral())
 	out.WriteString(" ")
-	out.WriteString(vd.Name.String())
+	out.WriteString(vs.Name.String())
 	out.WriteString(" = ")
 
-	if vd.Value != nil {
-		out.WriteString(vd.Value.String())
+	if vs.Value != nil {
+		out.WriteString(vs.Value.String())
 	}
 
 	out.WriteString(";")
-	return out.String()
-}
-
-type ReturnStatement struct {
-	Token       token.Token // the 'return' token
-	ReturnValue Expression
-}
-
-func (rs *ReturnStatement) statementNode()       {}
-func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
-func (rs *ReturnStatement) String() string {
-	var out bytes.Buffer
-
-	out.WriteString(rs.TokenLiteral() + " ")
-
-	if rs.ReturnValue != nil {
-		out.WriteString(rs.ReturnValue.String())
-	}
-
-	out.WriteString(";")
-
 	return out.String()
 }
 
@@ -131,33 +110,33 @@ func (fl *FloatLiteral) expressionNode()      {}
 func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
 func (fl *FloatLiteral) String() string       { return fl.Token.Literal }
 
-type VectorDeclaration struct {
-	Token  token.Token  // The token.INT token
-	Name   *Identifier  // The variable name (e.g., x, y, or z)
+type VectorStatement struct {
+	Token  token.Token  // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
 	Size   Expression   // The size of the vector, can be integer or expression
+	Name   *Identifier  // The variable name (e.g., x, y, or z)
 	Values []Expression // The values assigned to the vector, can be nil or an array of expressions
 }
 
-func (vd *VectorDeclaration) statementNode()       {}
-func (vd *VectorDeclaration) TokenLiteral() string { return vd.Token.Literal }
-func (vd *VectorDeclaration) String() string {
+func (vl *VectorStatement) statementNode()       {}
+func (vs *VectorStatement) TokenLiteral() string { return vs.Token.Literal }
+func (vs *VectorStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("int ")
-	out.WriteString(vd.Name.String())
+	out.WriteString(vs.TokenLiteral() + " ")
+	out.WriteString(vs.Name.String())
 	out.WriteString("[")
 
-	if vd.Size != nil {
-		out.WriteString(vd.Size.String())
+	if vs.Size != nil {
+		out.WriteString(vs.Size.String())
 	}
 
 	out.WriteString("]")
 
-	if len(vd.Values) > 0 {
+	if len(vs.Values) > 0 {
 		out.WriteString(" = {")
-		for i, value := range vd.Values {
+		for i, value := range vs.Values {
 			out.WriteString(value.String())
-			if i < len(vd.Values)-1 {
+			if i < len(vs.Values)-1 {
 				out.WriteString(", ")
 			}
 		}
@@ -259,10 +238,60 @@ func (ie *IfExpression) String() string {
 	return out.String()
 }
 
+type Attribute struct {
+	Token    token.Token
+	Name     *Identifier
+	IsVector bool
+	Size     Expression // Can be nil if the size is not specified
+}
+
+func (p *Attribute) expressionNode()      {}
+func (p *Attribute) TokenLiteral() string { return p.Token.Literal }
+func (p *Attribute) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(p.TokenLiteral())
+	out.WriteString(" ")
+	out.WriteString(p.Name.String())
+	if p.IsVector {
+		out.WriteString("[")
+		if p.Size != nil {
+			out.WriteString(p.Size.String())
+		}
+		out.WriteString("]")
+	}
+
+	return out.String()
+}
+
+type ReturnType struct {
+	Token    token.Token
+	IsVector bool
+	Size     Expression
+}
+
+func (ti *ReturnType) expressionNode()      {}
+func (ti *ReturnType) TokenLiteral() string { return ti.Token.Literal }
+func (ti *ReturnType) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ti.TokenLiteral())
+	if ti.IsVector {
+		out.WriteString("[")
+		if ti.Size != nil {
+			out.WriteString(ti.Size.String())
+		}
+		out.WriteString("]")
+	}
+
+	return out.String()
+}
+
 type FunctionLiteral struct {
-	Token      token.Token // the 'fn' token
-	Parameters []*Identifier
-	Body       *BlockStatement
+	Token      token.Token     // The function name token
+	Parameters []*Attribute    // The function parameters
+	ReturnType *ReturnType     // The function return type
+	Body       *BlockStatement // The function body
 }
 
 func (fl *FunctionLiteral) expressionNode()      {}
@@ -279,6 +308,7 @@ func (fl *FunctionLiteral) String() string {
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
 	out.WriteString(") ")
+	out.WriteString(fl.ReturnType.String())
 	out.WriteString(fl.Body.String())
 
 	return out.String()
@@ -317,20 +347,52 @@ func (sl *StringLiteral) expressionNode()      {}
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
 
-type StructDefinition struct {
-	Token     token.Token
-	Name      *Identifier
-	FieldList []*Field
+// structs {
+//   <struct_name> { <struct_definition> };
+//	 <struct_name> { <struct_definition> };
+//   ...
+// }
+
+type StructsDefinition struct {
+	Token   token.Token
+	Structs []*StructLiteral
 }
 
-type Field struct {
-	Token token.Token
-	Name  *Identifier
-	Type  Expression
+func (sd *StructsDefinition) statementNode()       {}
+func (sd *StructsDefinition) TokenLiteral() string { return sd.Token.Literal }
+func (sd *StructsDefinition) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("structs {")
+	for _, str := range sd.Structs {
+		out.WriteString("\n\t")
+		out.WriteString(str.String())
+	}
+	out.WriteString("\n}")
+
+	return out.String()
 }
 
 type StructLiteral struct {
-	Token  token.Token
-	Name   *Identifier
-	Fields map[string]Expression
+	Token      token.Token
+	Attributes []*Attribute
+}
+
+func (sl *StructLiteral) expressionNode()      {}
+func (sl *StructLiteral) TokenLiteral() string { return sl.Token.Literal }
+func (sl *StructLiteral) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(sl.TokenLiteral())
+	out.WriteString(" { ")
+	for i, attr := range sl.Attributes {
+		out.WriteString(attr.String())
+		if i < len(sl.Attributes)-1 {
+			out.WriteString(", ")
+		} else {
+			out.WriteString("; };")
+		}
+	}
+
+	return out.String()
 }

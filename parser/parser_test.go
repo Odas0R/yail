@@ -40,7 +40,7 @@ func TestVarDeclarationStatements(t *testing.T) {
 			return
 		}
 
-		val := stmt.(*ast.VarDeclaration).Value
+		val := stmt.(*ast.VarStatement).Value
 		if !testLiteralExpression(t, val, tt.expectedValue) {
 			return
 		}
@@ -61,6 +61,7 @@ func TestVectorDeclarationStatements(t *testing.T) {
 		{"int x[3]={1, 2, 3};", "int", "x", 3, []int64{1, 2, 3}},
 		{"float y[2]={1.2, 2.3};", "float", "y", 2, []float64{1.2, 2.3}},
 		{"int k[]={1,2,3,4,5};", "int", "k", 5, []int64{1, 2, 3, 4, 5}},
+		{"j={1,2,3,4,5};", "int", "j", 5, []int64{1, 2, 3, 4, 5}},
 	}
 
 	for _, tt := range tests {
@@ -80,7 +81,7 @@ func TestVectorDeclarationStatements(t *testing.T) {
 			t.Errorf("s.TokenLiteral not '%s'. got=%q", tt.expectedType, stmt.TokenLiteral())
 		}
 
-		vecStmt, ok := stmt.(*ast.VectorDeclaration)
+		vecStmt, ok := stmt.(*ast.VectorStatement)
 		if !ok {
 			t.Errorf("vecStmt not *ast.VectorDeclaration. got=%T", vecStmt)
 		}
@@ -122,6 +123,205 @@ func TestVectorDeclarationStatements(t *testing.T) {
 			}
 		default:
 			t.Errorf("vecStmt.Values has wrong type. got=%T", vecStmt.Values)
+		}
+	}
+}
+
+func TestStructsDeclaration(t *testing.T) {
+	input := `
+	structs {
+		point2D { float x, float y; };
+		point3D { float x, y, z; };
+		point4D { float x, y, z, int j; };
+		pointND { float x[]; };
+		pointNDSize { float x[5]; };
+		pointNDSizeM { float x[5], y[2], z[]; };
+	}
+`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.StructsDefinition)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.StructDefinition. got=%T", program.Statements[0])
+	}
+
+	if len(stmt.Structs) != 6 {
+		t.Fatalf("stmt.Structs has wrong length. got=%d", len(stmt.Structs))
+	}
+
+	expectedStructs := []struct {
+		Name       string
+		Attributes []struct {
+			Token    string
+			Name     string
+			Size     interface{}
+			IsVector bool
+		}
+	}{
+		{
+			Name: "point2D",
+			Attributes: []struct {
+				Token    string
+				Name     string
+				Size     interface{}
+				IsVector bool
+			}{
+				{
+					Token: "float",
+					Name:  "x",
+				},
+				{
+					Token: "float",
+					Name:  "y",
+				},
+			},
+		},
+		{
+			Name: "point3D",
+			Attributes: []struct {
+				Token    string
+				Name     string
+				Size     interface{}
+				IsVector bool
+			}{
+				{
+					Token: "float",
+					Name:  "x",
+				},
+				{
+					Token: "float",
+					Name:  "y",
+				},
+				{
+					Token: "float",
+					Name:  "z",
+				},
+			},
+		},
+		{
+			Name: "point4D",
+			Attributes: []struct {
+				Token    string
+				Name     string
+				Size     interface{}
+				IsVector bool
+			}{
+				{
+					Token: "float",
+					Name:  "x",
+				},
+				{
+					Token: "float",
+					Name:  "y",
+				},
+				{
+					Token: "float",
+					Name:  "z",
+				},
+				{
+					Token: "int",
+					Name:  "j",
+				},
+			},
+		},
+		{
+			Name: "pointND",
+			Attributes: []struct {
+				Token    string
+				Name     string
+				Size     interface{}
+				IsVector bool
+			}{
+				{
+					Token:    "float",
+					Name:     "x",
+					Size:     nil,
+					IsVector: true,
+				},
+			},
+		},
+		{
+			Name: "pointNDSize",
+			Attributes: []struct {
+				Token    string
+				Name     string
+				Size     interface{}
+				IsVector bool
+			}{
+				{
+					Token:    "float",
+					Name:     "x",
+					Size:     "5",
+					IsVector: true,
+				},
+			},
+		},
+		{
+			Name: "pointNDSizeM",
+			Attributes: []struct {
+				Token    string
+				Name     string
+				Size     interface{}
+				IsVector bool
+			}{
+				{
+					Token:    "float",
+					Name:     "x",
+					Size:     "5",
+					IsVector: true,
+				},
+				{
+					Token:    "float",
+					Name:     "y",
+					Size:     "2",
+					IsVector: true,
+				},
+				{
+					Token:    "float",
+					Name:     "z",
+					IsVector: true,
+				},
+			},
+		},
+	}
+
+	for i, str := range stmt.Structs {
+		expectedStruct := expectedStructs[i]
+
+		if str.TokenLiteral() != expectedStruct.Name {
+			t.Errorf("str.Name.Value not %s. got=%s", expectedStructs[i].Name, str.TokenLiteral())
+		}
+
+		for j, a := range str.Attributes {
+			attr := expectedStruct.Attributes[j]
+
+			if a.TokenLiteral() != attr.Token {
+				t.Errorf("p.Token.Literal not %s. got=%s", attr.Token, a.Token.Literal)
+			}
+
+			if a.Name.Value != attr.Name {
+				t.Errorf("p.Name.Value not %s. got=%s", attr.Name, a.Name.Value)
+			}
+
+			// only check size if it is not nil
+			if a.Size != nil {
+				if a.Size.String() != fmt.Sprintf("%v", attr.Size) {
+					t.Errorf("p.Size not %v. got=%v", attr.Size, a.Size)
+				}
+			}
+
+			if a.IsVector != attr.IsVector {
+				t.Errorf("p.IsVector not %t. got=%t", attr.IsVector, a.IsVector)
+			}
 		}
 	}
 }
@@ -667,7 +867,7 @@ func testVarDeclaration(t *testing.T, s ast.Statement, st string, name string) b
 		return false
 	}
 
-	varStmt, ok := s.(*ast.VarDeclaration)
+	varStmt, ok := s.(*ast.VarStatement)
 	if !ok {
 		t.Errorf("s not *ast.VarDeclaration. got=%T", s)
 		return false
