@@ -382,14 +382,14 @@ func (sl *StringLiteral) String() string       { return sl.Token.Literal }
 //   ...
 // }
 
-type StructsDefinition struct {
+type StructsStatement struct {
 	Token   token.Token
-	Structs []*StructLiteral
+	Structs []*Struct
 }
 
-func (sd *StructsDefinition) statementNode()       {}
-func (sd *StructsDefinition) TokenLiteral() string { return sd.Token.Literal }
-func (sd *StructsDefinition) String() string {
+func (sd *StructsStatement) statementNode()       {}
+func (sd *StructsStatement) TokenLiteral() string { return sd.Token.Literal }
+func (sd *StructsStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString("structs {")
@@ -402,21 +402,21 @@ func (sd *StructsDefinition) String() string {
 	return out.String()
 }
 
-type StructLiteral struct {
+type Struct struct {
 	Token      token.Token
 	Attributes []*Attribute
 }
 
-func (sl *StructLiteral) expressionNode()      {}
-func (sl *StructLiteral) TokenLiteral() string { return sl.Token.Literal }
-func (sl *StructLiteral) String() string {
+func (s *Struct) expressionNode()      {}
+func (s *Struct) TokenLiteral() string { return s.Token.Literal }
+func (s *Struct) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(sl.TokenLiteral())
+	out.WriteString(s.TokenLiteral())
 	out.WriteString(" { ")
-	for i, attr := range sl.Attributes {
+	for i, attr := range s.Attributes {
 		out.WriteString(attr.String())
-		if i < len(sl.Attributes)-1 {
+		if i < len(s.Attributes)-1 {
 			out.WriteString(", ")
 		} else {
 			out.WriteString("; };")
