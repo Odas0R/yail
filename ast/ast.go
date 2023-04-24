@@ -55,6 +55,8 @@ func (i *Identifier) String() string       { return i.Value }
 
 type VarStatement struct {
 	Token token.Token // The token.TYPE_INT, token.TYPE_FLOAT, or token.TYPE_BOOL token
+	// TODO: add support for types. This will be the next phase of the project.
+	Type  *Identifier // The type of the variable (e.g., int, float, or bool)
 	Name  *Identifier // The variable name (e.g., x, y, or z)
 	Value Expression  // The value assigned to the variable, can be nil
 }
@@ -64,7 +66,7 @@ func (vs *VarStatement) TokenLiteral() string { return vs.Token.Literal }
 func (vs *VarStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(vs.TokenLiteral())
+	out.WriteString(vs.Type.String())
 	out.WriteString(" ")
 	out.WriteString(vs.Name.String())
 	out.WriteString(" = ")
@@ -113,6 +115,7 @@ func (fl *FloatLiteral) String() string       { return fl.Token.Literal }
 type VectorStatement struct {
 	Token  token.Token  // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
 	Size   Expression   // The size of the vector, can be integer or expression
+	Type   *Identifier  // The type of the vector (e.g., int, float, or bool)
 	Name   *Identifier  // The variable name (e.g., x, y, or z)
 	Values []Expression // The values assigned to the vector, can be nil or an array of expressions
 }
@@ -122,7 +125,7 @@ func (vs *VectorStatement) TokenLiteral() string { return vs.Token.Literal }
 func (vs *VectorStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(vs.TokenLiteral() + " ")
+	out.WriteString(vs.Type.String() + " ")
 	out.WriteString(vs.Name.String())
 	out.WriteString("[")
 
@@ -245,9 +248,58 @@ type Attribute struct {
 	Size     Expression // Can be nil if the size is not specified
 }
 
-func (p *Attribute) expressionNode()      {}
-func (p *Attribute) TokenLiteral() string { return p.Token.Literal }
-func (p *Attribute) String() string {
+func (a *Attribute) expressionNode()      {}
+func (a *Attribute) TokenLiteral() string { return a.Token.Literal }
+func (a *Attribute) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(a.TokenLiteral())
+	out.WriteString(" ")
+	out.WriteString(a.Name.String())
+	if a.IsVector {
+		out.WriteString("[")
+		if a.Size != nil {
+			out.WriteString(a.Size.String())
+		}
+		out.WriteString("]")
+	}
+
+	return out.String()
+}
+
+type ReturnType struct {
+	Token    token.Token
+	IsVector bool
+	Size     Expression
+}
+
+func (rt *ReturnType) expressionNode()      {}
+func (rt *ReturnType) TokenLiteral() string { return rt.Token.Literal }
+func (rt *ReturnType) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(rt.TokenLiteral())
+	if rt.IsVector {
+		out.WriteString("[")
+		if rt.Size != nil {
+			out.WriteString(rt.Size.String())
+		}
+		out.WriteString("]")
+	}
+
+	return out.String()
+}
+
+type Parameter struct {
+	Token    token.Token
+	Name     *Identifier
+	IsVector bool
+	Size     Expression // Can be nil if the size is not specified
+}
+
+func (p *Parameter) expressionNode()      {}
+func (p *Parameter) TokenLiteral() string { return p.Token.Literal }
+func (p *Parameter) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(p.TokenLiteral())
@@ -264,52 +316,29 @@ func (p *Attribute) String() string {
 	return out.String()
 }
 
-type ReturnType struct {
-	Token    token.Token
-	IsVector bool
-	Size     Expression
-}
-
-func (ti *ReturnType) expressionNode()      {}
-func (ti *ReturnType) TokenLiteral() string { return ti.Token.Literal }
-func (ti *ReturnType) String() string {
-	var out bytes.Buffer
-
-	out.WriteString(ti.TokenLiteral())
-	if ti.IsVector {
-		out.WriteString("[")
-		if ti.Size != nil {
-			out.WriteString(ti.Size.String())
-		}
-		out.WriteString("]")
-	}
-
-	return out.String()
-}
-
-type FunctionLiteral struct {
+type FunctionStatement struct {
 	Token      token.Token     // The function name token
-	Parameters []*Attribute    // The function parameters
+	Parameters []*Parameter    // The function parameters
 	ReturnType *ReturnType     // The function return type
 	Body       *BlockStatement // The function body
 }
 
-func (fl *FunctionLiteral) expressionNode()      {}
-func (fl *FunctionLiteral) TokenLiteral() string { return fl.Token.Literal }
-func (fl *FunctionLiteral) String() string {
+func (fs *FunctionStatement) statementNode()       {}
+func (fs *FunctionStatement) TokenLiteral() string { return fs.Token.Literal }
+func (fs *FunctionStatement) String() string {
 	var out bytes.Buffer
 
 	params := []string{}
-	for _, p := range fl.Parameters {
+	for _, p := range fs.Parameters {
 		params = append(params, p.String())
 	}
 
-	out.WriteString(fl.TokenLiteral())
+	out.WriteString(fs.TokenLiteral())
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
 	out.WriteString(") ")
-	out.WriteString(fl.ReturnType.String())
-	out.WriteString(fl.Body.String())
+	out.WriteString(fs.ReturnType.String())
+	out.WriteString(fs.Body.String())
 
 	return out.String()
 }
