@@ -6,7 +6,6 @@ import (
 
 	"github.com/odas0r/yail/ast"
 	"github.com/odas0r/yail/lexer"
-	"github.com/odas0r/yail/token"
 )
 
 func TestVarDeclarationStatements(t *testing.T) {
@@ -157,7 +156,7 @@ func TestStructsDeclaration(t *testing.T) {
 			len(program.Statements))
 	}
 
-	stmt, ok := program.Statements[0].(*ast.StructsDefinition)
+	stmt, ok := program.Statements[0].(*ast.StructsStatement)
 	if !ok {
 		t.Fatalf("program.Statements[0] is not *ast.StructDefinition. got=%T", program.Statements[0])
 	}
@@ -169,7 +168,7 @@ func TestStructsDeclaration(t *testing.T) {
 	expectedStructs := []struct {
 		Name       string
 		Attributes []struct {
-			Token    string
+			Type     string
 			Name     string
 			Size     interface{}
 			IsVector bool
@@ -178,79 +177,79 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "point2D",
 			Attributes: []struct {
-				Token    string
+				Type     string
 				Name     string
 				Size     interface{}
 				IsVector bool
 			}{
 				{
-					Token: "float",
-					Name:  "x",
+					Type: "float",
+					Name: "x",
 				},
 				{
-					Token: "float",
-					Name:  "y",
+					Type: "float",
+					Name: "y",
 				},
 			},
 		},
 		{
 			Name: "point3D",
 			Attributes: []struct {
-				Token    string
+				Type     string
 				Name     string
 				Size     interface{}
 				IsVector bool
 			}{
 				{
-					Token: "float",
-					Name:  "x",
+					Type: "float",
+					Name: "x",
 				},
 				{
-					Token: "float",
-					Name:  "y",
+					Type: "float",
+					Name: "y",
 				},
 				{
-					Token: "float",
-					Name:  "z",
+					Type: "float",
+					Name: "z",
 				},
 			},
 		},
 		{
 			Name: "point4D",
 			Attributes: []struct {
-				Token    string
+				Type     string
 				Name     string
 				Size     interface{}
 				IsVector bool
 			}{
 				{
-					Token: "float",
-					Name:  "x",
+					Type: "float",
+					Name: "x",
 				},
 				{
-					Token: "float",
-					Name:  "y",
+					Type: "float",
+					Name: "y",
 				},
 				{
-					Token: "float",
-					Name:  "z",
+					Type: "float",
+					Name: "z",
 				},
 				{
-					Token: "int",
-					Name:  "j",
+					Type: "int",
+					Name: "j",
 				},
 			},
 		},
 		{
 			Name: "pointND",
 			Attributes: []struct {
-				Token    string
+				Type     string
 				Name     string
 				Size     interface{}
 				IsVector bool
 			}{
 				{
-					Token:    "float",
+					Type:     "float",
 					Name:     "x",
 					Size:     1,
 					IsVector: true,
@@ -260,13 +259,13 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "pointNDSize",
 			Attributes: []struct {
-				Token    string
+				Type     string
 				Name     string
 				Size     interface{}
 				IsVector bool
 			}{
 				{
-					Token:    "float",
+					Type:     "float",
 					Name:     "x",
 					Size:     "5",
 					IsVector: true,
@@ -276,25 +275,25 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "pointNDSizeM",
 			Attributes: []struct {
-				Token    string
+				Type     string
 				Name     string
 				Size     interface{}
 				IsVector bool
 			}{
 				{
-					Token:    "float",
+					Type:     "float",
 					Name:     "x",
 					Size:     "5",
 					IsVector: true,
 				},
 				{
-					Token:    "float",
+					Type:     "float",
 					Name:     "y",
 					Size:     "2",
 					IsVector: true,
 				},
 				{
-					Token:    "float",
+					Type:     "float",
 					Name:     "z",
 					Size:     1,
 					IsVector: true,
@@ -313,8 +312,8 @@ func TestStructsDeclaration(t *testing.T) {
 		for j, a := range str.Attributes {
 			attr := expectedStruct.Attributes[j]
 
-			if a.TokenLiteral() != attr.Token {
-				t.Errorf("p.Token.Literal not %s. got=%s", attr.Token, a.Token.Literal)
+			if a.Type.Value != attr.Type {
+				t.Errorf("a.Type.Value not %s. got=%s", attr.Type, a.Type.Value)
 			}
 
 			if a.Name.Value != attr.Name {
@@ -795,7 +794,7 @@ func TestFunctionParameterParsing(t *testing.T) {
 		}
 
 		for i, p := range tt.expectedParams {
-			testTokenType(t, function.Parameters[i].Token, p.Type)
+			testTokenType(t, function.Parameters[i].Type, p.Type)
 			testLiteralExpression(t, function.Parameters[i].Name, p.Name)
 		}
 	}
@@ -827,12 +826,12 @@ func TestFunctionLiteralParsing(t *testing.T) {
 	}
 
 	testLiteralExpression(t, function.Parameters[0].Name, "x")
-	testTokenType(t, function.Parameters[0].Token, "int")
+	testTokenType(t, function.Parameters[0].Type, "int")
 
 	testLiteralExpression(t, function.Parameters[1].Name, "y")
-	testTokenType(t, function.Parameters[1].Token, "int")
+	testTokenType(t, function.Parameters[1].Type, "int")
 
-	testTokenType(t, function.ReturnType.Token, "int")
+	testTokenType(t, function.ReturnType.Type, "int")
 	if function.ReturnType.IsVector {
 		t.Errorf("function.ReturnType.IsVector is not false. got=%t", function.ReturnType.IsVector)
 	}
@@ -934,9 +933,9 @@ func testVarDeclaration(t *testing.T, s ast.Statement, typ string, name string) 
 	return true
 }
 
-func testTokenType(t *testing.T, tt token.Token, expected string) bool {
-	if tt.Literal != expected {
-		t.Errorf("tt.Literal not '%s'. got=%s", expected, tt.Literal)
+func testTokenType(t *testing.T, tt *ast.Identifier, expected string) bool {
+	if tt.Value != expected {
+		t.Errorf("tt.Literal not '%s'. got=%s", expected, tt.Value)
 		return false
 	}
 	return false

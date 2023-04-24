@@ -75,9 +75,9 @@ func TestVectorDeclarationString(t *testing.T) {
 func TestStructDefinitionString(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{
-			&StructsDefinition{
+			&StructsStatement{
 				Token: token.Token{Type: token.STRUCTS, Literal: "structs"},
-				Structs: []*StructLiteral{
+				Structs: []*Struct{
 					{
 						Token: token.Token{Type: token.IDENT, Literal: "point2D"},
 						Attributes: []*Attribute{

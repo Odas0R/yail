@@ -55,7 +55,6 @@ func (i *Identifier) String() string       { return i.Value }
 
 type VarStatement struct {
 	Token token.Token // The token.TYPE_INT, token.TYPE_FLOAT, or token.TYPE_BOOL token
-	// TODO: add support for types. This will be the next phase of the project.
 	Type  *Identifier // The type of the variable (e.g., int, float, or bool)
 	Name  *Identifier // The variable name (e.g., x, y, or z)
 	Value Expression  // The value assigned to the variable, can be nil
@@ -244,6 +243,7 @@ func (ie *IfExpression) String() string {
 type Attribute struct {
 	Token    token.Token
 	Name     *Identifier
+	Type     *Identifier // Type of the parameter
 	IsVector bool
 	Size     Expression // Can be nil if the size is not specified
 }
@@ -253,7 +253,7 @@ func (a *Attribute) TokenLiteral() string { return a.Token.Literal }
 func (a *Attribute) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(a.TokenLiteral())
+	out.WriteString(a.Type.String())
 	out.WriteString(" ")
 	out.WriteString(a.Name.String())
 	if a.IsVector {
@@ -269,6 +269,7 @@ func (a *Attribute) String() string {
 
 type ReturnType struct {
 	Token    token.Token
+	Type     *Identifier // Type of the parameter
 	IsVector bool
 	Size     Expression
 }
@@ -278,7 +279,7 @@ func (rt *ReturnType) TokenLiteral() string { return rt.Token.Literal }
 func (rt *ReturnType) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(rt.TokenLiteral())
+	out.WriteString(rt.Type.String())
 	if rt.IsVector {
 		out.WriteString("[")
 		if rt.Size != nil {
@@ -293,6 +294,7 @@ func (rt *ReturnType) String() string {
 type Parameter struct {
 	Token    token.Token
 	Name     *Identifier
+	Type     *Identifier // Type of the parameter
 	IsVector bool
 	Size     Expression // Can be nil if the size is not specified
 }
@@ -302,7 +304,7 @@ func (p *Parameter) TokenLiteral() string { return p.Token.Literal }
 func (p *Parameter) String() string {
 	var out bytes.Buffer
 
-	out.WriteString(p.TokenLiteral())
+	out.WriteString(p.Type.String())
 	out.WriteString(" ")
 	out.WriteString(p.Name.String())
 	if p.IsVector {

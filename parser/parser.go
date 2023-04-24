@@ -295,18 +295,18 @@ func (p *Parser) parseExpressionList() []ast.Expression {
 	return expressions
 }
 
-func (p *Parser) parseStructsStatement() *ast.StructsDefinition {
-	sd := &ast.StructsDefinition{Token: p.curToken}
+func (p *Parser) parseStructsStatement() *ast.StructsStatement {
+	sd := &ast.StructsStatement{Token: p.curToken}
 
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
 	p.nextToken()
 
-	var structs []*ast.StructLiteral
+	var structs []*ast.Struct
 
 	for !p.peekTokenIs(token.RBRACE) {
-		sl := &ast.StructLiteral{Token: p.curToken}
+		sl := &ast.Struct{Token: p.curToken}
 
 		if !p.expectPeek(token.LBRACE) {
 			return nil
@@ -340,7 +340,10 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 	}
 	p.nextToken()
 
-	topAttr := &ast.Attribute{Token: p.curToken}
+	topAttr := &ast.Attribute{
+		Token: p.curToken,
+		Type:  p.parseType(),
+	}
 
 	if !p.expectPeek(token.IDENT) {
 		return nil
@@ -375,10 +378,15 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 		}
 
 		if !p.peekTokenIs(token.IDENT) {
-			attr.Token = topAttr.Token // set the token to the top attribute
+			attr.Type = topAttr.Type // set type top attribute type
 			attr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 		} else {
-			p.nextToken()
+			attr.Type = p.parseType()
+
+			if !p.expectPeek(token.IDENT) {
+				return nil
+			}
+
 			attr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 		}
 
@@ -620,7 +628,10 @@ func (p *Parser) parseFunctionParameters() []*ast.Parameter {
 	}
 	p.nextToken()
 
-	topParam := &ast.Parameter{Token: p.curToken}
+	topParam := &ast.Parameter{
+		Token: p.curToken,
+		Type:  p.parseType(),
+	}
 
 	if !p.expectPeek(token.IDENT) {
 		return nil
@@ -655,10 +666,15 @@ func (p *Parser) parseFunctionParameters() []*ast.Parameter {
 		}
 
 		if !p.peekTokenIs(token.IDENT) {
-			param.Token = topParam.Token // set the token to the top attribute
+			param.Type = topParam.Type // set the top attribute type as default
 			param.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 		} else {
-			p.nextToken()
+			param.Type = p.parseType()
+
+			if !p.expectPeek(token.IDENT) {
+				return nil
+			}
+
 			param.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 		}
 
@@ -691,7 +707,10 @@ func (p *Parser) parseFunctionParameters() []*ast.Parameter {
 }
 
 func (p *Parser) parseFunctionReturnType() *ast.ReturnType {
-	returnType := &ast.ReturnType{Token: p.curToken}
+	returnType := &ast.ReturnType{
+		Token: p.curToken,
+		Type:  p.parseType(),
+	}
 
 	if p.peekTokenIs(token.LBRACKET) {
 		p.nextToken()
