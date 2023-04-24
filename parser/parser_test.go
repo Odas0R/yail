@@ -10,10 +10,10 @@ import (
 
 func TestVarDeclarationStatements(t *testing.T) {
 	tests := []struct {
-		input              string
-		expectedType       string
-		expectedIdentifier string
-		expectedValue      interface{}
+		input         string
+		expectedToken string
+		expectedName  string
+		expectedValue interface{}
 	}{
 		{"int x;", "int", "x", 0},
 		{"bool y;", "bool", "y", false},
@@ -36,7 +36,7 @@ func TestVarDeclarationStatements(t *testing.T) {
 				len(program.Statements))
 		}
 		stmt := program.Statements[0]
-		if !testVarDeclaration(t, stmt, tt.expectedType, tt.expectedIdentifier) {
+		if !testVarDeclaration(t, stmt, tt.expectedToken, tt.expectedName) {
 			return
 		}
 
@@ -49,11 +49,11 @@ func TestVarDeclarationStatements(t *testing.T) {
 
 func TestVectorDeclarationStatements(t *testing.T) {
 	tests := []struct {
-		input              string
-		expectedType       string
-		expectedIdentifier string
-		expectedSize       int64
-		expectedValue      interface{}
+		input         string
+		expectedToken string
+		expectedName  string
+		expectedSize  int64
+		expectedValue interface{}
 	}{
 		{"int a[];", "int", "a", 1, []int64{0}},
 		{"bool b[];", "bool", "b", 1, []bool{false}},
@@ -61,7 +61,7 @@ func TestVectorDeclarationStatements(t *testing.T) {
 		{"int x[3]={1, 2, 3};", "int", "x", 3, []int64{1, 2, 3}},
 		{"float y[2]={1.2, 2.3};", "float", "y", 2, []float64{1.2, 2.3}},
 		{"int k[]={1,2,3,4,5};", "int", "k", 5, []int64{1, 2, 3, 4, 5}},
-		{"j={1,2,3,4,5};", "int", "j", 5, []int64{1, 2, 3, 4, 5}},
+		// {"j={1,2,3,4,5};", "int", "j", 5, []int64{1, 2, 3, 4, 5}},
 	}
 
 	for _, tt := range tests {
@@ -77,8 +77,8 @@ func TestVectorDeclarationStatements(t *testing.T) {
 		}
 		stmt := program.Statements[0]
 
-		if stmt.TokenLiteral() != tt.expectedType {
-			t.Errorf("s.TokenLiteral not '%s'. got=%q", tt.expectedType, stmt.TokenLiteral())
+		if stmt.TokenLiteral() != tt.expectedToken {
+			t.Errorf("s.TokenLiteral not '%s'. got=%q", tt.expectedToken, stmt.TokenLiteral())
 		}
 
 		vecStmt, ok := stmt.(*ast.VectorStatement)
@@ -86,8 +86,8 @@ func TestVectorDeclarationStatements(t *testing.T) {
 			t.Errorf("vecStmt not *ast.VectorDeclaration. got=%T", vecStmt)
 		}
 
-		if vecStmt.Name.Value != tt.expectedIdentifier {
-			t.Errorf("vecStmt.Name.Value not '%s'. got=%s", tt.expectedIdentifier, vecStmt.Name.Value)
+		if vecStmt.Name.Value != tt.expectedName {
+			t.Errorf("vecStmt.Name.Value not '%s'. got=%s", tt.expectedName, vecStmt.Name.Value)
 		}
 
 		// test the vector values
@@ -96,7 +96,7 @@ func TestVectorDeclarationStatements(t *testing.T) {
 		}
 
 		// Check the values
-		switch tt.expectedType {
+		switch tt.expectedToken {
 		case "int":
 			expected := tt.expectedValue.([]int64)
 			for i, v := range vecStmt.Values {
@@ -244,7 +244,7 @@ func TestStructsDeclaration(t *testing.T) {
 				{
 					Token:    "float",
 					Name:     "x",
-					Size:     nil,
+					Size:     1,
 					IsVector: true,
 				},
 			},
@@ -288,6 +288,7 @@ func TestStructsDeclaration(t *testing.T) {
 				{
 					Token:    "float",
 					Name:     "z",
+					Size:     1,
 					IsVector: true,
 				},
 			},

@@ -197,6 +197,8 @@ func (p *Parser) parseVariableStatement() ast.Statement {
 				}
 			}
 
+			p.nextToken()
+
 			return vecStmt
 		} else if p.peekTokenIs(token.ASSIGN) {
 			p.nextToken()
@@ -288,18 +290,13 @@ func (p *Parser) parseStructsStatement() *ast.StructsDefinition {
 	p.nextToken()
 
 	var structs []*ast.StructLiteral
-	structNames := make(map[string]bool)
 
 	for !p.peekTokenIs(token.RBRACE) {
 		ps := p.parseStructLiteral()
 
-		// check if struct already exists
-		name := ps.TokenLiteral()
-		if _, exists := structNames[name]; exists {
-			p.errors = append(p.errors, fmt.Sprintf("Duplicate struct name '%s' in structs", name))
-			return nil
+		if ps == nil {
+			break
 		}
-		structNames[name] = true
 
 		structs = append(structs, ps)
 	}
@@ -326,88 +323,69 @@ func (p *Parser) parseStructLiteral() *ast.StructLiteral {
 	}
 
 	var attributes []*ast.Attribute
-	attributeNames := make(map[string]bool)
 
-	attr := &ast.Attribute{Token: p.curToken}
+	topAttr := &ast.Attribute{Token: p.curToken}
 
 	// expect attribute name
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 
-	// check if attribute already exists
-	name := p.curToken.Literal
-	if _, exists := attributeNames[name]; exists {
-		p.errors = append(p.errors, fmt.Sprintf("Duplicate attribute name '%s' in struct %s", name, sl.TokenLiteral()))
-		return nil
-	}
-	attributeNames[name] = true
-
-	attr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	topAttr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	if p.peekTokenIs(token.LBRACKET) {
-		attr.IsVector = true
+		p.nextToken()
 		p.nextToken()
 
-		if !p.peekTokenIs(token.RBRACKET) {
-			p.nextToken()
-			attr.Size = p.parseExpression(LOWEST)
-		}
+		if p.curTokenIs(token.RBRACKET) {
+			topAttr.Size = &ast.IntegerLiteral{Token: token.Token{Type: token.INT, Literal: "1"}, Value: 1}
+		} else {
+			topAttr.Size = p.parseExpression(LOWEST)
 
-		if !p.expectPeek(token.RBRACKET) {
-			return nil
+			if !p.expectPeek(token.RBRACKET) {
+				return nil
+			}
 		}
+		topAttr.IsVector = true
 	}
 
-	attributes = append(attributes, attr)
+	attributes = append(attributes, topAttr)
 
 	if p.peekTokenIs(token.COMMA) {
 		p.nextToken() // consume the comma
-		p.nextToken() // consume the comma
+
+		if !p.expectPeek(token.IDENT) {
+			return nil
+		}
 
 		// iterate through the attributes till you find a semicolon or a type
 		for {
-			var attrToken token.Token
-
-			// if it's a type identifier, break
-			if p.curTokenIs(token.IDENT) {
-				attrToken = p.curToken
-
-				if !p.expectPeek(token.IDENT) {
-					return nil
-				}
-			} else {
-				attrToken = attr.Token
-			}
-
+			// check if it has two ident tokens
 			attr := &ast.Attribute{
-				Token: attrToken, // take the token from the first attribute (type)
-				Name:  &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal},
+				Token: p.curToken,
 			}
 
-			// check if attribute already exists
-			name := p.curToken.Literal
-			if _, exists := attributeNames[name]; exists {
-				p.errors = append(p.errors, fmt.Sprintf("Duplicate attribute name '%s' in struct %s", name, sl.TokenLiteral()))
-				return nil
+			if !p.peekTokenIs(token.IDENT) {
+				attr.Token = topAttr.Token // set the token to the top attribute
+				attr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+			} else {
+				p.nextToken()
+				attr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 			}
-			attributeNames[name] = true
 
+			// IS ARRAY
 			if p.peekTokenIs(token.LBRACKET) {
-				// set attribute as vector
-				attr.IsVector = true
-
+				p.nextToken()
 				p.nextToken()
 
-				if !p.peekTokenIs(token.RBRACKET) {
-					p.nextToken()
+				if p.curTokenIs(token.RBRACKET) {
+					attr.Size = &ast.IntegerLiteral{Token: token.Token{Type: token.INT, Literal: "1"}, Value: 1}
+				} else {
 					attr.Size = p.parseExpression(LOWEST)
+					p.nextToken()
 				}
 
-				// Expect the ']' token
-				if !p.expectPeek(token.RBRACKET) {
-					return nil
-				}
+				attr.IsVector = true
 			}
 
 			attributes = append(attributes, attr)
@@ -416,6 +394,7 @@ func (p *Parser) parseStructLiteral() *ast.StructLiteral {
 				p.nextToken()
 				p.nextToken()
 			} else {
+
 				// Expect ';' token to end the attribute
 				if !p.expectPeek(token.SEMICOLON) {
 					return nil
