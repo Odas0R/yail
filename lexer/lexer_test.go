@@ -36,6 +36,10 @@ if (5 < 10) {
 "foobar"
 "foo bar"
 
+global { }
+local { }
+const { }
+
 structs {
 	point2D { float x, y; };
 	pointND { float x[5]; };
@@ -151,6 +155,18 @@ structs {
 
 		{token.STRING, "foobar"},
 		{token.STRING, "foo bar"},
+
+		{token.GLOBAL, "global"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
+
+		{token.LOCAL, "local"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
+
+		{token.CONST, "const"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
 
 		{token.STRUCTS, "structs"},
 		{token.LBRACE, "{"},

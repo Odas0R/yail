@@ -12,6 +12,9 @@ const (
 	STRING = "STRING"
 
 	STRUCTS  = "STRUCTS"
+	GLOBAL   = "GLOBAL"
+	LOCAL    = "LOCAL"
+	CONST    = "CONST"
 	ACCESSOR = "."
 
 	// Operators
@@ -60,11 +63,9 @@ var keywords = map[string]TokenType{
 	"if":      IF,
 	"else":    ELSE,
 	"structs": STRUCTS,
-
-	// Types -- I don't think we need these, but I'm leaving them here for now
-	// "int":   TYPE_INT,
-	// "float": TYPE_FLOAT,
-	// "bool":  TYPE_BOOL,
+	"const":   CONST,
+	"global":  GLOBAL,
+	"local":   LOCAL,
 }
 
 func LookupIdent(ident string) TokenType {
