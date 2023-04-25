@@ -9,7 +9,7 @@ import (
 func TestVarDeclarationString(t *testing.T) {
 	program := &Program{
 		Statements: []Statement{
-			&VarStatement{
+			&VariableStatement{
 				Token: token.Token{Type: token.IDENT, Literal: "int"},
 				Name: &Identifier{
 					Token: token.Token{Type: token.IDENT, Literal: "myVar"},

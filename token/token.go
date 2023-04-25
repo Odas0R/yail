@@ -3,6 +3,7 @@ package token
 const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
+	COMMENT = "#"
 
 	// Identifiers + literals
 	IDENT  = "IDENT" // add, foobar, x, y, int, float, bool, string

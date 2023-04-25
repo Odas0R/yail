@@ -54,6 +54,9 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhiteSpace()
 
 	switch l.Ch {
+	case '#':
+		l.readComment()
+		return l.NextToken()
 	case '=':
 		if l.peekChar() == '=' {
 			ch := l.Ch
@@ -157,6 +160,12 @@ func (l *Lexer) readString() string {
 		}
 	}
 	return l.input[position:l.Position]
+}
+
+func (l *Lexer) readComment() {
+	for l.Ch != '\n' && l.Ch != 0 {
+		l.readChar()
+	}
 }
 
 // ------------------ helpers ------------------

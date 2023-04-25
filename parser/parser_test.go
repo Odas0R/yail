@@ -8,7 +8,7 @@ import (
 	"github.com/odas0r/yail/lexer"
 )
 
-func TestVarDeclarationStatements(t *testing.T) {
+func TestVariableStatements(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedType  string
@@ -39,23 +39,23 @@ func TestVarDeclarationStatements(t *testing.T) {
 				len(program.Statements))
 		}
 		stmt := program.Statements[0]
-		if !testVarDeclaration(t, stmt, tt.expectedType, tt.expectedName) {
+		if !testVariableStatement(t, stmt, tt.expectedType, tt.expectedName) {
 			return
 		}
 
-		val := stmt.(*ast.VarStatement).Value
+		val := stmt.(*ast.VariableStatement).Value
 		if !testLiteralExpression(t, val, tt.expectedValue) {
 			return
 		}
 	}
 }
 
-func TestVectorDeclarationStatements(t *testing.T) {
+func TestVectorStatements(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedType  string
 		expectedName  string
-		expectedSize  int64
+		expectedSize  interface{}
 		expectedValue interface{}
 	}{
 		{"int a[];", "int", "a", 1, []int64{0}},
@@ -80,56 +80,23 @@ func TestVectorDeclarationStatements(t *testing.T) {
 				len(program.Statements))
 		}
 
-		vecStmt, ok := program.Statements[0].(*ast.VectorStatement)
-		if !ok {
-			t.Errorf("vecStmt not *ast.VectorDeclaration. got=%T", vecStmt)
+		stmt := program.Statements[0]
+
+		if !testVectorStatement(t, stmt, tt.expectedType, tt.expectedName, tt.expectedSize) {
+			return
 		}
 
-		if vecStmt.Type.Value != tt.expectedType {
-			t.Errorf("s.TokenLiteral not '%s'. got=%q", tt.expectedType, vecStmt.Type.Value)
-		}
-
-		if vecStmt.Name.Value != tt.expectedName {
-			t.Errorf("vecStmt.Name.Value not '%s'. got=%s", tt.expectedName, vecStmt.Name.Value)
-		}
-
-		// test the vector values
-		if len(vecStmt.Values) != int(tt.expectedSize) {
-			t.Errorf("vecStmt.Values has wrong length. got=%d", len(vecStmt.Values))
-		}
-
-		// Check the values
-		switch tt.expectedType {
-		case "int":
-			expected := tt.expectedValue.([]int64)
-			for i, v := range vecStmt.Values {
-				val := v.(*ast.IntegerLiteral)
-				if val.Value != expected[i] {
-					t.Errorf("vecStmt.Values[%d] not '%d'. got=%d", i, expected[i], val.Value)
-				}
-			}
-		case "bool":
-			expected := tt.expectedValue.([]bool)
-			for i, v := range vecStmt.Values {
-				val := v.(*ast.Boolean)
-				if val.Value != expected[i] {
-					t.Errorf("vecStmt.Values[%d] not '%t'. got=%t", i, expected[i], val.Value)
-				}
-			}
-		case "float":
-			expected := tt.expectedValue.([]float64)
-			for i, v := range vecStmt.Values {
-				val := v.(*ast.FloatLiteral)
-				if val.Value != expected[i] {
-					t.Errorf("vecStmt.Values[%d] not '%f'. got=%f", i, expected[i], val.Value)
-				}
-			}
-		case "unknown":
-			for i, v := range vecStmt.Values {
+		for i, v := range stmt.(*ast.VectorStatement).Values {
+			switch tt.expectedValue.(type) {
+			case []int64:
+				testLiteralExpression(t, v, tt.expectedValue.([]int64)[i])
+			case []float64:
+				testLiteralExpression(t, v, tt.expectedValue.([]float64)[i])
+			case []bool:
+				testLiteralExpression(t, v, tt.expectedValue.([]bool)[i])
+			default:
 				testLiteralExpression(t, v, tt.expectedValue.([]interface{})[i])
 			}
-		default:
-			t.Errorf("Unknown type %s", tt.expectedType)
 		}
 	}
 }
@@ -331,6 +298,250 @@ func TestStructsDeclaration(t *testing.T) {
 				t.Errorf("p.IsVector not %t. got=%t", attr.IsVector, a.IsVector)
 			}
 		}
+	}
+}
+
+func TestGlobalStatement(t *testing.T) {
+	input := `global {
+	int x = 5;
+	float y = 5.5;
+	x = {1, 2, 3};
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.GlobalStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	tt := []struct {
+		expectedType  string
+		expectedName  string
+		expectedValue interface{}
+		expectedSize  interface{}
+	}{
+		{
+			expectedType:  "int",
+			expectedName:  "x",
+			expectedValue: 5,
+		},
+		{
+			expectedType:  "float",
+			expectedName:  "y",
+			expectedValue: 5.5,
+		},
+		{
+			expectedType:  "unknown",
+			expectedName:  "x",
+			expectedValue: []int{1, 2, 3},
+			expectedSize:  3,
+		},
+	}
+
+	for i, gv := range stmt.Body.Statements {
+		switch gv.(type) {
+		case *ast.VariableStatement:
+			testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName)
+		case *ast.VectorStatement:
+			testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize)
+		default:
+			t.Fatalf("gv is not ast.VariableStatement or ast.VectorStatement. got=%T", gv)
+		}
+	}
+}
+
+func TestGlobalErrorStatement(t *testing.T) {
+	input := `global {
+	int x = 5;
+	add(int x,y) int {
+		add = x + y;
+	}
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	p.ParseProgram()
+
+	expectedErrors := []string{
+		"only variable declarations are allowed in variable blocks",
+	}
+
+	testParserErrors(t, p, expectedErrors, false)
+}
+
+func TestConstStatement(t *testing.T) {
+	input := `const {
+	int x = 5;
+	float y = 5.5;
+	x = {1, 2, 3};
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ConstStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	tt := []struct {
+		expectedType  string
+		expectedName  string
+		expectedValue interface{}
+		expectedSize  interface{}
+	}{
+		{
+			expectedType:  "int",
+			expectedName:  "x",
+			expectedValue: 5,
+		},
+		{
+			expectedType:  "float",
+			expectedName:  "y",
+			expectedValue: 5.5,
+		},
+		{
+			expectedType:  "unknown",
+			expectedName:  "x",
+			expectedValue: []int{1, 2, 3},
+			expectedSize:  3,
+		},
+	}
+
+	for i, gv := range stmt.Body.Statements {
+		switch gv.(type) {
+		case *ast.VariableStatement:
+			testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName)
+		case *ast.VectorStatement:
+			testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize)
+		default:
+			t.Fatalf("gv is not ast.VariableStatement or ast.VectorStatement. got=%T", gv)
+		}
+	}
+}
+
+func TestConstErrorStatement(t *testing.T) {
+	input := `const {
+	int x = 5;
+	add(int x,y) int { add = x + y; }
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	p.ParseProgram()
+
+	expectedErrors := []string{
+		"only variable declarations are allowed in variable blocks",
+	}
+
+	testParserErrors(t, p, expectedErrors, false)
+}
+
+func TestLocalStatement(t *testing.T) {
+	input := `add() int {
+	local {
+		int x = 5;
+	}
+
+	add = x;
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.FunctionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.FunctionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	tt := []struct {
+		expectedType  string
+		expectedName  string
+		expectedValue interface{}
+		expectedSize  interface{}
+	}{
+		{
+			expectedType:  "int",
+			expectedName:  "x",
+			expectedValue: 5,
+		},
+	}
+
+	ls, ok := stmt.Body.Statements[0].(*ast.LocalStatement)
+	if !ok {
+		t.Fatalf("stmt.Body.Statements[0] is not ast.LocalStatement. got=%T",
+			stmt.Body.Statements[0])
+	}
+
+	for i, s := range ls.Body.Statements {
+		switch s.(type) {
+		case *ast.VariableStatement:
+			testVariableStatement(t, s, tt[i].expectedType, tt[i].expectedName)
+		case *ast.VectorStatement:
+			testVectorStatement(t, s, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize)
+		default:
+			t.Fatalf("gv is not ast.VariableStatement or ast.VectorStatement. got=%T", s)
+		}
+	}
+}
+
+func TestLocalErrorStatement(t *testing.T) {
+	input := `local {
+	int x = 5;
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	p.ParseProgram()
+
+	expectedErrors := []string{
+		"no prefix parse function for LOCAL found",
+		"no prefix parse function for { found",
+		"no prefix parse function for } found",
+	}
+
+	testParserErrors(t, p, expectedErrors, false)
+}
+
+func TestCommentStatement(t *testing.T) {
+	input := `
+	# this is a very interesting comment wow
+`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 0 {
+		t.Fatalf("program has statements. got=%d",
+			len(program.Statements))
 	}
 }
 
@@ -908,16 +1119,28 @@ func TestStringLiteralExpression(t *testing.T) {
 
 // ---------------------- helpers ----------------------
 
-func testVarDeclaration(t *testing.T, s ast.Statement, typ string, name string) bool {
-	varStmt, ok := s.(*ast.VarStatement)
+func testVariableStatement(t *testing.T, s ast.Statement, typ string, name string) bool {
+	varStmt, ok := s.(*ast.VariableStatement)
 	if !ok {
-		t.Errorf("s not *ast.VarDeclaration. got=%T", s)
+		t.Errorf("s not *ast.VariableDeclaration. got=%T", s)
 		return false
 	}
 
 	if varStmt.Type.Value != typ {
-		t.Errorf("s.TokenLiteral not '%s'. got=%q", typ, varStmt.Type.Value)
+		t.Errorf("varStmt.Type.Value not '%s'. got=%q", typ, varStmt.Type.Value)
 		return false
+	}
+
+	if varStmt.Type.Value == "unknown" {
+		if varStmt.Type.TokenLiteral() != name {
+			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", name, varStmt.Type.TokenLiteral())
+			return false
+		}
+	} else {
+		if varStmt.Type.TokenLiteral() != typ {
+			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", typ, varStmt.Type.TokenLiteral())
+			return false
+		}
 	}
 
 	if varStmt.Name.Value != name {
@@ -926,7 +1149,49 @@ func testVarDeclaration(t *testing.T, s ast.Statement, typ string, name string) 
 	}
 
 	if varStmt.Name.TokenLiteral() != name {
-		t.Errorf("s.Name not '%s'. got=%s", name, varStmt.Name)
+		t.Errorf("varStmt.Name.TokenLiteral() not '%s'. got=%s", name, varStmt.Name)
+		return false
+	}
+
+	return true
+}
+
+func testVectorStatement(t *testing.T, s ast.Statement, typ string, name string, size interface{}) bool {
+	vecStmt, ok := s.(*ast.VectorStatement)
+	if !ok {
+		t.Errorf("statment not *ast.VectorStatement. got=%T", s)
+		return false
+	}
+
+	if fmt.Sprintf("%v", vecStmt.Size) != fmt.Sprintf("%v", size) {
+		t.Errorf("vecStmt.Size not %v. got=%v", size, vecStmt.Size)
+		return false
+	}
+
+	if vecStmt.Type.Value != typ {
+		t.Errorf("vecStmt.Type.Value not '%s'. got=%q", typ, vecStmt.Type.Value)
+		return false
+	}
+
+	if vecStmt.Type.Value == "unknown" {
+		if vecStmt.Type.TokenLiteral() != name {
+			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", name, vecStmt.Type.TokenLiteral())
+			return false
+		}
+	} else {
+		if vecStmt.Type.TokenLiteral() != typ {
+			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", typ, vecStmt.Type.TokenLiteral())
+			return false
+		}
+	}
+
+	if vecStmt.Name.Value != name {
+		t.Errorf("vecStmt.Name.Value not '%s'. got=%s", name, vecStmt.Name.Value)
+		return false
+	}
+
+	if vecStmt.Name.TokenLiteral() != name {
+		t.Errorf("vecStmt.Name not '%s'. got=%s", name, vecStmt.Name)
 		return false
 	}
 
@@ -955,7 +1220,8 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{
 		} else if _, ok := exp.(*ast.Identifier); ok {
 			return testIdentifier(t, exp, v)
 		} else {
-			t.Errorf("type of exp not handled (case string:). got=%T", exp)
+			t.Errorf("type of exp not handled. got=%T", exp)
+			return false
 		}
 	case bool:
 		return testBooleanLiteral(t, exp, v)
@@ -1086,6 +1352,34 @@ func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
 	}
 
 	return true
+}
+
+func testParserErrors(t *testing.T, p *Parser, expectedErrors []string, debug bool) {
+	errors := p.Errors()
+
+	if debug {
+		for _, err := range p.Errors() {
+			fmt.Println(err)
+		}
+	}
+
+	if len(errors) != len(expectedErrors) {
+		t.Fatalf("wrong number of errors. expected=%d, got=%d", len(expectedErrors), len(errors))
+	}
+
+	for _, wantErr := range expectedErrors {
+		found := false
+		for _, gotErr := range errors {
+			if gotErr == wantErr {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("expected error not found: \"%s\"", wantErr)
+		}
+	}
+
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {

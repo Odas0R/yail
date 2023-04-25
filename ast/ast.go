@@ -53,16 +53,16 @@ func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
-type VarStatement struct {
+type VariableStatement struct {
 	Token token.Token // The token.TYPE_INT, token.TYPE_FLOAT, or token.TYPE_BOOL token
 	Type  *Identifier // The type of the variable (e.g., int, float, or bool)
 	Name  *Identifier // The variable name (e.g., x, y, or z)
 	Value Expression  // The value assigned to the variable, can be nil
 }
 
-func (vs *VarStatement) statementNode()       {}
-func (vs *VarStatement) TokenLiteral() string { return vs.Token.Literal }
-func (vs *VarStatement) String() string {
+func (vs *VariableStatement) statementNode()       {}
+func (vs *VariableStatement) TokenLiteral() string { return vs.Token.Literal }
+func (vs *VariableStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(vs.Type.String())
@@ -424,6 +424,66 @@ func (s *Struct) String() string {
 			out.WriteString("; };")
 		}
 	}
+
+	return out.String()
+}
+
+type GlobalStatement struct {
+	Token token.Token
+	Body  *BlockStatement
+}
+
+func (gs *GlobalStatement) statementNode()       {}
+func (gs *GlobalStatement) TokenLiteral() string { return gs.Token.Literal }
+func (gs *GlobalStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("global {")
+	for _, v := range gs.Body.Statements {
+		out.WriteString("\n\t")
+		out.WriteString(v.String())
+	}
+	out.WriteString("\n}")
+
+	return out.String()
+}
+
+type ConstStatement struct {
+	Token token.Token
+	Body  *BlockStatement
+}
+
+func (cs *ConstStatement) statementNode()       {}
+func (cs *ConstStatement) TokenLiteral() string { return cs.Token.Literal }
+func (cs *ConstStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("const {")
+	for _, v := range cs.Body.Statements {
+		out.WriteString("\n\t")
+		out.WriteString(v.String())
+	}
+	out.WriteString("\n}")
+
+	return out.String()
+}
+
+type LocalStatement struct {
+	Token token.Token
+	Body  *BlockStatement
+}
+
+func (ls *LocalStatement) statementNode()       {}
+func (ls *LocalStatement) TokenLiteral() string { return ls.Token.Literal }
+func (ls *LocalStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("local {")
+	for _, v := range ls.Body.Statements {
+		out.WriteString("\n\t")
+		out.WriteString(v.String())
+	}
+	out.WriteString("\n}")
 
 	return out.String()
 }

@@ -120,6 +120,10 @@ func (p *Parser) parseStatement() ast.Statement {
 		} else if p.peekTokenIs(token.IDENT) || p.peekTokenIs(token.ASSIGN) { // VARIABLE
 			return p.parseVariableStatement()
 		}
+	case token.GLOBAL:
+		return p.parseGlobalStatement()
+	case token.CONST:
+		return p.parseConstStatement()
 	case token.STRUCTS:
 		return p.parseStructsStatement()
 	}
@@ -130,7 +134,7 @@ func (p *Parser) parseStatement() ast.Statement {
 // ---------------------- parsers ----------------------
 
 func (p *Parser) parseVariableStatement() ast.Statement {
-	varStmt := &ast.VarStatement{
+	varStmt := &ast.VariableStatement{
 		Token: p.curToken,
 		Type:  p.parseType(),
 	}
@@ -224,6 +228,14 @@ func (p *Parser) parseVariableStatement() ast.Statement {
 			p.nextToken()
 
 			vecStmt.Values = p.parseExpressionList()
+
+			// Set the size if it wasn't set before
+			if vecStmt.Size == nil {
+				vecStmt.Size = &ast.IntegerLiteral{
+					Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vecStmt.Values))},
+					Value: int64(len(vecStmt.Values)),
+				}
+			}
 
 			// Expect the '}' token
 			if !p.expectPeek(token.RBRACE) {
@@ -595,6 +607,58 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	return block
 }
 
+func (p *Parser) parseFunctionBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.curToken}
+	block.Statements = []ast.Statement{}
+
+	p.nextToken()
+
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		var stmt ast.Statement
+
+		if p.curTokenIs(token.LOCAL) {
+			stmt = p.parseLocalStatement()
+		} else {
+			stmt = p.parseStatement()
+		}
+
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return block
+}
+
+func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.curToken}
+	block.Statements = []ast.Statement{}
+
+	p.nextToken()
+
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+
+		_, isVariable := stmt.(*ast.VariableStatement)
+		_, isVector := stmt.(*ast.VectorStatement)
+
+		if !isVariable && !isVector {
+			p.errors = append(p.errors, "only variable declarations are allowed in variable blocks")
+
+			p.nextToken()
+			return nil
+		}
+
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return block
+}
+
 func (p *Parser) parseFunctionStatement() ast.Statement {
 	lit := &ast.FunctionStatement{Token: p.curToken} // IDENT
 
@@ -614,7 +678,7 @@ func (p *Parser) parseFunctionStatement() ast.Statement {
 		return nil
 	}
 
-	lit.Body = p.parseBlockStatement()
+	lit.Body = p.parseFunctionBlockStatement()
 
 	return lit
 }
@@ -729,6 +793,48 @@ func (p *Parser) parseFunctionReturnType() *ast.ReturnType {
 	}
 
 	return returnType
+}
+
+func (p *Parser) parseGlobalStatement() ast.Statement {
+	gl := &ast.GlobalStatement{
+		Token: p.curToken,
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	gl.Body = p.parseVariableBlockStatement()
+
+	return gl
+}
+
+func (p *Parser) parseConstStatement() ast.Statement {
+	cs := &ast.ConstStatement{
+		Token: p.curToken,
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	cs.Body = p.parseVariableBlockStatement()
+
+	return cs
+}
+
+func (p *Parser) parseLocalStatement() ast.Statement {
+	ls := &ast.LocalStatement{
+		Token: p.curToken,
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	ls.Body = p.parseVariableBlockStatement()
+
+	return ls
 }
 
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
