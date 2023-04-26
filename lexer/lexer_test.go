@@ -22,6 +22,11 @@ int x[1] = {1};
 
 !-/*5;
 
+++
+--
++=
+-=
+
 5 < 10 > 5;
 
 if (5 < 10) {
@@ -121,6 +126,11 @@ structs {
 		{token.ASTERISK, "*"},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
+
+		{token.INCREMENT, "++"},
+		{token.DECREMENT, "--"},
+		{token.PLUS_EQ, "+="},
+		{token.MINUS_EQ, "-="},
 
 		{token.INT, "5"},
 		{token.LT, "<"},

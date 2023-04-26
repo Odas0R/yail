@@ -574,3 +574,75 @@ func (ae *AssignmentStatement) String() string {
 
 	return out.String()
 }
+
+type IncrementStatement struct {
+	Token token.Token
+	Var   Expression
+}
+
+func (is *IncrementStatement) statementNode()       {}
+func (is *IncrementStatement) TokenLiteral() string { return is.Token.Literal }
+func (is *IncrementStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(is.Var.String())
+	out.WriteString("++")
+	out.WriteString(";")
+
+	return out.String()
+}
+
+type DecrementStatement struct {
+	Token token.Token
+	Var   Expression
+}
+
+func (ds *DecrementStatement) statementNode()       {}
+func (ds *DecrementStatement) TokenLiteral() string { return ds.Token.Literal }
+func (ds *DecrementStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ds.Var.String())
+	out.WriteString("--")
+	out.WriteString(";")
+
+	return out.String()
+}
+
+type PlusEqualsStatement struct {
+	Token    token.Token
+	Var      Expression
+	Quantity Expression
+}
+
+func (ps *PlusEqualsStatement) statementNode()       {}
+func (ps *PlusEqualsStatement) TokenLiteral() string { return ps.Token.Literal }
+func (ps *PlusEqualsStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ps.Var.String())
+	out.WriteString(" += ")
+	out.WriteString(ps.Quantity.String())
+	out.WriteString(";")
+
+	return out.String()
+}
+
+type MinusEqualsStatement struct {
+	Token    token.Token
+	Var      Expression
+	Quantity Expression
+}
+
+func (ms *MinusEqualsStatement) statementNode()       {}
+func (ms *MinusEqualsStatement) TokenLiteral() string { return ms.Token.Literal }
+func (ms *MinusEqualsStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ms.Var.String())
+	out.WriteString(" -= ")
+	out.WriteString(ms.Quantity.String())
+	out.WriteString(";")
+
+	return out.String()
+}

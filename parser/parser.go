@@ -138,14 +138,30 @@ func (p *Parser) parseStatement() ast.Statement {
 
 	targetExpression := p.parseExpression(LOWEST)
 
-	if p.peekTokenIs(token.ASSIGN) {
+	if p.peekTokenIs(token.INCREMENT) {
+		p.nextToken()
+		return p.parseIncrementStatement(targetExpression)
+	} else if p.peekTokenIs(token.DECREMENT) {
+		p.nextToken()
+		return p.parseDecrementStatement(targetExpression)
+	} else if p.peekTokenIs(token.PLUS_EQ) {
+		p.nextToken()
+		return p.parsePlusEqualsStatement(targetExpression)
+	} else if p.peekTokenIs(token.MINUS_EQ) {
+		p.nextToken()
+		return p.parseMinusEqualsStatement(targetExpression)
+	} else if p.peekTokenIs(token.ASSIGN) {
+		p.nextToken()
 		return p.parseAssignmentStatement(targetExpression)
 	}
+
+	stmt := &ast.ExpressionStatement{Token: p.curToken, Expression: targetExpression}
+
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
-	return &ast.ExpressionStatement{Token: p.curToken, Expression: targetExpression}
+	return stmt
 }
 
 // ---------------------- parsers ----------------------
@@ -924,10 +940,6 @@ func (p *Parser) parseAccessorExpression(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseAssignmentStatement(exp ast.Expression) *ast.AssignmentStatement {
-	if !p.expectPeek(token.ASSIGN) {
-		return nil
-	}
-
 	// check if expression is of type accessor or index
 	_, isAccessorExpression := exp.(*ast.AccessorExpression)
 	_, isIndexExpression := exp.(*ast.IndexExpression)
@@ -971,6 +983,40 @@ func (p *Parser) parseWhileStatement() *ast.WhileStatement {
 	ws.Body = p.parseBlockStatement()
 
 	return ws
+}
+
+func (p *Parser) parseIncrementStatement(target ast.Expression) *ast.IncrementStatement {
+	stmt := &ast.IncrementStatement{Token: p.curToken, Var: target}
+	p.nextToken()
+	return stmt
+}
+
+func (p *Parser) parseDecrementStatement(target ast.Expression) *ast.DecrementStatement {
+	stmt := &ast.DecrementStatement{Token: p.curToken, Var: target}
+	p.nextToken()
+	return stmt
+}
+
+func (p *Parser) parsePlusEqualsStatement(target ast.Expression) *ast.PlusEqualsStatement {
+	stmt := &ast.PlusEqualsStatement{Token: p.curToken, Var: target}
+	p.nextToken()
+	stmt.Quantity = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return stmt
+}
+
+func (p *Parser) parseMinusEqualsStatement(target ast.Expression) *ast.MinusEqualsStatement {
+	stmt := &ast.MinusEqualsStatement{Token: p.curToken, Var: target}
+	p.nextToken()
+	stmt.Quantity = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return stmt
 }
 
 func (p *Parser) defaultValueForType(t token.Token) ast.Expression {

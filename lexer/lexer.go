@@ -83,11 +83,35 @@ func (l *Lexer) NextToken() token.Token {
 	case ')':
 		tok = newToken(token.RPAREN, l.Ch)
 	case '.':
-	  tok = newToken(token.ACCESSOR, l.Ch)
+		tok = newToken(token.ACCESSOR, l.Ch)
 	case '+':
-		tok = newToken(token.PLUS, l.Ch)
+		if l.peekChar() == '+' {
+			ch := l.Ch
+			l.readChar()
+			literal := string(ch) + string(l.Ch)
+			tok = token.Token{Type: token.INCREMENT, Literal: literal}
+		} else if l.peekChar() == '=' {
+			ch := l.Ch
+			l.readChar()
+			literal := string(ch) + string(l.Ch)
+			tok = token.Token{Type: token.PLUS_EQ, Literal: literal}
+		} else {
+			tok = newToken(token.PLUS, l.Ch)
+		}
 	case '-':
-		tok = newToken(token.MINUS, l.Ch)
+		if l.peekChar() == '-' {
+			ch := l.Ch
+			l.readChar()
+			literal := string(ch) + string(l.Ch)
+			tok = token.Token{Type: token.DECREMENT, Literal: literal}
+		} else if l.peekChar() == '=' {
+			ch := l.Ch
+			l.readChar()
+			literal := string(ch) + string(l.Ch)
+			tok = token.Token{Type: token.MINUS_EQ, Literal: literal}
+		} else {
+			tok = newToken(token.MINUS, l.Ch)
+		}
 	case '/':
 		tok = newToken(token.SLASH, l.Ch)
 	case '*':
