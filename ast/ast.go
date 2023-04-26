@@ -246,6 +246,7 @@ type Attribute struct {
 	Type     *Identifier // Type of the parameter
 	IsVector bool
 	Size     Expression // Can be nil if the size is not specified
+	Value    Expression // Can be nil if the value is not specified
 }
 
 func (a *Attribute) expressionNode()      {}
@@ -484,6 +485,69 @@ func (ls *LocalStatement) String() string {
 		out.WriteString(v.String())
 	}
 	out.WriteString("\n}")
+
+	return out.String()
+}
+
+type IndexExpression struct {
+	Token token.Token
+	Left  Expression // The object being accessed
+	Index Expression // The index being accessed
+}
+
+func (ie *IndexExpression) expressionNode()      {}
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
+func (ie *IndexExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
+
+	return out.String()
+}
+
+type AccessorExpression struct {
+	Token token.Token
+	Left  Expression   // The object being accessed
+	Index []Expression // The index being accessed
+}
+
+func (ae *AccessorExpression) expressionNode()      {}
+func (ae *AccessorExpression) TokenLiteral() string { return ae.Token.Literal }
+func (ae *AccessorExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ae.Left.String())
+	out.WriteString(".")
+	out.WriteString(ae.Index[0].String())
+	for _, i := range ae.Index[1:] {
+		out.WriteString(".")
+		out.WriteString(i.String())
+	}
+	out.WriteString(")")
+
+	return out.String()
+}
+
+type AssignmentStatement struct {
+	Token token.Token
+	Left  Expression
+	Value Expression
+}
+
+func (ae *AssignmentStatement) statementNode()       {}
+func (ae *AssignmentStatement) TokenLiteral() string { return ae.Token.Literal }
+func (ae *AssignmentStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ae.Left.String())
+	out.WriteString(" = ")
+	out.WriteString(ae.Value.String())
+	out.WriteString(";")
 
 	return out.String()
 }

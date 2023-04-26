@@ -22,6 +22,8 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X or !X
 	CALL        // myFunction(X)
+	INDEX       // array[index]
+	ACCESSOR    // a.b
 )
 
 var precedences = map[token.TokenType]int{
@@ -33,7 +35,9 @@ var precedences = map[token.TokenType]int{
 	token.MINUS:    SUM,         // -
 	token.SLASH:    PRODUCT,     // /
 	token.ASTERISK: PRODUCT,     // *
-	token.LPAREN:   CALL,
+	token.LPAREN:   CALL,        // myFunction(X)
+	token.LBRACKET: INDEX,       // array[index]
+	token.ACCESSOR: ACCESSOR,    // a.b
 }
 
 type Parser struct {
@@ -62,13 +66,13 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
+	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.IF, p.parseIfExpression)
-	p.registerPrefix(token.STRING, p.parseStringLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -81,6 +85,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GT, p.parseInfixExpression)
 
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+	p.registerInfix(token.ACCESSOR, p.parseAccessorExpression)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
@@ -128,7 +134,16 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseStructsStatement()
 	}
 
-	return p.parseExpressionStatement()
+	targetExpression := p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.ASSIGN) {
+		return p.parseAssignmentStatement(targetExpression)
+	}
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return &ast.ExpressionStatement{Token: p.curToken, Expression: targetExpression}
 }
 
 // ---------------------- parsers ----------------------
@@ -870,6 +885,67 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 
 func (p *Parser) parseStringLiteral() ast.Expression {
 	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	exp := &ast.IndexExpression{Token: p.curToken, Left: left}
+
+	p.nextToken()
+	exp.Index = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+
+	return exp
+}
+
+func (p *Parser) parseAccessorExpression(left ast.Expression) ast.Expression {
+	exp := &ast.AccessorExpression{Token: p.curToken, Left: left}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+
+	accessors := []ast.Expression{}
+	accessors = append(accessors, &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal})
+
+	for p.peekTokenIs(token.ACCESSOR) {
+		p.nextToken()
+		p.nextToken()
+		accessors = append(accessors, &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal})
+	}
+
+	exp.Index = accessors
+
+	return exp
+}
+
+func (p *Parser) parseAssignmentStatement(exp ast.Expression) *ast.AssignmentStatement {
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	// check if expression is of type accessor or index
+	_, isAccessorExpression := exp.(*ast.AccessorExpression)
+	_, isIndexExpression := exp.(*ast.IndexExpression)
+
+	if !isAccessorExpression && !isIndexExpression {
+		msg := "illegal assignment target"
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	as := &ast.AssignmentStatement{Token: p.curToken, Left: exp}
+
+	p.nextToken()
+	as.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return as
 }
 
 func (p *Parser) defaultValueForType(t token.Token) ast.Expression {

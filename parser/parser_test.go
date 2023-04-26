@@ -101,6 +101,56 @@ func TestVectorStatements(t *testing.T) {
 	}
 }
 
+func TestParsingVectorIndexSetterExpressions(t *testing.T) {
+	input := "x[0] = 5.4;"
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	stmt, ok := program.Statements[0].(*ast.AssignmentStatement)
+	if !ok {
+		t.Fatalf("stmt not *ast.AssignmentStatement. got=%T", program.Statements[0])
+	}
+
+	accessorExp, ok := stmt.Left.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("exp not *ast.AccessorExpression. got=%T", stmt.Left)
+	}
+	if !testIdentifier(t, accessorExp.Left, "x") {
+		return
+	}
+	if !testLiteralExpression(t, accessorExp.Index, 0) {
+		return
+	}
+	if !testLiteralExpression(t, stmt.Value, 5.4) {
+		return
+	}
+}
+
+func TestParsingIndexExpressions(t *testing.T) {
+	input := "myArray[1 + 1]"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+
+	indexExp, ok := stmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("exp not *ast.IndexExpression. got=%T", stmt.Expression)
+	}
+
+	if !testIdentifier(t, indexExp.Left, "myArray") {
+		return
+	}
+
+	if !testInfixExpression(t, indexExp.Index, 1, "+", 1) {
+		return
+	}
+}
+
 func TestStructsDeclaration(t *testing.T) {
 	input := `
 	structs {
@@ -298,6 +348,52 @@ func TestStructsDeclaration(t *testing.T) {
 				t.Errorf("p.IsVector not %t. got=%t", attr.IsVector, a.IsVector)
 			}
 		}
+	}
+}
+
+func TestParsingAccessorExpressions(t *testing.T) {
+	input := "point2D.x"
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+
+	accessorExp, ok := stmt.Expression.(*ast.AccessorExpression)
+	if !ok {
+		t.Fatalf("exp not *ast.AccessorExpression. got=%T", stmt.Expression)
+	}
+	if !testIdentifier(t, accessorExp.Left, "point2D") {
+		return
+	}
+	if !testIdentifier(t, accessorExp.Index[0], "x") {
+		return
+	}
+}
+
+func TestParsingStructAccessorSetterExpressions(t *testing.T) {
+	input := "point2D.x = 5.4;"
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	stmt, ok := program.Statements[0].(*ast.AssignmentStatement)
+	if !ok {
+		t.Fatalf("stmt not *ast.AssignmentStatement. got=%T", program.Statements[0])
+	}
+
+	accessorExp, ok := stmt.Left.(*ast.AccessorExpression)
+	if !ok {
+		t.Fatalf("exp not *ast.AccessorExpression. got=%T", stmt.Left)
+	}
+	if !testIdentifier(t, accessorExp.Left, "point2D") {
+		return
+	}
+	if !testIdentifier(t, accessorExp.Index[0], "x") {
+		return
+	}
+	if !testLiteralExpression(t, stmt.Value, 5.4) {
+		return
 	}
 }
 
@@ -824,6 +920,22 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{
 			"add(a + b + c * d / f + g)",
 			"add((((a + b) + ((c * d) / f)) + g))",
+		},
+		{
+			"a * a[b * c] * d",
+			"((a * (a[(b * c)])) * d)",
+		},
+		{
+			"add(a * b[2], b[1], 2 * a[1])",
+			"add((a * (b[2])), (b[1]), (2 * (a[1])))",
+		},
+		{
+			"a * (z.a) * d",
+			"((a * (z.a)) * d)",
+		},
+		{
+			"add(a * (z.a.b) * (d.a))",
+			"add(((a * (z.a.b)) * (d.a)))",
 		},
 	}
 
