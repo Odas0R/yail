@@ -40,6 +40,8 @@ global { }
 local { }
 const { }
 
+while (x < 5) { }
+
 structs {
 	point2D { float x, y; };
 	pointND { float x[5]; };
@@ -165,6 +167,15 @@ structs {
 		{token.RBRACE, "}"},
 
 		{token.CONST, "const"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
+
+		{token.WHILE, "while"},
+		{token.LPAREN, "("},
+		{token.IDENT, "x"},
+		{token.LT, "<"},
+		{token.INT, "5"},
+		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RBRACE, "}"},
 

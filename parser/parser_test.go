@@ -22,9 +22,9 @@ func TestVariableStatements(t *testing.T) {
 		{"bool k = true;", "bool", "k", true},
 		{"float l = 5.24;", "float", "l", 5.24},
 		{"bool foobar = y;", "bool", "foobar", "y"},
-		{"foobar = 123;", "unknown", "foobar", 123},
-		{"foobar = \"123\";", "unknown", "foobar", "123"},
-		{"foobar = false;", "unknown", "foobar", false},
+		{"foobar = 123;", "", "foobar", 123},
+		{"foobar = \"123\";", "", "foobar", "123"},
+		{"foobar = false;", "", "foobar", false},
 	}
 
 	for _, tt := range tests {
@@ -64,8 +64,8 @@ func TestVectorStatements(t *testing.T) {
 		{"int x[3]={1, 2, 3};", "int", "x", 3, []int64{1, 2, 3}},
 		{"float y[2]={1.2, 2.3};", "float", "y", 2, []float64{1.2, 2.3}},
 		{"int k[]={1,2,3,4,5};", "int", "k", 5, []int64{1, 2, 3, 4, 5}},
-		{"j={1,2,3,4,5};", "unknown", "j", 5, []interface{}{1, 2, 3, 4, 5}},
-		{"z={\"a\",\"b\"};", "unknown", "z", 2, []interface{}{"a", "b"}},
+		{"j={1,2,3,4,5};", "", "j", 5, []interface{}{1, 2, 3, 4, 5}},
+		{"z={\"a\",\"b\"};", "", "z", 2, []interface{}{"a", "b"}},
 	}
 
 	for _, tt := range tests {
@@ -437,7 +437,7 @@ func TestGlobalStatement(t *testing.T) {
 			expectedValue: 5.5,
 		},
 		{
-			expectedType:  "unknown",
+			expectedType:  "",
 			expectedName:  "x",
 			expectedValue: []int{1, 2, 3},
 			expectedSize:  3,
@@ -515,7 +515,7 @@ func TestConstStatement(t *testing.T) {
 			expectedValue: 5.5,
 		},
 		{
-			expectedType:  "unknown",
+			expectedType:  "",
 			expectedName:  "x",
 			expectedValue: []int{1, 2, 3},
 			expectedSize:  3,
@@ -1058,6 +1058,44 @@ func TestIfElseExpression(t *testing.T) {
 	}
 }
 
+func TestWhileStatement(t *testing.T) {
+	input := `while (x < y) { x = 5; }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+	whileStmt, ok := program.Statements[0].(*ast.WhileStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.WhileStatement. got=%T",
+			program.Statements[0])
+	}
+
+	if !testInfixExpression(t, whileStmt.Condition, "x", "<", "y") {
+		return
+	}
+
+	if len(whileStmt.Body.Statements) != 1 {
+		t.Errorf("consequence is not 1 statements. got=%d\n",
+			len(whileStmt.Body.Statements))
+	}
+
+	consequence, ok := whileStmt.Body.Statements[0].(*ast.VariableStatement)
+	if !ok {
+		t.Fatalf("Statements[0] is not ast.VariableStatement. got=%T",
+			whileStmt.Body.Statements[0])
+	}
+
+	if !testIdentifier(t, consequence.Name, "x") {
+		return
+	}
+}
+
 func TestFunctionParameterParsing(t *testing.T) {
 	tests := []struct {
 		input          string
@@ -1243,7 +1281,7 @@ func testVariableStatement(t *testing.T, s ast.Statement, typ string, name strin
 		return false
 	}
 
-	if varStmt.Type.Value == "unknown" {
+	if varStmt.Type.Value == "" {
 		if varStmt.Type.TokenLiteral() != name {
 			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", name, varStmt.Type.TokenLiteral())
 			return false
@@ -1285,7 +1323,7 @@ func testVectorStatement(t *testing.T, s ast.Statement, typ string, name string,
 		return false
 	}
 
-	if vecStmt.Type.Value == "unknown" {
+	if vecStmt.Type.Value == "" {
 		if vecStmt.Type.TokenLiteral() != name {
 			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", name, vecStmt.Type.TokenLiteral())
 			return false

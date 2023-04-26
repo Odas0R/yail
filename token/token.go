@@ -12,10 +12,6 @@ const (
 	BOOL   = "BOOL"  // bool z
 	STRING = "STRING"
 
-	STRUCTS  = "STRUCTS"
-	GLOBAL   = "GLOBAL"
-	LOCAL    = "LOCAL"
-	CONST    = "CONST"
 	ACCESSOR = "."
 
 	// Operators
@@ -45,10 +41,15 @@ const (
 	RBRACKET = "]"
 
 	// Keywords
-	TRUE  = "TRUE"
-	FALSE = "FALSE"
-	IF    = "IF"
-	ELSE  = "ELSE"
+	TRUE    = "TRUE"
+	FALSE   = "FALSE"
+	IF      = "IF"
+	ELSE    = "ELSE"
+	STRUCTS = "STRUCTS"
+	GLOBAL  = "GLOBAL"
+	LOCAL   = "LOCAL"
+	CONST   = "CONST"
+	WHILE   = "WHILE"
 )
 
 type TokenType string
@@ -67,6 +68,7 @@ var keywords = map[string]TokenType{
 	"const":   CONST,
 	"global":  GLOBAL,
 	"local":   LOCAL,
+	"while":   WHILE,
 }
 
 func LookupIdent(ident string) TokenType {

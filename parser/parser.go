@@ -132,6 +132,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseConstStatement()
 	case token.STRUCTS:
 		return p.parseStructsStatement()
+	case token.WHILE:
+		return p.parseWhileStatement()
 	}
 
 	targetExpression := p.parseExpression(LOWEST)
@@ -948,6 +950,29 @@ func (p *Parser) parseAssignmentStatement(exp ast.Expression) *ast.AssignmentSta
 	return as
 }
 
+func (p *Parser) parseWhileStatement() *ast.WhileStatement {
+	ws := &ast.WhileStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	p.nextToken()
+	ws.Condition = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	ws.Body = p.parseBlockStatement()
+
+	return ws
+}
+
 func (p *Parser) defaultValueForType(t token.Token) ast.Expression {
 	switch t.Literal {
 	case "int":
@@ -970,7 +995,7 @@ func (p *Parser) parseType() *ast.Identifier {
 	case "bool":
 		return &ast.Identifier{Token: p.curToken, Value: "bool"}
 	default:
-		return &ast.Identifier{Token: p.curToken, Value: "unknown"}
+		return &ast.Identifier{Token: p.curToken, Value: ""}
 	}
 }
 
