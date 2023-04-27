@@ -1,6 +1,3 @@
-# Programa fatorial, versão não recursiva, não tem estruturas nem variáveis
-# globais
-
 const {
   int max = 100;
 }
@@ -18,7 +15,7 @@ main() bool {
     write("Erro!!!");
   } else {
     write(n, "!=", fact(n));
-    main = true; # altera o valor de retorno da função main
+    main = true;
   }
 }
 
@@ -27,7 +24,7 @@ fact (int n) int {
     int i;
   }
 
-  fact = 1; # valor inicial
+  fact = 1;
 
   for (i,2,n,1) {
     fact *= i;
