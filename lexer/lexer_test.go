@@ -27,6 +27,11 @@ int x[1] = {1};
 +=
 -=
 
+>=
+<=
+or
+and
+
 5 < 10 > 5;
 
 if (5 < 10) {
@@ -46,6 +51,8 @@ local { }
 const { }
 
 while (x < 5) { }
+
+for (i,1,10,1) { }
 
 structs {
 	point2D { float x, y; };
@@ -132,6 +139,11 @@ structs {
 		{token.PLUS_EQ, "+="},
 		{token.MINUS_EQ, "-="},
 
+		{token.GTE, ">="},
+		{token.LTE, "<="},
+		{token.OR, "or"},
+		{token.AND, "and"},
+
 		{token.INT, "5"},
 		{token.LT, "<"},
 		{token.INT, "10"},
@@ -185,6 +197,19 @@ structs {
 		{token.IDENT, "x"},
 		{token.LT, "<"},
 		{token.INT, "5"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
+
+		{token.FOR, "for"},
+		{token.LPAREN, "("},
+		{token.IDENT, "i"},
+		{token.COMMA, ","},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.INT, "10"},
+		{token.COMMA, ","},
+		{token.INT, "1"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RBRACE, "}"},

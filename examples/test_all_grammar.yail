@@ -1,0 +1,78 @@
+int x;
+float x;
+bool x;
+
+int x = 5;
+float x = 5.5;
+bool x = false;
+x = 4;
+x = 2.4;
+x = true;
+
+# vectors
+int x[] = { 1, 2, 3, 4, 5 };
+float x[] = {1.3,1.2};
+bool x[] = {false, true};
+int x[5] = {1,2,3,4,5};
+x = {false, true, false};
+x = {1.2424, 2.12412512, 3.10284091284901824};
+
+const {
+  int y = 5;
+  int y;
+}
+
+global {
+  bool y = false;
+  bool y = true;
+}
+
+structs {
+  point2D { float x, float y; };
+  point3D { float x, y, z; };
+  point4D { float x, y, z, int j; };
+  pointND { float x[]; };
+  pointNDSize { float x[5]; };
+  pointNDSizeM { float x[5], y[2], z[]; };
+}
+
+# initialize the point2D
+point2D p;
+pointNDSize w;
+
+p.x = 2.3;
+p.y = 2.8;
+
+w[0] = 1.2;
+w[1] = 1.2;
+w[2] = 1.2;
+w[3] = 1.2;
+w[4] = 1.2;
+
+w[0]++;
+p.x++;
+x++;
+w[0]--;
+p.x--;
+x--;
+
+w[0] += 1;
+w[0] -= 1;
+
+add(int x, y, z) int {
+  # parse local variables
+  local {
+    float w;
+  }
+
+  # parse if statement :)
+  if (x > y or ((x >= z) and (x <= z))) {
+    add = x + y + z + int64(w);
+  } else {
+    add = x + y + z;
+  }
+
+  while(x > y) {
+    add += 1;
+  }
+}

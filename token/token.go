@@ -23,8 +23,12 @@ const (
 	ASTERISK = "*"
 	SLASH    = "/"
 
-	LT = "<"
-	GT = ">"
+	AND = "AND"
+	OR  = "OR"
+	LT  = "<"
+	LTE = "<="
+	GT  = ">"
+	GTE = ">="
 
 	EQ     = "=="
 	NOT_EQ = "!="
@@ -55,6 +59,7 @@ const (
 	LOCAL   = "LOCAL"
 	CONST   = "CONST"
 	WHILE   = "WHILE"
+	FOR		 = "FOR"
 )
 
 type TokenType string
@@ -74,6 +79,9 @@ var keywords = map[string]TokenType{
 	"global":  GLOBAL,
 	"local":   LOCAL,
 	"while":   WHILE,
+	"and":     AND,
+	"or":      OR,
+	"for":     FOR,
 }
 
 func LookupIdent(ident string) TokenType {

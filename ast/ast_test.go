@@ -158,12 +158,7 @@ func TestStructDefinitionString(t *testing.T) {
 		},
 	}
 
-	want := `structs {
-	point2D { float x, float y; };
-	point3D { float x, float y, float z; };
-	pointND { float x[]; };
-	pointNDSize { float x[5]; };
-}`
+	want := `structs { point2D { float x, float y; }; point3D { float x, float y, float z; }; pointND { float x[]; }; pointNDSize { float x[5]; };}`
 
 	if program.String() != want {
 		t.Errorf("program.String() wrong. got=%q", program.String())

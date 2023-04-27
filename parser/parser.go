@@ -27,17 +27,23 @@ const (
 )
 
 var precedences = map[token.TokenType]int{
-	token.EQ:       EQUALS,      // == and != have the same precedence
-	token.NOT_EQ:   EQUALS,      // == and != have the same precedence
-	token.LT:       LESSGREATER, // <
-	token.GT:       LESSGREATER, // >
-	token.PLUS:     SUM,         // +
-	token.MINUS:    SUM,         // -
-	token.SLASH:    PRODUCT,     // /
-	token.ASTERISK: PRODUCT,     // *
-	token.LPAREN:   CALL,        // myFunction(X)
-	token.LBRACKET: INDEX,       // array[index]
-	token.ACCESSOR: ACCESSOR,    // a.b
+	token.EQ:     EQUALS, // == and != have the same precedence
+	token.NOT_EQ: EQUALS, // == and != have the same precedence
+
+	token.LT:  LESSGREATER, // <
+	token.GT:  LESSGREATER, // >
+	token.LTE: LESSGREATER, // <=
+	token.GTE: LESSGREATER, // >=
+	token.AND: LESSGREATER, // and
+	token.OR:  LESSGREATER, // or
+
+	token.PLUS:     SUM,      // +
+	token.MINUS:    SUM,      // -
+	token.SLASH:    PRODUCT,  // /
+	token.ASTERISK: PRODUCT,  // *
+	token.LPAREN:   CALL,     // myFunction(X)
+	token.LBRACKET: INDEX,    // array[index]
+	token.ACCESSOR: ACCESSOR, // a.b
 }
 
 type Parser struct {
@@ -83,6 +89,11 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+
+	p.registerInfix(token.LTE, p.parseInfixExpression)
+	p.registerInfix(token.GTE, p.parseInfixExpression)
+	p.registerInfix(token.AND, p.parseInfixExpression)
+	p.registerInfix(token.OR, p.parseInfixExpression)
 
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
@@ -134,6 +145,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseStructsStatement()
 	case token.WHILE:
 		return p.parseWhileStatement()
+	case token.FOR:
+		return p.parseForStatement()
 	}
 
 	targetExpression := p.parseExpression(LOWEST)
@@ -985,6 +998,53 @@ func (p *Parser) parseWhileStatement() *ast.WhileStatement {
 	return ws
 }
 
+func (p *Parser) parseForStatement() *ast.ForStatement {
+	fs := &ast.ForStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+
+	fs.Var = p.parseIdentifier()
+
+	if !p.expectPeek(token.COMMA) {
+		return nil
+	}
+	p.nextToken()
+
+	fs.Start = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.COMMA) {
+		return nil
+	}
+	p.nextToken()
+
+	fs.End = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.COMMA) {
+		return nil
+	}
+	p.nextToken()
+
+	fs.Increment = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	fs.Body = p.parseBlockStatement()
+
+	return fs
+}
+
 func (p *Parser) parseIncrementStatement(target ast.Expression) *ast.IncrementStatement {
 	stmt := &ast.IncrementStatement{Token: p.curToken, Var: target}
 	p.nextToken()
@@ -1041,7 +1101,7 @@ func (p *Parser) parseType() *ast.Identifier {
 	case "bool":
 		return &ast.Identifier{Token: p.curToken, Value: "bool"}
 	default:
-		return &ast.Identifier{Token: p.curToken, Value: ""}
+		return &ast.Identifier{Token: p.curToken, Value: "<unknown>"}
 	}
 }
 

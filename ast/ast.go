@@ -2,6 +2,8 @@ package ast
 
 import (
 	"bytes"
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/odas0r/yail/token"
@@ -10,6 +12,7 @@ import (
 type Node interface {
 	TokenLiteral() string
 	String() string
+	StringAST(level int) string
 }
 
 type Statement interface {
@@ -44,6 +47,25 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+// Program
+// |
+// | Statement: VariableStatement
+// | | Expression: Identifier (int)
+// | | Expression: Identifier (myVar)
+// | | Expression: IntegerLiteral (5)
+// ...
+func (p *Program) PrintAST() string {
+	var out bytes.Buffer
+
+	out.WriteString("Program\n")
+
+	for _, s := range p.Statements {
+		out.WriteString(s.StringAST(1))
+	}
+
+	return out.String()
+}
+
 type Identifier struct {
 	Token token.Token // the token.IDENT token
 	Value string
@@ -52,6 +74,16 @@ type Identifier struct {
 func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
+func (i *Identifier) StringAST(level int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", level))
+	out.WriteString("Expression: Identifier (")
+	out.WriteString(i.Value)
+	out.WriteString(")\n")
+
+	return out.String()
+}
 
 type VariableStatement struct {
 	Token token.Token // The token.TYPE_INT, token.TYPE_FLOAT, or token.TYPE_BOOL token
@@ -79,6 +111,36 @@ func (vs *VariableStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
+func (vs *VariableStatement) StringAST(level int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", level))
+	out.WriteString("Statement: VariableStatement\n")
+	out.WriteString(strings.Repeat("| ", level+1))
+	out.WriteString("Token: " + vs.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", level+1))
+	out.WriteString("Expression(Type): Indentifier (")
+	out.WriteString(vs.Type.String())
+	out.WriteString(")\n")
+
+	out.WriteString(strings.Repeat("| ", level+1))
+	out.WriteString("Expression(Name): Identifier (")
+	out.WriteString(vs.Name.String())
+	out.WriteString(")\n")
+
+	out.WriteString(strings.Repeat("| ", level+1))
+	out.WriteString("Expression(Value):")
+
+	if vs.Value != nil {
+		out.WriteString("\n")
+		out.WriteString(vs.Value.StringAST(level + 2))
+	} else {
+		out.WriteString(" <nil>\n")
+	}
+
+	return out.String()
+}
 
 type ExpressionStatement struct {
 	Token      token.Token // the first token of the expression
@@ -94,6 +156,18 @@ func (es *ExpressionStatement) String() string {
 
 	return ""
 }
+func (es *ExpressionStatement) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: ExpressionStatement\n")
+
+	if es.Expression != nil {
+		out.WriteString(es.Expression.StringAST(indent + 1))
+	}
+
+	return out.String()
+}
 
 type IntegerLiteral struct {
 	Token token.Token
@@ -103,6 +177,16 @@ type IntegerLiteral struct {
 func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
+func (il *IntegerLiteral) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: IntegerLiteral (")
+	out.WriteString(il.Token.Literal)
+	out.WriteString(")\n")
+
+	return out.String()
+}
 
 type FloatLiteral struct {
 	Token token.Token
@@ -112,6 +196,16 @@ type FloatLiteral struct {
 func (fl *FloatLiteral) expressionNode()      {}
 func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
 func (fl *FloatLiteral) String() string       { return fl.Token.Literal }
+func (fl *FloatLiteral) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: FloatLiteral (")
+	out.WriteString(fl.Token.Literal)
+	out.WriteString(")\n")
+
+	return out.String()
+}
 
 type VectorStatement struct {
 	Token  token.Token  // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
@@ -150,6 +244,42 @@ func (vs *VectorStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
+func (vs *VectorStatement) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: VectorStatement\n")
+
+	indent++
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression(Type): Indentifier (")
+	out.WriteString(vs.Type.String())
+	out.WriteString(")\n")
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression(Name): Identifier (")
+	out.WriteString(vs.Name.String())
+	out.WriteString(")\n")
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString(fmt.Sprintf("Expression(Size): %T (", vs.Size))
+	if vs.Size != nil {
+		out.WriteString(vs.Size.String())
+	}
+	out.WriteString(")\n")
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression(Values):\n")
+
+	if len(vs.Values) > 0 {
+		for _, value := range vs.Values {
+			out.WriteString(value.StringAST(indent + 1))
+		}
+	}
+
+	return out.String()
+}
 
 type Boolean struct {
 	Token token.Token
@@ -159,6 +289,16 @@ type Boolean struct {
 func (b *Boolean) expressionNode()      {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
 func (b *Boolean) String() string       { return b.Token.Literal }
+func (b *Boolean) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: Boolean (")
+	out.WriteString(b.Token.Literal)
+	out.WriteString(")\n")
+
+	return out.String()
+}
 
 type PrefixExpression struct {
 	Token    token.Token // the prefix token, e.g. !
@@ -175,6 +315,18 @@ func (pe *PrefixExpression) String() string {
 	out.WriteString(pe.Operator)
 	out.WriteString(pe.Right.String())
 	out.WriteString(")")
+
+	return out.String()
+}
+func (pe *PrefixExpression) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: PrefixExpression (")
+	out.WriteString(pe.Operator)
+	out.WriteString(")\n")
+
+	out.WriteString(pe.Right.StringAST(indent + 1))
 
 	return out.String()
 }
@@ -199,6 +351,19 @@ func (ie *InfixExpression) String() string {
 
 	return out.String()
 }
+func (ie *InfixExpression) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: InfixExpression (")
+	out.WriteString(ie.Operator)
+	out.WriteString(")\n")
+
+	out.WriteString(ie.Left.StringAST(indent + 1))
+	out.WriteString(ie.Right.StringAST(indent + 1))
+
+	return out.String()
+}
 
 type BlockStatement struct {
 	Token      token.Token // the '{' token
@@ -212,6 +377,18 @@ func (bs *BlockStatement) String() string {
 
 	for _, s := range bs.Statements {
 		out.WriteString(s.String())
+	}
+
+	return out.String()
+}
+func (bs *BlockStatement) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: BlockStatement\n")
+
+	for _, s := range bs.Statements {
+		out.WriteString(s.StringAST(indent + 1))
 	}
 
 	return out.String()
@@ -241,6 +418,28 @@ func (ie *IfExpression) String() string {
 
 	return out.String()
 }
+func (ie *IfExpression) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: IfExpression\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Condition:\n")
+	out.WriteString(ie.Condition.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Consequence:\n")
+	out.WriteString(ie.Consequence.StringAST(indent + 2))
+
+	if ie.Alternative != nil {
+		out.WriteString(strings.Repeat("| ", indent+1))
+		out.WriteString("Alternative:\n")
+		out.WriteString(ie.Alternative.StringAST(indent + 2))
+	}
+
+	return out.String()
+}
 
 type WhileStatement struct {
 	Token     token.Token // the 'if' token
@@ -258,6 +457,79 @@ func (ws *WhileStatement) String() string {
 	out.WriteString(ws.Condition.String())
 	out.WriteString(" ")
 	out.WriteString(ws.Body.String())
+
+	return out.String()
+}
+func (ws *WhileStatement) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: WhileStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Condition:\n")
+	out.WriteString(ws.Condition.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Body:\n")
+	out.WriteString(ws.Body.StringAST(indent + 2))
+
+	return out.String()
+}
+
+type ForStatement struct {
+	Token     token.Token // the 'if' token
+	Var       Expression
+	Start   Expression
+	End       Expression
+	Increment Expression
+	Body      *BlockStatement
+}
+
+func (fs *ForStatement) statementNode()       {}
+func (fs *ForStatement) TokenLiteral() string { return fs.Token.Literal }
+func (fs *ForStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("for")
+	out.WriteString(" (")
+	out.WriteString(fs.Var.String())
+	out.WriteString(", ")
+	out.WriteString(fs.Start.String())
+	out.WriteString(", ")
+	out.WriteString(fs.End.String())
+	out.WriteString(", ")
+	out.WriteString(fs.Increment.String())
+	out.WriteString(") ")
+	out.WriteString(fs.Body.String())
+
+	return out.String()
+}
+func (fs *ForStatement) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: ForStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Var:\n")
+	out.WriteString(fs.Start.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Initial:\n")
+	out.WriteString(fs.Start.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("End:\n")
+	out.WriteString(fs.End.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Increment:\n")
+	out.WriteString(fs.Increment.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Body:\n")
+	out.WriteString(fs.Body.StringAST(indent + 2))
 
 	return out.String()
 }
@@ -289,6 +561,37 @@ func (a *Attribute) String() string {
 
 	return out.String()
 }
+func (a *Attribute) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: Attribute\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Vector: " + strconv.FormatBool(a.IsVector) + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Type): Identifier (" + a.Type.String() + ")\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Name): Identifier (" + a.Name.String() + ")\n")
+
+	if a.IsVector {
+		if a.Size != nil {
+			out.WriteString(strings.Repeat("| ", indent+1))
+			out.WriteString("Expression(Size):\n")
+			out.WriteString(a.Size.StringAST(indent + 2))
+		}
+	}
+
+	if a.Value != nil {
+		out.WriteString(strings.Repeat("| ", indent+1))
+		out.WriteString("Expression(Value):\n")
+		out.WriteString(a.Value.StringAST(indent + 2))
+	}
+
+	return out.String()
+}
 
 type ReturnType struct {
 	Token    token.Token
@@ -309,6 +612,28 @@ func (rt *ReturnType) String() string {
 			out.WriteString(rt.Size.String())
 		}
 		out.WriteString("]")
+	}
+
+	return out.String()
+}
+func (rt *ReturnType) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Vector: " + strconv.FormatBool(rt.IsVector) + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: ReturnType\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Type): Identifier (" + rt.Type.String() + ")\n")
+
+	if rt.IsVector {
+		if rt.Size != nil {
+			out.WriteString(strings.Repeat("| ", indent+1))
+			out.WriteString("Size:\n")
+			out.WriteString(rt.Size.StringAST(indent + 2))
+		}
 	}
 
 	return out.String()
@@ -336,6 +661,29 @@ func (p *Parameter) String() string {
 			out.WriteString(p.Size.String())
 		}
 		out.WriteString("]")
+	}
+
+	return out.String()
+}
+func (p *Parameter) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: Parameter\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Vector: " + strconv.FormatBool(p.IsVector) + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Type): Identifier (" + p.Type.String() + ")\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Name): Identifier (" + p.Name.String() + ")\n")
+
+	if p.Size != nil {
+		out.WriteString(strings.Repeat("| ", indent+1))
+		out.WriteString("Expression(Size):\n")
+		out.WriteString(p.Size.StringAST(indent + 2))
 	}
 
 	return out.String()
@@ -368,6 +716,29 @@ func (fs *FunctionStatement) String() string {
 
 	return out.String()
 }
+func (fs *FunctionStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: FunctionStatement\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + fs.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Parameters:\n")
+	for _, p := range fs.Parameters {
+		out.WriteString(p.StringAST(indent + 2))
+	}
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("ReturnType:\n")
+	out.WriteString(fs.ReturnType.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Body:\n")
+	out.WriteString(fs.Body.StringAST(indent + 2))
+
+	return out.String()
+}
 
 type CallExpression struct {
 	Token     token.Token // the '(' token
@@ -392,6 +763,23 @@ func (ce *CallExpression) String() string {
 
 	return out.String()
 }
+func (ce *CallExpression) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: CallExpression\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Function:\n")
+	out.WriteString(ce.Function.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Arguments:\n")
+	for _, a := range ce.Arguments {
+		out.WriteString(a.StringAST(indent + 2))
+	}
+
+	return out.String()
+}
 
 type StringLiteral struct {
 	Token token.Token
@@ -401,6 +789,20 @@ type StringLiteral struct {
 func (sl *StringLiteral) expressionNode()      {}
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
+func (sl *StringLiteral) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: StringLiteral\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + sl.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Value: " + sl.Value + "\n")
+
+	return out.String()
+}
 
 // structs {
 //   <struct_name> { <struct_definition> };
@@ -418,12 +820,29 @@ func (sd *StructsStatement) TokenLiteral() string { return sd.Token.Literal }
 func (sd *StructsStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("structs {")
+	out.WriteString("structs { ")
 	for _, str := range sd.Structs {
-		out.WriteString("\n\t")
 		out.WriteString(str.String())
 	}
-	out.WriteString("\n}")
+	out.WriteString(" }")
+
+	return out.String()
+}
+func (sd *StructsStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: StructsStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + sd.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Structs:\n")
+
+	for _, str := range sd.Structs {
+		out.WriteString(str.StringAST(indent + 2))
+	}
 
 	return out.String()
 }
@@ -451,6 +870,24 @@ func (s *Struct) String() string {
 
 	return out.String()
 }
+func (s *Struct) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: Struct\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + s.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Attributes:\n")
+
+	for _, attr := range s.Attributes {
+		out.WriteString(attr.StringAST(indent + 2))
+	}
+
+	return out.String()
+}
 
 type GlobalStatement struct {
 	Token token.Token
@@ -462,12 +899,28 @@ func (gs *GlobalStatement) TokenLiteral() string { return gs.Token.Literal }
 func (gs *GlobalStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("global {")
+	out.WriteString("global { ")
 	for _, v := range gs.Body.Statements {
-		out.WriteString("\n\t")
 		out.WriteString(v.String())
 	}
-	out.WriteString("\n}")
+	out.WriteString(" }")
+
+	return out.String()
+}
+func (gs *GlobalStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: GlobalStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + gs.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Body:\n")
+	for _, v := range gs.Body.Statements {
+		out.WriteString(v.StringAST(indent + 2))
+	}
 
 	return out.String()
 }
@@ -482,12 +935,29 @@ func (cs *ConstStatement) TokenLiteral() string { return cs.Token.Literal }
 func (cs *ConstStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("const {")
+	out.WriteString("const { ")
 	for _, v := range cs.Body.Statements {
-		out.WriteString("\n\t")
 		out.WriteString(v.String())
 	}
-	out.WriteString("\n}")
+	out.WriteString(" }")
+
+	return out.String()
+}
+func (cs *ConstStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: ConstStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + cs.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Body:\n")
+
+	for _, v := range cs.Body.Statements {
+		out.WriteString(v.StringAST(indent + 2))
+	}
 
 	return out.String()
 }
@@ -502,12 +972,29 @@ func (ls *LocalStatement) TokenLiteral() string { return ls.Token.Literal }
 func (ls *LocalStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("local {")
+	out.WriteString("local { ")
 	for _, v := range ls.Body.Statements {
-		out.WriteString("\n\t")
 		out.WriteString(v.String())
 	}
-	out.WriteString("\n}")
+	out.WriteString(" }")
+
+	return out.String()
+}
+func (ls *LocalStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: LocalStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ls.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Body:\n")
+
+	for _, v := range ls.Body.Statements {
+		out.WriteString(v.StringAST(indent + 2))
+	}
 
 	return out.String()
 }
@@ -528,6 +1015,26 @@ func (ie *IndexExpression) String() string {
 	out.WriteString("[")
 	out.WriteString(ie.Index.String())
 	out.WriteString("])")
+
+	return out.String()
+}
+func (ie *IndexExpression) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: IndexExpression\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ie.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Left):\n")
+	out.WriteString(ie.Left.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Index):\n")
+
+	out.WriteString(ie.Index.StringAST(indent + 2))
 
 	return out.String()
 }
@@ -555,6 +1062,24 @@ func (ae *AccessorExpression) String() string {
 
 	return out.String()
 }
+func (ae *AccessorExpression) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: AccessorExpression\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ae.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Left):\n")
+	out.WriteString(ae.Left.StringAST(indent + 2))
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Index):\n")
+	for _, i := range ae.Index {
+		out.WriteString(i.StringAST(indent + 2))
+	}
+
+	return out.String()
+}
 
 type AssignmentStatement struct {
 	Token token.Token
@@ -571,6 +1096,27 @@ func (ae *AssignmentStatement) String() string {
 	out.WriteString(" = ")
 	out.WriteString(ae.Value.String())
 	out.WriteString(";")
+
+	return out.String()
+}
+func (ae *AssignmentStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: AssignmentStatement\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ae.TokenLiteral() + "\n")
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Left):\n")
+
+	out.WriteString(ae.Left.StringAST(indent + 2))
+
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Value):\n")
+
+	out.WriteString(ae.Value.StringAST(indent + 2))
 
 	return out.String()
 }
@@ -591,6 +1137,19 @@ func (is *IncrementStatement) String() string {
 
 	return out.String()
 }
+func (is *IncrementStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: IncrementStatement\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + is.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Var):\n")
+	out.WriteString(is.Var.StringAST(indent + 2))
+
+	return out.String()
+}
 
 type DecrementStatement struct {
 	Token token.Token
@@ -605,6 +1164,19 @@ func (ds *DecrementStatement) String() string {
 	out.WriteString(ds.Var.String())
 	out.WriteString("--")
 	out.WriteString(";")
+
+	return out.String()
+}
+func (ds *DecrementStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: DecrementStatement\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ds.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Var):\n")
+	out.WriteString(ds.Var.StringAST(indent + 2))
 
 	return out.String()
 }
@@ -627,6 +1199,22 @@ func (ps *PlusEqualsStatement) String() string {
 
 	return out.String()
 }
+func (ps *PlusEqualsStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: PlusEqualsStatement\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ps.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Var):\n")
+	out.WriteString(ps.Var.StringAST(indent + 2))
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Quantity):\n")
+	out.WriteString(ps.Quantity.StringAST(indent + 2))
+
+	return out.String()
+}
 
 type MinusEqualsStatement struct {
 	Token    token.Token
@@ -643,6 +1231,22 @@ func (ms *MinusEqualsStatement) String() string {
 	out.WriteString(" -= ")
 	out.WriteString(ms.Quantity.String())
 	out.WriteString(";")
+
+	return out.String()
+}
+func (ms *MinusEqualsStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: MinusEqualsStatement\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + ms.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Var):\n")
+	out.WriteString(ms.Var.StringAST(indent + 2))
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Quantity):\n")
+	out.WriteString(ms.Quantity.StringAST(indent + 2))
 
 	return out.String()
 }

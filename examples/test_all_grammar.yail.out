@@ -1,0 +1,853 @@
+
+========================================= AST =========================================
+
+Program
+| Statement: VariableStatement
+| | Token: int
+| | Expression(Type): Indentifier (int)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: IntegerLiteral (0)
+| Statement: VariableStatement
+| | Token: float
+| | Expression(Type): Indentifier (float)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: FloatLiteral (0)
+| Statement: VariableStatement
+| | Token: bool
+| | Expression(Type): Indentifier (bool)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: Boolean (false)
+| Statement: VariableStatement
+| | Token: int
+| | Expression(Type): Indentifier (int)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: IntegerLiteral (5)
+| Statement: VariableStatement
+| | Token: float
+| | Expression(Type): Indentifier (float)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: FloatLiteral (5.5)
+| Statement: VariableStatement
+| | Token: bool
+| | Expression(Type): Indentifier (bool)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: Boolean (false)
+| Statement: VariableStatement
+| | Token: x
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: IntegerLiteral (4)
+| Statement: VariableStatement
+| | Token: x
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: FloatLiteral (2.4)
+| Statement: VariableStatement
+| | Token: x
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Value):
+| | | Expression: Boolean (true)
+| Statement: VectorStatement
+| | Expression(Type): Indentifier (int)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (5)
+| | Expression(Values):
+| | | Expression: IntegerLiteral (1)
+| | | Expression: IntegerLiteral (2)
+| | | Expression: IntegerLiteral (3)
+| | | Expression: IntegerLiteral (4)
+| | | Expression: IntegerLiteral (5)
+| Statement: VectorStatement
+| | Expression(Type): Indentifier (float)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (2)
+| | Expression(Values):
+| | | Expression: FloatLiteral (1.3)
+| | | Expression: FloatLiteral (1.2)
+| Statement: VectorStatement
+| | Expression(Type): Indentifier (bool)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (2)
+| | Expression(Values):
+| | | Expression: Boolean (false)
+| | | Expression: Boolean (true)
+| Statement: VectorStatement
+| | Expression(Type): Indentifier (int)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (5)
+| | Expression(Values):
+| | | Expression: IntegerLiteral (1)
+| | | Expression: IntegerLiteral (2)
+| | | Expression: IntegerLiteral (3)
+| | | Expression: IntegerLiteral (4)
+| | | Expression: IntegerLiteral (5)
+| Statement: VectorStatement
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (3)
+| | Expression(Values):
+| | | Expression: Boolean (false)
+| | | Expression: Boolean (true)
+| | | Expression: Boolean (false)
+| Statement: VectorStatement
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (3)
+| | Expression(Values):
+| | | Expression: FloatLiteral (1.2424)
+| | | Expression: FloatLiteral (2.12412512)
+| | | Expression: FloatLiteral (3.10284091284901824)
+| Statement: ConstStatement
+| | Token: const
+| | Body:
+| | | Statement: VariableStatement
+| | | | Token: int
+| | | | Expression(Type): Indentifier (int)
+| | | | Expression(Name): Identifier (y)
+| | | | Expression(Value):
+| | | | | Expression: IntegerLiteral (5)
+| | | Statement: VariableStatement
+| | | | Token: int
+| | | | Expression(Type): Indentifier (int)
+| | | | Expression(Name): Identifier (y)
+| | | | Expression(Value):
+| | | | | Expression: IntegerLiteral (0)
+| Statement: GlobalStatement
+| | Token: global
+| | Body:
+| | | Statement: VariableStatement
+| | | | Token: bool
+| | | | Expression(Type): Indentifier (bool)
+| | | | Expression(Name): Identifier (y)
+| | | | Expression(Value):
+| | | | | Expression: Boolean (false)
+| | | Statement: VariableStatement
+| | | | Token: bool
+| | | | Expression(Type): Indentifier (bool)
+| | | | Expression(Name): Identifier (y)
+| | | | Expression(Value):
+| | | | | Expression: Boolean (true)
+| Statement: StructsStatement
+| | Token: structs
+| | Structs:
+| | | Expression: Struct
+| | | | Token: point2D
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (y)
+| | | Expression: Struct
+| | | | Token: point3D
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (y)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (z)
+| | | Expression: Struct
+| | | | Token: point4D
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (y)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (z)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (int)
+| | | | | | Expression(Name): Identifier (j)
+| | | Expression: Struct
+| | | | Token: pointND
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: true
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | | Expression(Size):
+| | | | | | | Expression: IntegerLiteral (1)
+| | | Expression: Struct
+| | | | Token: pointNDSize
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: true
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | | Expression(Size):
+| | | | | | | Expression: IntegerLiteral (5)
+| | | Expression: Struct
+| | | | Token: pointNDSizeM
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: true
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | | Expression(Size):
+| | | | | | | Expression: IntegerLiteral (5)
+| | | | | Expression: Attribute
+| | | | | | Vector: true
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (y)
+| | | | | | Expression(Size):
+| | | | | | | Expression: IntegerLiteral (2)
+| | | | | Expression: Attribute
+| | | | | | Vector: true
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (z)
+| | | | | | Expression(Size):
+| | | | | | | Expression: IntegerLiteral (1)
+| Statement: VariableStatement
+| | Token: point2D
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (p)
+| | Expression(Value): <nil>
+| Statement: VariableStatement
+| | Token: pointNDSize
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (w)
+| | Expression(Value): <nil>
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: AccessorExpression
+| | | | Token: .
+| | | | Expression(Left):
+| | | | | Expression: Identifier (p)
+| | | | Expression(Index):
+| | | | | Expression: Identifier (x)
+| | Expression(Value):
+| | | Expression: FloatLiteral (2.3)
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: AccessorExpression
+| | | | Token: .
+| | | | Expression(Left):
+| | | | | Expression: Identifier (p)
+| | | | Expression(Index):
+| | | | | Expression: Identifier (y)
+| | Expression(Value):
+| | | Expression: FloatLiteral (2.8)
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (0)
+| | Expression(Value):
+| | | Expression: FloatLiteral (1.2)
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (1)
+| | Expression(Value):
+| | | Expression: FloatLiteral (1.2)
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (2)
+| | Expression(Value):
+| | | Expression: FloatLiteral (1.2)
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (3)
+| | Expression(Value):
+| | | Expression: FloatLiteral (1.2)
+| Statement: AssignmentStatement
+| | Token: =
+| | Expression(Left):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (4)
+| | Expression(Value):
+| | | Expression: FloatLiteral (1.2)
+| Statement: IncrementStatement
+| | Token: ++
+| | Expression(Var):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (0)
+| Statement: IncrementStatement
+| | Token: ++
+| | Expression(Var):
+| | | Expression: AccessorExpression
+| | | | Token: .
+| | | | Expression(Left):
+| | | | | Expression: Identifier (p)
+| | | | Expression(Index):
+| | | | | Expression: Identifier (x)
+| Statement: IncrementStatement
+| | Token: ++
+| | Expression(Var):
+| | | Expression: Identifier (x)
+| Statement: DecrementStatement
+| | Token: --
+| | Expression(Var):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (0)
+| Statement: DecrementStatement
+| | Token: --
+| | Expression(Var):
+| | | Expression: AccessorExpression
+| | | | Token: .
+| | | | Expression(Left):
+| | | | | Expression: Identifier (p)
+| | | | Expression(Index):
+| | | | | Expression: Identifier (x)
+| Statement: DecrementStatement
+| | Token: --
+| | Expression(Var):
+| | | Expression: Identifier (x)
+| Statement: PlusEqualsStatement
+| | Token: +=
+| | Expression(Var):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (0)
+| | Expression(Quantity):
+| | | Expression: IntegerLiteral (1)
+| Statement: MinusEqualsStatement
+| | Token: -=
+| | Expression(Var):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (0)
+| | Expression(Quantity):
+| | | Expression: IntegerLiteral (1)
+| Statement: FunctionStatement
+| | Token: add
+| | Parameters:
+| | | Expression: Parameter
+| | | | Vector: false
+| | | | Expression(Type): Identifier (int)
+| | | | Expression(Name): Identifier (x)
+| | | Expression: Parameter
+| | | | Vector: false
+| | | | Expression(Type): Identifier (int)
+| | | | Expression(Name): Identifier (y)
+| | | Expression: Parameter
+| | | | Vector: false
+| | | | Expression(Type): Identifier (int)
+| | | | Expression(Name): Identifier (z)
+| | ReturnType:
+| | | | Vector: false
+| | | Expression: ReturnType
+| | | | Expression(Type): Identifier (int)
+| | Body:
+| | | Statement: BlockStatement
+| | | | Statement: LocalStatement
+| | | | | Token: local
+| | | | | Body:
+| | | | | | Statement: VariableStatement
+| | | | | | | Token: float
+| | | | | | | Expression(Type): Indentifier (float)
+| | | | | | | Expression(Name): Identifier (w)
+| | | | | | | Expression(Value):
+| | | | | | | | Expression: FloatLiteral (0)
+| | | | Statement: ExpressionStatement
+| | | | | Expression: IfExpression
+| | | | | | Condition:
+| | | | | | | Expression: InfixExpression (or)
+| | | | | | | | Expression: InfixExpression (>)
+| | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | Expression: Identifier (y)
+| | | | | | | | Expression: InfixExpression (and)
+| | | | | | | | | Expression: InfixExpression (>=)
+| | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | | Expression: Identifier (z)
+| | | | | | | | | Expression: InfixExpression (<=)
+| | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | | Expression: Identifier (z)
+| | | | | | Consequence:
+| | | | | | | Statement: BlockStatement
+| | | | | | | | Statement: VariableStatement
+| | | | | | | | | Token: add
+| | | | | | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | | | | | Expression(Name): Identifier (add)
+| | | | | | | | | Expression(Value):
+| | | | | | | | | | Expression: InfixExpression (+)
+| | | | | | | | | | | Expression: InfixExpression (+)
+| | | | | | | | | | | | Expression: InfixExpression (+)
+| | | | | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | | | | | Expression: Identifier (y)
+| | | | | | | | | | | | Expression: Identifier (z)
+| | | | | | | | | | | Expression: CallExpression
+| | | | | | | | | | | | Function:
+| | | | | | | | | | | | | Expression: Identifier (int64)
+| | | | | | | | | | | | Arguments:
+| | | | | | | | | | | | | Expression: Identifier (w)
+| | | | | | Alternative:
+| | | | | | | Statement: BlockStatement
+| | | | | | | | Statement: VariableStatement
+| | | | | | | | | Token: add
+| | | | | | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | | | | | Expression(Name): Identifier (add)
+| | | | | | | | | Expression(Value):
+| | | | | | | | | | Expression: InfixExpression (+)
+| | | | | | | | | | | Expression: InfixExpression (+)
+| | | | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | | | | Expression: Identifier (y)
+| | | | | | | | | | | Expression: Identifier (z)
+| | | | Statement: WhileStatement
+| | | | | Condition:
+| | | | | | Expression: InfixExpression (>)
+| | | | | | | Expression: Identifier (x)
+| | | | | | | Expression: Identifier (y)
+| | | | | Body:
+| | | | | | Statement: BlockStatement
+| | | | | | | Statement: PlusEqualsStatement
+| | | | | | | | Token: +=
+| | | | | | | | Expression(Var):
+| | | | | | | | | Expression: Identifier (add)
+| | | | | | | | Expression(Quantity):
+| | | | | | | | | Expression: IntegerLiteral (1)
+
+========================================= TOKENS =========================================
+
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:x}
+{Type:; Literal:;}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:; Literal:;}
+{Type:IDENT Literal:bool}
+{Type:IDENT Literal:x}
+{Type:; Literal:;}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:INT Literal:5}
+{Type:; Literal:;}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:FLOAT Literal:5.5}
+{Type:; Literal:;}
+{Type:IDENT Literal:bool}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:FALSE Literal:false}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:INT Literal:4}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:FLOAT Literal:2.4}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:{ Literal:{}
+{Type:INT Literal:1}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:, Literal:,}
+{Type:INT Literal:3}
+{Type:, Literal:,}
+{Type:INT Literal:4}
+{Type:, Literal:,}
+{Type:INT Literal:5}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:{ Literal:{}
+{Type:FLOAT Literal:1.3}
+{Type:, Literal:,}
+{Type:FLOAT Literal:1.2}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:bool}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:{ Literal:{}
+{Type:FALSE Literal:false}
+{Type:, Literal:,}
+{Type:TRUE Literal:true}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:INT Literal:5}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:{ Literal:{}
+{Type:INT Literal:1}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:, Literal:,}
+{Type:INT Literal:3}
+{Type:, Literal:,}
+{Type:INT Literal:4}
+{Type:, Literal:,}
+{Type:INT Literal:5}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:{ Literal:{}
+{Type:FALSE Literal:false}
+{Type:, Literal:,}
+{Type:TRUE Literal:true}
+{Type:, Literal:,}
+{Type:FALSE Literal:false}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:{ Literal:{}
+{Type:FLOAT Literal:1.2424}
+{Type:, Literal:,}
+{Type:FLOAT Literal:2.12412512}
+{Type:, Literal:,}
+{Type:FLOAT Literal:3.10284091284901824}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:CONST Literal:const}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:y}
+{Type:= Literal:=}
+{Type:INT Literal:5}
+{Type:; Literal:;}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:y}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:GLOBAL Literal:global}
+{Type:{ Literal:{}
+{Type:IDENT Literal:bool}
+{Type:IDENT Literal:y}
+{Type:= Literal:=}
+{Type:FALSE Literal:false}
+{Type:; Literal:;}
+{Type:IDENT Literal:bool}
+{Type:IDENT Literal:y}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:STRUCTS Literal:structs}
+{Type:{ Literal:{}
+{Type:IDENT Literal:point2D}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:y}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:point3D}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:point4D}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:, Literal:,}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:j}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:pointND}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:pointNDSize}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:INT Literal:5}
+{Type:] Literal:]}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:pointNDSizeM}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:[ Literal:[}
+{Type:INT Literal:5}
+{Type:] Literal:]}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:[ Literal:[}
+{Type:INT Literal:2}
+{Type:] Literal:]}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:point2D}
+{Type:IDENT Literal:p}
+{Type:; Literal:;}
+{Type:IDENT Literal:pointNDSize}
+{Type:IDENT Literal:w}
+{Type:; Literal:;}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:FLOAT Literal:2.3}
+{Type:; Literal:;}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:= Literal:=}
+{Type:FLOAT Literal:2.8}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:0}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:FLOAT Literal:1.2}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:1}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:FLOAT Literal:1.2}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:2}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:FLOAT Literal:1.2}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:3}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:FLOAT Literal:1.2}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:4}
+{Type:] Literal:]}
+{Type:= Literal:=}
+{Type:FLOAT Literal:1.2}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:0}
+{Type:] Literal:]}
+{Type:++ Literal:++}
+{Type:; Literal:;}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:++ Literal:++}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:++ Literal:++}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:0}
+{Type:] Literal:]}
+{Type:-- Literal:--}
+{Type:; Literal:;}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:-- Literal:--}
+{Type:; Literal:;}
+{Type:IDENT Literal:x}
+{Type:-- Literal:--}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:0}
+{Type:] Literal:]}
+{Type:+= Literal:+=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:0}
+{Type:] Literal:]}
+{Type:-= Literal:-=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:IDENT Literal:add}
+{Type:( Literal:(}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:) Literal:)}
+{Type:IDENT Literal:int}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:w}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IF Literal:if}
+{Type:( Literal:(}
+{Type:IDENT Literal:x}
+{Type:> Literal:>}
+{Type:IDENT Literal:y}
+{Type:OR Literal:or}
+{Type:( Literal:(}
+{Type:( Literal:(}
+{Type:IDENT Literal:x}
+{Type:>= Literal:>=}
+{Type:IDENT Literal:z}
+{Type:) Literal:)}
+{Type:AND Literal:and}
+{Type:( Literal:(}
+{Type:IDENT Literal:x}
+{Type:<= Literal:<=}
+{Type:IDENT Literal:z}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:add}
+{Type:= Literal:=}
+{Type:IDENT Literal:x}
+{Type:+ Literal:+}
+{Type:IDENT Literal:y}
+{Type:+ Literal:+}
+{Type:IDENT Literal:z}
+{Type:+ Literal:+}
+{Type:IDENT Literal:int64}
+{Type:( Literal:(}
+{Type:IDENT Literal:w}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:ELSE Literal:else}
+{Type:{ Literal:{}
+{Type:IDENT Literal:add}
+{Type:= Literal:=}
+{Type:IDENT Literal:x}
+{Type:+ Literal:+}
+{Type:IDENT Literal:y}
+{Type:+ Literal:+}
+{Type:IDENT Literal:z}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:WHILE Literal:while}
+{Type:( Literal:(}
+{Type:IDENT Literal:x}
+{Type:> Literal:>}
+{Type:IDENT Literal:y}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:add}
+{Type:+= Literal:+=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:} Literal:}}
+{Type:EOF Literal:}

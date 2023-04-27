@@ -1,0 +1,37 @@
+# Programa fatorial, versão não recursiva, não tem estruturas nem variáveis
+# globais
+
+const {
+  int max = 100;
+}
+
+main() bool {
+  local {
+    int n;
+  }
+
+  write("introduza um número entre 0 e ", max);
+
+  n = read();
+
+  if (n > max or n < 0) {
+    write("Erro!!!");
+  } else {
+    write(n, "!=", fact(n));
+    main = true; # altera o valor de retorno da função main
+  }
+}
+
+fact (int n) int {
+  local {
+    int i;
+  }
+
+  fact = 1; # valor inicial
+
+  i = 1;
+  while (i <= n) {
+    fact = fact * i;
+    i = i + 1;
+  }
+}

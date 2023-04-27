@@ -1,0 +1,263 @@
+
+========================================= AST =========================================
+
+Program
+| Statement: ConstStatement
+| | Token: const
+| | Body:
+| | | Statement: VariableStatement
+| | | | Token: int
+| | | | Expression(Type): Indentifier (int)
+| | | | Expression(Name): Identifier (max)
+| | | | Expression(Value):
+| | | | | Expression: IntegerLiteral (100)
+| Statement: FunctionStatement
+| | Token: main
+| | Parameters:
+| | ReturnType:
+| | | | Vector: false
+| | | Expression: ReturnType
+| | | | Expression(Type): Identifier (bool)
+| | Body:
+| | | Statement: BlockStatement
+| | | | Statement: LocalStatement
+| | | | | Token: local
+| | | | | Body:
+| | | | | | Statement: VariableStatement
+| | | | | | | Token: int
+| | | | | | | Expression(Type): Indentifier (int)
+| | | | | | | Expression(Name): Identifier (n)
+| | | | | | | Expression(Value):
+| | | | | | | | Expression: IntegerLiteral (0)
+| | | | Statement: ExpressionStatement
+| | | | | Expression: CallExpression
+| | | | | | Function:
+| | | | | | | Expression: Identifier (write)
+| | | | | | Arguments:
+| | | | | | | Expression: StringLiteral
+| | | | | | | | Token: introduza um número entre 0 e 
+| | | | | | | | Value: introduza um número entre 0 e 
+| | | | | | | Expression: Identifier (max)
+| | | | Statement: VariableStatement
+| | | | | Token: n
+| | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | Expression(Name): Identifier (n)
+| | | | | Expression(Value):
+| | | | | | Expression: CallExpression
+| | | | | | | Function:
+| | | | | | | | Expression: Identifier (read)
+| | | | | | | Arguments:
+| | | | Statement: ExpressionStatement
+| | | | | Expression: IfExpression
+| | | | | | Condition:
+| | | | | | | Expression: InfixExpression (<)
+| | | | | | | | Expression: InfixExpression (or)
+| | | | | | | | | Expression: InfixExpression (>)
+| | | | | | | | | | Expression: Identifier (n)
+| | | | | | | | | | Expression: Identifier (max)
+| | | | | | | | | Expression: Identifier (n)
+| | | | | | | | Expression: IntegerLiteral (0)
+| | | | | | Consequence:
+| | | | | | | Statement: BlockStatement
+| | | | | | | | Statement: ExpressionStatement
+| | | | | | | | | Expression: CallExpression
+| | | | | | | | | | Function:
+| | | | | | | | | | | Expression: Identifier (write)
+| | | | | | | | | | Arguments:
+| | | | | | | | | | | Expression: StringLiteral
+| | | | | | | | | | | | Token: Erro!!!
+| | | | | | | | | | | | Value: Erro!!!
+| | | | | | Alternative:
+| | | | | | | Statement: BlockStatement
+| | | | | | | | Statement: ExpressionStatement
+| | | | | | | | | Expression: CallExpression
+| | | | | | | | | | Function:
+| | | | | | | | | | | Expression: Identifier (write)
+| | | | | | | | | | Arguments:
+| | | | | | | | | | | Expression: Identifier (n)
+| | | | | | | | | | | Expression: StringLiteral
+| | | | | | | | | | | | Token: !=
+| | | | | | | | | | | | Value: !=
+| | | | | | | | | | | Expression: CallExpression
+| | | | | | | | | | | | Function:
+| | | | | | | | | | | | | Expression: Identifier (fact)
+| | | | | | | | | | | | Arguments:
+| | | | | | | | | | | | | Expression: Identifier (n)
+| | | | | | | | Statement: VariableStatement
+| | | | | | | | | Token: main
+| | | | | | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | | | | | Expression(Name): Identifier (main)
+| | | | | | | | | Expression(Value):
+| | | | | | | | | | Expression: Boolean (true)
+| Statement: FunctionStatement
+| | Token: fact
+| | Parameters:
+| | | Expression: Parameter
+| | | | Vector: false
+| | | | Expression(Type): Identifier (int)
+| | | | Expression(Name): Identifier (n)
+| | ReturnType:
+| | | | Vector: false
+| | | Expression: ReturnType
+| | | | Expression(Type): Identifier (int)
+| | Body:
+| | | Statement: BlockStatement
+| | | | Statement: LocalStatement
+| | | | | Token: local
+| | | | | Body:
+| | | | | | Statement: VariableStatement
+| | | | | | | Token: int
+| | | | | | | Expression(Type): Indentifier (int)
+| | | | | | | Expression(Name): Identifier (i)
+| | | | | | | Expression(Value):
+| | | | | | | | Expression: IntegerLiteral (0)
+| | | | Statement: VariableStatement
+| | | | | Token: fact
+| | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | Expression(Name): Identifier (fact)
+| | | | | Expression(Value):
+| | | | | | Expression: IntegerLiteral (1)
+| | | | Statement: VariableStatement
+| | | | | Token: i
+| | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | Expression(Name): Identifier (i)
+| | | | | Expression(Value):
+| | | | | | Expression: IntegerLiteral (1)
+| | | | Statement: WhileStatement
+| | | | | Condition:
+| | | | | | Expression: InfixExpression (<=)
+| | | | | | | Expression: Identifier (i)
+| | | | | | | Expression: Identifier (n)
+| | | | | Body:
+| | | | | | Statement: BlockStatement
+| | | | | | | Statement: VariableStatement
+| | | | | | | | Token: fact
+| | | | | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | | | | Expression(Name): Identifier (fact)
+| | | | | | | | Expression(Value):
+| | | | | | | | | Expression: InfixExpression (*)
+| | | | | | | | | | Expression: Identifier (fact)
+| | | | | | | | | | Expression: Identifier (i)
+| | | | | | | Statement: VariableStatement
+| | | | | | | | Token: i
+| | | | | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | | | | Expression(Name): Identifier (i)
+| | | | | | | | Expression(Value):
+| | | | | | | | | Expression: InfixExpression (+)
+| | | | | | | | | | Expression: Identifier (i)
+| | | | | | | | | | Expression: IntegerLiteral (1)
+
+========================================= TOKENS =========================================
+
+{Type:CONST Literal:const}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:max}
+{Type:= Literal:=}
+{Type:INT Literal:100}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:IDENT Literal:bool}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:n}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:introduza um número entre 0 e }
+{Type:, Literal:,}
+{Type:IDENT Literal:max}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:n}
+{Type:= Literal:=}
+{Type:IDENT Literal:read}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IF Literal:if}
+{Type:( Literal:(}
+{Type:IDENT Literal:n}
+{Type:> Literal:>}
+{Type:IDENT Literal:max}
+{Type:OR Literal:or}
+{Type:IDENT Literal:n}
+{Type:< Literal:<}
+{Type:INT Literal:0}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:Erro!!!}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:ELSE Literal:else}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:IDENT Literal:n}
+{Type:, Literal:,}
+{Type:STRING Literal:!=}
+{Type:, Literal:,}
+{Type:IDENT Literal:fact}
+{Type:( Literal:(}
+{Type:IDENT Literal:n}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:main}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:} Literal:}}
+{Type:IDENT Literal:fact}
+{Type:( Literal:(}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:n}
+{Type:) Literal:)}
+{Type:IDENT Literal:int}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:i}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:fact}
+{Type:= Literal:=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:IDENT Literal:i}
+{Type:= Literal:=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:WHILE Literal:while}
+{Type:( Literal:(}
+{Type:IDENT Literal:i}
+{Type:<= Literal:<=}
+{Type:IDENT Literal:n}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:fact}
+{Type:= Literal:=}
+{Type:IDENT Literal:fact}
+{Type:* Literal:*}
+{Type:IDENT Literal:i}
+{Type:; Literal:;}
+{Type:IDENT Literal:i}
+{Type:= Literal:=}
+{Type:IDENT Literal:i}
+{Type:+ Literal:+}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:} Literal:}}
+{Type:EOF Literal:}
