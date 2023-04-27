@@ -480,7 +480,7 @@ func (ws *WhileStatement) StringAST(indent int) string {
 type ForStatement struct {
 	Token     token.Token // the 'if' token
 	Var       Expression
-	Start   Expression
+	Start     Expression
 	End       Expression
 	Increment Expression
 	Body      *BlockStatement

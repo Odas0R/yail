@@ -463,6 +463,23 @@ Program
 | | | | | | | | | Expression: Identifier (add)
 | | | | | | | | Expression(Quantity):
 | | | | | | | | | Expression: IntegerLiteral (1)
+| | | | Statement: ForStatement
+| | | | | Var:
+| | | | | | Expression: IntegerLiteral (1)
+| | | | | Initial:
+| | | | | | Expression: IntegerLiteral (1)
+| | | | | End:
+| | | | | | Expression: IntegerLiteral (10)
+| | | | | Increment:
+| | | | | | Expression: IntegerLiteral (10)
+| | | | | Body:
+| | | | | | Statement: BlockStatement
+| | | | | | | Statement: MinusEqualsStatement
+| | | | | | | | Token: -=
+| | | | | | | | Expression(Var):
+| | | | | | | | | Expression: Identifier (add)
+| | | | | | | | Expression(Quantity):
+| | | | | | | | | Expression: IntegerLiteral (1)
 
 ========================================= TOKENS =========================================
 
@@ -846,6 +863,22 @@ Program
 {Type:{ Literal:{}
 {Type:IDENT Literal:add}
 {Type:+= Literal:+=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:FOR Literal:for}
+{Type:( Literal:(}
+{Type:IDENT Literal:i}
+{Type:, Literal:,}
+{Type:INT Literal:1}
+{Type:, Literal:,}
+{Type:INT Literal:10}
+{Type:, Literal:,}
+{Type:INT Literal:10}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:add}
+{Type:-= Literal:-=}
 {Type:INT Literal:1}
 {Type:; Literal:;}
 {Type:} Literal:}}
