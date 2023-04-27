@@ -1,0 +1,117 @@
+
+========================================= AST =========================================
+
+Program
+| Statement: StructsStatement
+| | Token: structs
+| | Structs:
+| | | Expression: Struct
+| | | | Token: point3D
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (y)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (z)
+| Statement: FunctionStatement
+| | Token: main
+| | Parameters:
+| | ReturnType:
+| | | | Vector: false
+| | | Expression: ReturnType
+| | | | Expression(Type): Identifier (bool)
+| | Body:
+| | | Statement: BlockStatement
+| | | | Statement: ExpressionStatement
+| | | | | Expression: CallExpression
+| | | | | | Function:
+| | | | | | | Expression: Identifier (write)
+| | | | | | Arguments:
+| | | | | | | Expression: StringLiteral
+| | | | | | | | Token: Introduza os dois cilindros
+| | | | | | | | Value: Introduza os dois cilindros
+| | | | Statement: VariableStatement
+| | | | | Token: c1
+| | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | Expression(Name): Identifier (c1)
+| | | | | Expression(Value):
+| | | | | | Expression: CallExpression
+| | | | | | | Function:
+| | | | | | | | Expression: Identifier (read_all)
+| | | | | | | Arguments:
+| | | | Statement: VariableStatement
+| | | | | Token: c2
+| | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | Expression(Name): Identifier (c2)
+| | | | | Expression(Value):
+| | | | | | Expression: CallExpression
+| | | | | | | Function:
+| | | | | | | | Expression: Identifier (read_all)
+| | | | | | | Arguments:
+| | | | Statement: VariableStatement
+| | | | | Token: main
+| | | | | Expression(Type): Indentifier (<unknown>)
+| | | | | Expression(Name): Identifier (main)
+| | | | | Expression(Value):
+| | | | | | Expression: Boolean (true)
+| Statement: ExpressionStatement
+| | Expression: CallExpression
+| | | Function:
+| | | | Expression: Identifier (main)
+| | | Arguments:
+
+========================================= TOKENS =========================================
+
+{Type:STRUCTS Literal:structs}
+{Type:{ Literal:{}
+{Type:IDENT Literal:point3D}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:IDENT Literal:bool}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:Introduza os dois cilindros}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:c1}
+{Type:= Literal:=}
+{Type:IDENT Literal:read_all}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:c2}
+{Type:= Literal:=}
+{Type:IDENT Literal:read_all}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:main}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:EOF Literal:}

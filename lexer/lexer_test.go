@@ -26,6 +26,7 @@ int x[1] = {1};
 --
 +=
 -=
+*=
 
 >=
 <=
@@ -138,6 +139,7 @@ structs {
 		{token.DECREMENT, "--"},
 		{token.PLUS_EQ, "+="},
 		{token.MINUS_EQ, "-="},
+		{token.MULT_EQ, "*="},
 
 		{token.GTE, ">="},
 		{token.LTE, "<="},

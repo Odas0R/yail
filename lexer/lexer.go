@@ -115,7 +115,14 @@ func (l *Lexer) NextToken() token.Token {
 	case '/':
 		tok = newToken(token.SLASH, l.Ch)
 	case '*':
-		tok = newToken(token.ASTERISK, l.Ch)
+		if l.peekChar() == '=' {
+			ch := l.Ch
+			l.readChar()
+			literal := string(ch) + string(l.Ch)
+			tok = token.Token{Type: token.MULT_EQ, Literal: literal}
+		} else {
+			tok = newToken(token.ASTERISK, l.Ch)
+		}
 	case '<':
 		if l.peekChar() == '=' {
 			ch := l.Ch

@@ -91,6 +91,24 @@ func RunFile(path string) {
 		out.WriteString("\n")
 		printParserErrors(out, p.Errors())
 		out.WriteString("\n")
+
+		// create a new lexer to print the tokens
+		l = lexer.New(string(content))
+
+		out.WriteString("=========================================")
+		out.WriteString(" TOKENS ")
+		out.WriteString("=========================================\n\n")
+		for {
+			tok := l.NextToken()
+			fmt.Fprintf(out, "%+v\n", tok)
+			if tok.Type == token.EOF {
+				break
+			}
+		}
+
+		// print the errors on the console
+		printParserErrors(os.Stderr, p.Errors())
+		os.Exit(1)
 	} else {
 		out.WriteString("\n")
 		out.WriteString(program.PrintAST())
@@ -106,8 +124,6 @@ func RunFile(path string) {
 	for {
 		tok := l.NextToken()
 		fmt.Fprintf(out, "%+v\n", tok)
-		// fmt.Fprintf(out, "{Type:%s, Literal:%s}\n", tok.Type, tok.Literal)
-
 		if tok.Type == token.EOF {
 			break
 		}

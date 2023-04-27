@@ -1,0 +1,14 @@
+structs {
+  point3D {float x, y, z;};
+}
+
+main() bool {
+  local { cylinder c1, c2;};
+  write("Introduza os dois cilindros");
+  c1 = read_all();
+  c2 = read_all();
+  main = true;
+}
+
+main();
+

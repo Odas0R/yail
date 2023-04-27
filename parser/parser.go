@@ -160,6 +160,9 @@ func (p *Parser) parseStatement() ast.Statement {
 	} else if p.peekTokenIs(token.PLUS_EQ) {
 		p.nextToken()
 		return p.parsePlusEqualsStatement(targetExpression)
+	} else if p.peekTokenIs(token.MULT_EQ) {
+		p.nextToken()
+		return p.parseMultEqualsStatement(targetExpression)
 	} else if p.peekTokenIs(token.MINUS_EQ) {
 		p.nextToken()
 		return p.parseMinusEqualsStatement(targetExpression)
@@ -180,130 +183,68 @@ func (p *Parser) parseStatement() ast.Statement {
 // ---------------------- parsers ----------------------
 
 func (p *Parser) parseVariableStatement() ast.Statement {
-	varStmt := &ast.VariableStatement{
-		Token: p.curToken,
-		Type:  p.parseType(),
-	}
 
 	if p.peekTokenIs(token.ASSIGN) {
-		varStmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-		p.nextToken()
+		return p.parseVariableAssignStatment()
+	}
 
-		// VECTOR
-		if p.peekTokenIs(token.LBRACE) {
-			p.nextToken()
-			p.nextToken()
+	var statements []ast.Statement
 
-			vecValues := p.parseExpressionList()
+	curToken := p.curToken
+	curType := p.parseType()
 
-			vecStmt := &ast.VectorStatement{
-				Token:  varStmt.Token,
-				Name:   varStmt.Name,
-				Values: vecValues,
-				Type:   varStmt.Type,
-				Size: &ast.IntegerLiteral{
-					Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vecValues))},
-					Value: int64(len(vecValues)),
-				},
-			}
+	for {
+		// Expect the variable name
+		if !p.expectPeek(token.IDENT) {
+			return nil
+		}
 
-			// Expect the '}' token
-			if !p.expectPeek(token.RBRACE) {
-				return nil
-			}
+		name := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
-			if p.peekTokenIs(token.SEMICOLON) {
-				p.nextToken()
-			}
+		// ----------------
+		// Vector
+		// ----------------
 
-			return vecStmt
+		if p.peekTokenIs(token.LBRACKET) {
+			statements = append(statements, p.parseVectorStatement(curToken, curType, name))
 		} else {
-			// VARIABLE
-			p.nextToken()
 
-			varStmt.Value = p.parseExpression(LOWEST)
+			// ----------------
+			// Variable
+			// ----------------
 
-			// Expect the semicolon
-			if p.peekTokenIs(token.SEMICOLON) {
+			if p.peekTokenIs(token.ASSIGN) {
 				p.nextToken()
-			}
-
-			return varStmt
-		}
-	}
-
-	varStmt.Type = p.parseType()
-
-	// Expect the variable name
-	if !p.expectPeek(token.IDENT) {
-		return nil
-	}
-	varStmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-
-	if p.peekTokenIs(token.LBRACKET) {
-		vecSize := p.parseVectorSize()
-
-		// read the [<expr>] part
-		vecStmt := &ast.VectorStatement{
-			Token: varStmt.Token,
-			Name:  varStmt.Name,
-			Size:  vecSize,
-			Type:  varStmt.Type,
-		}
-
-		if p.peekTokenIs(token.SEMICOLON) {
-			sizeLiteral, ok := vecStmt.Size.(*ast.IntegerLiteral)
-
-			if ok {
-				vecStmt.Values = make([]ast.Expression, sizeLiteral.Value)
-				for i := 0; i < int(sizeLiteral.Value); i++ {
-					vecStmt.Values[i] = p.defaultValueForType(vecStmt.Token)
-				}
-			}
-
-			p.nextToken()
-
-			return vecStmt
-		} else if p.peekTokenIs(token.ASSIGN) {
-			p.nextToken()
-
-			// Expect the '{' token
-			if !p.expectPeek(token.LBRACE) {
-				return nil
-			}
-			p.nextToken()
-
-			vecStmt.Values = p.parseExpressionList()
-
-			// Set the size if it wasn't set before
-			if vecStmt.Size == nil {
-				vecStmt.Size = &ast.IntegerLiteral{
-					Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vecStmt.Values))},
-					Value: int64(len(vecStmt.Values)),
-				}
-			}
-
-			// Expect the '}' token
-			if !p.expectPeek(token.RBRACE) {
-				return nil
-			}
-
-			// Expect the semicolon
-			if p.peekTokenIs(token.SEMICOLON) {
 				p.nextToken()
+
+				expr := p.parseExpression(LOWEST)
+
+				stmt := &ast.VariableStatement{
+					Token: curToken,
+					Name:  name,
+					Type:  curType,
+					Value: expr,
+				}
+
+				statements = append(statements, stmt)
+			} else {
+				stmt := &ast.VariableStatement{
+					Token: curToken,
+					Name:  name,
+					Type:  curType,
+					Value: p.defaultValueForType(curToken),
+				}
+
+				statements = append(statements, stmt)
 			}
-
-			return vecStmt
 		}
-	}
 
-	if p.peekTokenIs(token.ASSIGN) {
-		p.nextToken()
-		p.nextToken()
-
-		varStmt.Value = p.parseExpression(LOWEST)
-	} else {
-		varStmt.Value = p.defaultValueForType(varStmt.Token)
+		// If the next token is a comma, continue parsing additional variable declarations
+		if p.peekTokenIs(token.COMMA) {
+			p.nextToken() // Consume the ',' token
+		} else {
+			break
+		}
 	}
 
 	// Expect the semicolon
@@ -311,7 +252,106 @@ func (p *Parser) parseVariableStatement() ast.Statement {
 		p.nextToken()
 	}
 
-	return varStmt
+	if len(statements) == 1 {
+		return statements[0]
+	} else {
+		return &ast.BlockStatement{Statements: statements}
+	}
+}
+
+func (p *Parser) parseVectorStatement(curToken token.Token, curType *ast.Identifier, name *ast.Identifier) ast.Statement {
+	vecSize := p.parseVectorSize()
+
+	vecStmt := &ast.VectorStatement{
+		Token: curToken,
+		Name:  name,
+		Size:  vecSize,
+		Type:  curType,
+	}
+
+	if !p.peekTokenIs(token.ASSIGN) {
+		sizeLiteral, ok := vecStmt.Size.(*ast.IntegerLiteral)
+		if ok {
+			values := make([]ast.Expression, sizeLiteral.Value)
+			for i := 0; i < int(sizeLiteral.Value); i++ {
+				values[i] = p.defaultValueForType(vecStmt.Token)
+			}
+
+			vecStmt.Values = &ast.VectorLiteral{
+				token.Token{Type: token.LBRACE, Literal: "{"},
+				values,
+			}
+		}
+	} else {
+		p.nextToken()
+
+		// Expect the '{' token
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+		p.nextToken()
+
+		vecStmt.Values = p.parseVectorLiteral()
+
+		// Set the size if it wasn't set before
+		if vl, ok := vecStmt.Values.(*ast.VectorLiteral); ok {
+			vecStmt.Size = &ast.IntegerLiteral{
+				token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Values))},
+				int64(len(vl.Values)),
+			}
+		}
+
+		// Expect the '}' token
+		if !p.expectPeek(token.RBRACE) {
+			return nil
+		}
+	}
+
+	return vecStmt
+}
+
+func (p *Parser) parseVariableAssignStatment() ast.Statement {
+	curToken := p.curToken
+
+	name := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	p.nextToken()
+
+	if p.peekTokenIs(token.LBRACE) {
+		p.nextToken()
+		p.nextToken()
+
+		values := p.parseVectorLiteral()
+
+		if !p.expectPeek(token.RBRACE) {
+			return nil
+		}
+
+		if p.peekTokenIs(token.SEMICOLON) {
+			p.nextToken()
+		}
+
+		return &ast.AssignmentStatement{
+			Token: curToken,
+			Left:  name,
+			Value: values,
+		}
+	} else {
+		p.nextToken()
+
+		value := p.parseExpression(LOWEST)
+
+		// Expect the semicolon
+		if p.peekTokenIs(token.SEMICOLON) {
+			p.nextToken()
+		}
+
+		return &ast.AssignmentStatement{
+			Token: curToken,
+			Left:  name,
+			Value: value,
+		}
+	}
 }
 
 func (p *Parser) parseVectorSize() ast.Expression {
@@ -335,11 +375,12 @@ func (p *Parser) parseVectorSize() ast.Expression {
 	return size
 }
 
-func (p *Parser) parseExpressionList() []ast.Expression {
+func (p *Parser) parseVectorLiteral() ast.Expression {
+	curToken := p.curToken
 	expressions := []ast.Expression{}
 
 	if p.curTokenIs(token.RBRACE) {
-		return expressions
+		return &ast.VectorLiteral{Token: curToken, Values: expressions}
 	}
 
 	expressions = append(expressions, p.parseExpression(LOWEST))
@@ -350,7 +391,7 @@ func (p *Parser) parseExpressionList() []ast.Expression {
 		expressions = append(expressions, p.parseExpression(LOWEST))
 	}
 
-	return expressions
+	return &ast.VectorLiteral{Token: curToken, Values: expressions}
 }
 
 func (p *Parser) parseStructsStatement() *ast.StructsStatement {
@@ -686,14 +727,30 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
 		stmt := p.parseStatement()
 
-		_, isVariable := stmt.(*ast.VariableStatement)
-		_, isVector := stmt.(*ast.VectorStatement)
+		_, isBlock := stmt.(*ast.BlockStatement)
 
-		if !isVariable && !isVector {
-			p.errors = append(p.errors, "only variable declarations are allowed in variable blocks")
+		if isBlock {
+			for _, s := range stmt.(*ast.BlockStatement).Statements {
+				_, isVariable := s.(*ast.VariableStatement)
+				_, isVector := s.(*ast.VectorStatement)
+				_, isAssign := stmt.(*ast.AssignmentStatement)
 
-			p.nextToken()
-			return nil
+				if !isVariable && !isVector && !isAssign {
+					p.errors = append(p.errors, "only variable declarations are allowed in variable blocks")
+					p.nextToken()
+					return nil
+				}
+			}
+		} else {
+			_, isVariable := stmt.(*ast.VariableStatement)
+			_, isVector := stmt.(*ast.VectorStatement)
+			_, isAssign := stmt.(*ast.AssignmentStatement)
+
+			if !isVariable && !isVector && !isAssign {
+				p.errors = append(p.errors, "only variable declarations are allowed in variable blocks")
+				p.nextToken()
+				return nil
+			}
 		}
 
 		if stmt != nil {
@@ -1059,6 +1116,17 @@ func (p *Parser) parseDecrementStatement(target ast.Expression) *ast.DecrementSt
 
 func (p *Parser) parsePlusEqualsStatement(target ast.Expression) *ast.PlusEqualsStatement {
 	stmt := &ast.PlusEqualsStatement{Token: p.curToken, Var: target}
+	p.nextToken()
+	stmt.Quantity = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return stmt
+}
+
+func (p *Parser) parseMultEqualsStatement(target ast.Expression) *ast.MultEqualsStatement {
+	stmt := &ast.MultEqualsStatement{Token: p.curToken, Var: target}
 	p.nextToken()
 	stmt.Quantity = p.parseExpression(LOWEST)
 

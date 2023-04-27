@@ -376,6 +376,17 @@ Program
 | | | | | Expression: IntegerLiteral (0)
 | | Expression(Quantity):
 | | | Expression: IntegerLiteral (1)
+| Statement: MultEqualsStatement
+| | Token: *=
+| | Expression(Var):
+| | | Expression: IndexExpression
+| | | | Token: [
+| | | | Expression(Left):
+| | | | | Expression: Identifier (w)
+| | | | Expression(Index):
+| | | | | Expression: IntegerLiteral (0)
+| | Expression(Quantity):
+| | | Expression: IntegerLiteral (1)
 | Statement: FunctionStatement
 | | Token: add
 | | Parameters:
@@ -789,6 +800,13 @@ Program
 {Type:INT Literal:0}
 {Type:] Literal:]}
 {Type:-= Literal:-=}
+{Type:INT Literal:1}
+{Type:; Literal:;}
+{Type:IDENT Literal:w}
+{Type:[ Literal:[}
+{Type:INT Literal:0}
+{Type:] Literal:]}
+{Type:*= Literal:*=}
 {Type:INT Literal:1}
 {Type:; Literal:;}
 {Type:IDENT Literal:add}

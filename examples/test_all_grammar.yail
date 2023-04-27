@@ -58,6 +58,7 @@ x--;
 
 w[0] += 1;
 w[0] -= 1;
+w[0] *= 1;
 
 add(int x, y, z) int {
   # parse local variables

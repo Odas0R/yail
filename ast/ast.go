@@ -207,12 +207,48 @@ func (fl *FloatLiteral) StringAST(indent int) string {
 	return out.String()
 }
 
+type VectorLiteral struct {
+	Token  token.Token
+	Values []Expression
+}
+
+func (vl *VectorLiteral) expressionNode()      {}
+func (vl *VectorLiteral) TokenLiteral() string { return vl.Token.Literal }
+func (vl *VectorLiteral) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("{")
+	if len(vl.Values) > 0 {
+		for i, value := range vl.Values {
+			out.WriteString(value.String())
+			if i < len(vl.Values)-1 {
+				out.WriteString(", ")
+			}
+		}
+		out.WriteString("}")
+	}
+
+	return out.String()
+}
+func (vl *VectorLiteral) StringAST(indent int) string {
+	var out strings.Builder
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Expression: VectorLiteral\n")
+
+	for _, value := range vl.Values {
+		out.WriteString(value.StringAST(indent + 1))
+	}
+
+	return out.String()
+}
+
 type VectorStatement struct {
-	Token  token.Token  // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
-	Size   Expression   // The size of the vector, can be integer or expression
-	Type   *Identifier  // The type of the vector (e.g., int, float, or bool)
-	Name   *Identifier  // The variable name (e.g., x, y, or z)
-	Values []Expression // The values assigned to the vector, can be nil or an array of expressions
+	Token  token.Token // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
+	Size   Expression  // The size of the vector, can be integer or expression
+	Type   *Identifier // The type of the vector (e.g., int, float, or bool)
+	Name   *Identifier // The variable name (e.g., x, y, or z)
+	Values Expression  // The values assigned to the vector, can be nil or an array of expressions
 }
 
 func (vl *VectorStatement) statementNode()       {}
@@ -229,16 +265,10 @@ func (vs *VectorStatement) String() string {
 	}
 
 	out.WriteString("]")
+	out.WriteString(" = ")
 
-	if len(vs.Values) > 0 {
-		out.WriteString(" = {")
-		for i, value := range vs.Values {
-			out.WriteString(value.String())
-			if i < len(vs.Values)-1 {
-				out.WriteString(", ")
-			}
-		}
-		out.WriteString("}")
+	if vs.Values != nil {
+		out.WriteString(vs.Values.String())
 	}
 
 	out.WriteString(";")
@@ -272,10 +302,11 @@ func (vs *VectorStatement) StringAST(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression(Values):\n")
 
-	if len(vs.Values) > 0 {
-		for _, value := range vs.Values {
-			out.WriteString(value.StringAST(indent + 1))
-		}
+	if vs.Values == nil {
+		out.WriteString(strings.Repeat("| ", indent+1))
+		out.WriteString("nil\n")
+	} else {
+		out.WriteString(vs.Values.StringAST(indent + 1))
 	}
 
 	return out.String()
@@ -1212,6 +1243,41 @@ func (ps *PlusEqualsStatement) StringAST(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Quantity):\n")
 	out.WriteString(ps.Quantity.StringAST(indent + 2))
+
+	return out.String()
+}
+
+type MultEqualsStatement struct {
+	Token    token.Token
+	Var      Expression
+	Quantity Expression
+}
+
+func (mes *MultEqualsStatement) statementNode()       {}
+func (mes *MultEqualsStatement) TokenLiteral() string { return mes.Token.Literal }
+func (mes *MultEqualsStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(mes.Var.String())
+	out.WriteString(" += ")
+	out.WriteString(mes.Quantity.String())
+	out.WriteString(";")
+
+	return out.String()
+}
+func (mes *MultEqualsStatement) StringAST(indent int) string {
+	var out bytes.Buffer
+
+	out.WriteString(strings.Repeat("| ", indent))
+	out.WriteString("Statement: MultEqualsStatement\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Token: " + mes.TokenLiteral() + "\n")
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Var):\n")
+	out.WriteString(mes.Var.StringAST(indent + 2))
+	out.WriteString(strings.Repeat("| ", indent+1))
+	out.WriteString("Expression(Quantity):\n")
+	out.WriteString(mes.Quantity.StringAST(indent + 2))
 
 	return out.String()
 }

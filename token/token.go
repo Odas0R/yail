@@ -37,6 +37,7 @@ const (
 	DECREMENT = "--"
 	PLUS_EQ   = "+="
 	MINUS_EQ  = "-="
+	MULT_EQ   = "*="
 
 	// Delimiters
 	COMMA     = ","
@@ -59,7 +60,7 @@ const (
 	LOCAL   = "LOCAL"
 	CONST   = "CONST"
 	WHILE   = "WHILE"
-	FOR		 = "FOR"
+	FOR     = "FOR"
 )
 
 type TokenType string

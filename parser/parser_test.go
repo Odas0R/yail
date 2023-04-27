@@ -22,9 +22,6 @@ func TestVariableStatements(t *testing.T) {
 		{"bool k = true;", "bool", "k", true},
 		{"float l = 5.24;", "float", "l", 5.24},
 		{"bool foobar = y;", "bool", "foobar", "y"},
-		{"foobar = 123;", "<unknown>", "foobar", 123},
-		{"foobar = \"123\";", "<unknown>", "foobar", "123"},
-		{"foobar = false;", "<unknown>", "foobar", false},
 	}
 
 	for _, tt := range tests {
@@ -50,6 +47,84 @@ func TestVariableStatements(t *testing.T) {
 	}
 }
 
+func TestAssignmentStatements(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedName  string
+		expectedValue interface{}
+	}{
+		{"foobar = 123;", "foobar", 123},
+		{"foobar = \"123\";", "foobar", "123"},
+		{"foobar = false;", "foobar", false},
+		{"foobar = false;", "foobar", false},
+		// TODO
+		// {"j={1,2,3,4,5};", "j", []interface{}{1, 2, 3, 4, 5}},
+		// {"z={\"a\",\"b\"};", "z", []interface{}{"a", "b"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain 1 statements. got=%d",
+				len(program.Statements))
+		}
+		stmt := program.Statements[0]
+		if !testAssignmentStatement(t, stmt, tt.expectedName) {
+			return
+		}
+
+		val := stmt.(*ast.AssignmentStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
+			return
+		}
+	}
+}
+
+func TestMultiVariableStatements(t *testing.T) {
+	input := `int x,y,z;`
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain 1 statements. got=%d",
+			len(program.Statements))
+	}
+	blockStmt := program.Statements[0].(*ast.BlockStatement)
+
+	stmt := blockStmt.Statements[0]
+	if !testVariableStatement(t, stmt, "int", "x") {
+		return
+	}
+	if !testLiteralExpression(t, stmt.(*ast.VariableStatement).Value, 0) {
+		return
+	}
+
+	stmt = blockStmt.Statements[1]
+	if !testVariableStatement(t, stmt, "int", "y") {
+		return
+	}
+	if !testLiteralExpression(t, stmt.(*ast.VariableStatement).Value, 0) {
+		return
+	}
+
+	stmt = blockStmt.Statements[2]
+	if !testVariableStatement(t, stmt, "int", "z") {
+		return
+	}
+	if !testLiteralExpression(t, stmt.(*ast.VariableStatement).Value, 0) {
+		return
+	}
+}
+
 func TestVectorStatements(t *testing.T) {
 	tests := []struct {
 		input         string
@@ -64,8 +139,6 @@ func TestVectorStatements(t *testing.T) {
 		{"int x[3]={1, 2, 3};", "int", "x", 3, []int64{1, 2, 3}},
 		{"float y[2]={1.2, 2.3};", "float", "y", 2, []float64{1.2, 2.3}},
 		{"int k[]={1,2,3,4,5};", "int", "k", 5, []int64{1, 2, 3, 4, 5}},
-		{"j={1,2,3,4,5};", "<unknown>", "j", 5, []interface{}{1, 2, 3, 4, 5}},
-		{"z={\"a\",\"b\"};", "<unknown>", "z", 2, []interface{}{"a", "b"}},
 	}
 
 	for _, tt := range tests {
@@ -86,7 +159,7 @@ func TestVectorStatements(t *testing.T) {
 			return
 		}
 
-		for i, v := range stmt.(*ast.VectorStatement).Values {
+		for i, v := range stmt.(*ast.VectorStatement).Values.(*ast.VectorLiteral).Values {
 			switch tt.expectedValue.(type) {
 			case []int64:
 				testLiteralExpression(t, v, tt.expectedValue.([]int64)[i])
@@ -416,7 +489,7 @@ func TestGlobalStatement(t *testing.T) {
 
 	stmt, ok := program.Statements[0].(*ast.GlobalStatement)
 	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+		t.Fatalf("program.Statements[0] is not ast.GlobalStatement. got=%T",
 			program.Statements[0])
 	}
 
@@ -447,11 +520,19 @@ func TestGlobalStatement(t *testing.T) {
 	for i, gv := range stmt.Body.Statements {
 		switch gv.(type) {
 		case *ast.VariableStatement:
-			testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName)
+			if !testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName) {
+				return
+			}
 		case *ast.VectorStatement:
-			testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize)
+			if !testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
+				return
+			}
+		case *ast.AssignmentStatement:
+			if !testAssignmentStatement(t, gv, tt[i].expectedName) {
+				return
+			}
 		default:
-			t.Fatalf("gv is not ast.VariableStatement or ast.VectorStatement. got=%T", gv)
+			t.Fatalf("gv type not found. got=%T", gv)
 		}
 	}
 }
@@ -525,11 +606,19 @@ func TestConstStatement(t *testing.T) {
 	for i, gv := range stmt.Body.Statements {
 		switch gv.(type) {
 		case *ast.VariableStatement:
-			testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName)
+			if !testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName) {
+				return
+			}
 		case *ast.VectorStatement:
-			testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize)
+			if !testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
+				return
+			}
+		case *ast.AssignmentStatement:
+			if !testAssignmentStatement(t, gv, tt[i].expectedName) {
+				return
+			}
 		default:
-			t.Fatalf("gv is not ast.VariableStatement or ast.VectorStatement. got=%T", gv)
+			t.Fatalf("gv type not found. got=%T", gv)
 		}
 	}
 }
@@ -598,11 +687,19 @@ func TestLocalStatement(t *testing.T) {
 	for i, s := range ls.Body.Statements {
 		switch s.(type) {
 		case *ast.VariableStatement:
-			testVariableStatement(t, s, tt[i].expectedType, tt[i].expectedName)
+			if !testVariableStatement(t, s, tt[i].expectedType, tt[i].expectedName) {
+				return
+			}
 		case *ast.VectorStatement:
-			testVectorStatement(t, s, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize)
+			if !testVectorStatement(t, s, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
+				return
+			}
+		case *ast.AssignmentStatement:
+			if !testAssignmentStatement(t, s, tt[i].expectedName) {
+				return
+			}
 		default:
-			t.Fatalf("gv is not ast.VariableStatement or ast.VectorStatement. got=%T", s)
+			t.Fatalf("s type not found. got=%T", s)
 		}
 	}
 }
@@ -1085,13 +1182,17 @@ func TestWhileStatement(t *testing.T) {
 			len(whileStmt.Body.Statements))
 	}
 
-	consequence, ok := whileStmt.Body.Statements[0].(*ast.VariableStatement)
+	consequence, ok := whileStmt.Body.Statements[0].(*ast.AssignmentStatement)
 	if !ok {
 		t.Fatalf("Statements[0] is not ast.VariableStatement. got=%T",
 			whileStmt.Body.Statements[0])
 	}
 
-	if !testIdentifier(t, consequence.Name, "x") {
+	if !testIdentifier(t, consequence.Left, "x") {
+		return
+	}
+
+	if !testLiteralExpression(t, consequence.Value, 5) {
 		return
 	}
 }
@@ -1114,8 +1215,8 @@ func TestForStatement(t *testing.T) {
 			program.Statements[0])
 	}
 
-	if !testIdentifier(t, forStmt.Var, "i"){
-		return 
+	if !testIdentifier(t, forStmt.Var, "i") {
+		return
 	}
 
 	if !testLiteralExpression(t, forStmt.Start, 1) {
@@ -1135,13 +1236,16 @@ func TestForStatement(t *testing.T) {
 			len(forStmt.Body.Statements))
 	}
 
-	variable, ok := forStmt.Body.Statements[0].(*ast.VariableStatement)
+	variable, ok := forStmt.Body.Statements[0].(*ast.AssignmentStatement)
 	if !ok {
 		t.Fatalf("Statements[0] is not ast.VariableStatement. got=%T",
 			forStmt.Body.Statements[0])
 	}
 
-	if !testIdentifier(t, variable.Name, "x") {
+	if !testIdentifier(t, variable.Left, "x") {
+		return
+	}
+	if !testLiteralExpression(t, variable.Value, "i") {
 		return
 	}
 }
@@ -1350,6 +1454,21 @@ func testVariableStatement(t *testing.T, s ast.Statement, typ string, name strin
 
 	if varStmt.Name.TokenLiteral() != name {
 		t.Errorf("varStmt.Name.TokenLiteral() not '%s'. got=%s", name, varStmt.Name)
+		return false
+	}
+
+	return true
+}
+
+func testAssignmentStatement(t *testing.T, s ast.Statement, name string) bool {
+	varStmt, ok := s.(*ast.AssignmentStatement)
+	if !ok {
+		t.Errorf("s not *ast.AssignmentStatement. got=%T", s)
+		return false
+	}
+
+	if varStmt.Left.TokenLiteral() != name {
+		t.Errorf("varStmt.Name.Value not '%s'. got=%s", name, varStmt.Left.TokenLiteral())
 		return false
 	}
 

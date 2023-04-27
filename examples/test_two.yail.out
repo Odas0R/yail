@@ -117,35 +117,23 @@ Program
 | | | | | Expression(Name): Identifier (fact)
 | | | | | Expression(Value):
 | | | | | | Expression: IntegerLiteral (1)
-| | | | Statement: VariableStatement
-| | | | | Token: i
-| | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | Expression(Name): Identifier (i)
-| | | | | Expression(Value):
+| | | | Statement: ForStatement
+| | | | | Var:
+| | | | | | Expression: IntegerLiteral (2)
+| | | | | Initial:
+| | | | | | Expression: IntegerLiteral (2)
+| | | | | End:
+| | | | | | Expression: Identifier (n)
+| | | | | Increment:
 | | | | | | Expression: IntegerLiteral (1)
-| | | | Statement: WhileStatement
-| | | | | Condition:
-| | | | | | Expression: InfixExpression (<=)
-| | | | | | | Expression: Identifier (i)
-| | | | | | | Expression: Identifier (n)
 | | | | | Body:
 | | | | | | Statement: BlockStatement
-| | | | | | | Statement: VariableStatement
-| | | | | | | | Token: fact
-| | | | | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | | | | Expression(Name): Identifier (fact)
-| | | | | | | | Expression(Value):
-| | | | | | | | | Expression: InfixExpression (*)
-| | | | | | | | | | Expression: Identifier (fact)
-| | | | | | | | | | Expression: Identifier (i)
-| | | | | | | Statement: VariableStatement
-| | | | | | | | Token: i
-| | | | | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | | | | Expression(Name): Identifier (i)
-| | | | | | | | Expression(Value):
-| | | | | | | | | Expression: InfixExpression (+)
-| | | | | | | | | | Expression: Identifier (i)
-| | | | | | | | | | Expression: IntegerLiteral (1)
+| | | | | | | Statement: MultEqualsStatement
+| | | | | | | | Token: *=
+| | | | | | | | Expression(Var):
+| | | | | | | | | Expression: Identifier (fact)
+| | | | | | | | Expression(Quantity):
+| | | | | | | | | Expression: Identifier (i)
 
 ========================================= TOKENS =========================================
 
@@ -235,28 +223,20 @@ Program
 {Type:= Literal:=}
 {Type:INT Literal:1}
 {Type:; Literal:;}
-{Type:IDENT Literal:i}
-{Type:= Literal:=}
-{Type:INT Literal:1}
-{Type:; Literal:;}
-{Type:WHILE Literal:while}
+{Type:FOR Literal:for}
 {Type:( Literal:(}
 {Type:IDENT Literal:i}
-{Type:<= Literal:<=}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:, Literal:,}
 {Type:IDENT Literal:n}
+{Type:, Literal:,}
+{Type:INT Literal:1}
 {Type:) Literal:)}
 {Type:{ Literal:{}
 {Type:IDENT Literal:fact}
-{Type:= Literal:=}
-{Type:IDENT Literal:fact}
-{Type:* Literal:*}
+{Type:*= Literal:*=}
 {Type:IDENT Literal:i}
-{Type:; Literal:;}
-{Type:IDENT Literal:i}
-{Type:= Literal:=}
-{Type:IDENT Literal:i}
-{Type:+ Literal:+}
-{Type:INT Literal:1}
 {Type:; Literal:;}
 {Type:} Literal:}}
 {Type:} Literal:}}

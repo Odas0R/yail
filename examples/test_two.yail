@@ -29,9 +29,7 @@ fact (int n) int {
 
   fact = 1; # valor inicial
 
-  i = 1;
-  while (i <= n) {
-    fact = fact * i;
-    i = i + 1;
+  for (i,2,n,1) {
+    fact *= i;
   }
 }
