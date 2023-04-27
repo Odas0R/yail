@@ -704,6 +704,84 @@ func TestLocalStatement(t *testing.T) {
 	}
 }
 
+func TestLocalBlockStatement(t *testing.T) {
+	input := `add() int {
+	local {
+	  int x = 5;
+		cylinder x,y,z;
+	}
+}`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.FunctionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.FunctionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	tt := []struct {
+		expectedType  string
+		expectedName  string
+		expectedValue interface{}
+		expectedSize  interface{}
+	}{
+		{
+			expectedType:  "int",
+			expectedName:  "x",
+			expectedValue: 5,
+		},
+		{
+			expectedType:  "cylinder",
+			expectedName:  "x",
+			expectedValue: nil,
+		},
+		{
+			expectedType:  "cylinder",
+			expectedName:  "y",
+			expectedValue: nil,
+		},
+		{
+			expectedType:  "cylinder",
+			expectedName:  "z",
+			expectedValue: nil,
+		},
+	}
+
+	ls, ok := stmt.Body.Statements[0].(*ast.LocalStatement)
+	if !ok {
+		t.Fatalf("stmt.Body.Statements[0] is not ast.LocalStatement. got=%T",
+			stmt.Body.Statements[0])
+	}
+
+	fistStmt := ls.Body.Statements[0].(*ast.VariableStatement)
+	if !testVariableStatement(t, fistStmt, tt[0].expectedType, tt[0].expectedName) {
+		return
+	}
+	if !testLiteralExpression(t, fistStmt.Value, tt[0].expectedValue) {
+		return
+	}
+
+	sndStmt := ls.Body.Statements[1].(*ast.BlockStatement)
+	if !testVariableStatement(t, sndStmt.Statements[0], tt[1].expectedType, tt[1].expectedName) {
+		return
+	}
+	if !testVariableStatement(t, sndStmt.Statements[1], tt[2].expectedType, tt[2].expectedName) {
+		return
+	}
+	if !testVariableStatement(t, sndStmt.Statements[2], tt[3].expectedType, tt[3].expectedName) {
+		return
+	}
+}
+
 func TestLocalErrorStatement(t *testing.T) {
 	input := `local {
 	int x = 5;

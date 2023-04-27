@@ -38,22 +38,22 @@ Program
 | | Expression(Name): Identifier (x)
 | | Expression(Value):
 | | | Expression: Boolean (false)
-| Statement: VariableStatement
+| Statement: AssignmentStatement
 | | Token: x
-| | Expression(Type): Indentifier (<unknown>)
-| | Expression(Name): Identifier (x)
+| | Expression(Left):
+| | | Expression: Identifier (x)
 | | Expression(Value):
 | | | Expression: IntegerLiteral (4)
-| Statement: VariableStatement
+| Statement: AssignmentStatement
 | | Token: x
-| | Expression(Type): Indentifier (<unknown>)
-| | Expression(Name): Identifier (x)
+| | Expression(Left):
+| | | Expression: Identifier (x)
 | | Expression(Value):
 | | | Expression: FloatLiteral (2.4)
-| Statement: VariableStatement
+| Statement: AssignmentStatement
 | | Token: x
-| | Expression(Type): Indentifier (<unknown>)
-| | Expression(Name): Identifier (x)
+| | Expression(Left):
+| | | Expression: Identifier (x)
 | | Expression(Value):
 | | | Expression: Boolean (true)
 | Statement: VectorStatement
@@ -61,51 +61,57 @@ Program
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (5)
 | | Expression(Values):
-| | | Expression: IntegerLiteral (1)
-| | | Expression: IntegerLiteral (2)
-| | | Expression: IntegerLiteral (3)
-| | | Expression: IntegerLiteral (4)
-| | | Expression: IntegerLiteral (5)
+| | | Expression: VectorLiteral
+| | | | Expression: IntegerLiteral (1)
+| | | | Expression: IntegerLiteral (2)
+| | | | Expression: IntegerLiteral (3)
+| | | | Expression: IntegerLiteral (4)
+| | | | Expression: IntegerLiteral (5)
 | Statement: VectorStatement
 | | Expression(Type): Indentifier (float)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (2)
 | | Expression(Values):
-| | | Expression: FloatLiteral (1.3)
-| | | Expression: FloatLiteral (1.2)
+| | | Expression: VectorLiteral
+| | | | Expression: FloatLiteral (1.3)
+| | | | Expression: FloatLiteral (1.2)
 | Statement: VectorStatement
 | | Expression(Type): Indentifier (bool)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (2)
 | | Expression(Values):
-| | | Expression: Boolean (false)
-| | | Expression: Boolean (true)
+| | | Expression: VectorLiteral
+| | | | Expression: Boolean (false)
+| | | | Expression: Boolean (true)
 | Statement: VectorStatement
 | | Expression(Type): Indentifier (int)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (5)
 | | Expression(Values):
-| | | Expression: IntegerLiteral (1)
-| | | Expression: IntegerLiteral (2)
-| | | Expression: IntegerLiteral (3)
-| | | Expression: IntegerLiteral (4)
-| | | Expression: IntegerLiteral (5)
-| Statement: VectorStatement
-| | Expression(Type): Indentifier (<unknown>)
-| | Expression(Name): Identifier (x)
-| | Expression(Size): *ast.IntegerLiteral (3)
-| | Expression(Values):
-| | | Expression: Boolean (false)
-| | | Expression: Boolean (true)
-| | | Expression: Boolean (false)
-| Statement: VectorStatement
-| | Expression(Type): Indentifier (<unknown>)
-| | Expression(Name): Identifier (x)
-| | Expression(Size): *ast.IntegerLiteral (3)
-| | Expression(Values):
-| | | Expression: FloatLiteral (1.2424)
-| | | Expression: FloatLiteral (2.12412512)
-| | | Expression: FloatLiteral (3.10284091284901824)
+| | | Expression: VectorLiteral
+| | | | Expression: IntegerLiteral (1)
+| | | | Expression: IntegerLiteral (2)
+| | | | Expression: IntegerLiteral (3)
+| | | | Expression: IntegerLiteral (4)
+| | | | Expression: IntegerLiteral (5)
+| Statement: AssignmentStatement
+| | Token: x
+| | Expression(Left):
+| | | Expression: Identifier (x)
+| | Expression(Value):
+| | | Expression: VectorLiteral
+| | | | Expression: Boolean (false)
+| | | | Expression: Boolean (true)
+| | | | Expression: Boolean (false)
+| Statement: AssignmentStatement
+| | Token: x
+| | Expression(Left):
+| | | Expression: Identifier (x)
+| | Expression(Value):
+| | | Expression: VectorLiteral
+| | | | Expression: FloatLiteral (1.2424)
+| | | | Expression: FloatLiteral (2.12412512)
+| | | | Expression: FloatLiteral (3.10284091284901824)
 | Statement: ConstStatement
 | | Token: const
 | | Body:
@@ -225,12 +231,12 @@ Program
 | | | | | | | Expression: IntegerLiteral (1)
 | Statement: VariableStatement
 | | Token: point2D
-| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Type): Indentifier (point2D)
 | | Expression(Name): Identifier (p)
 | | Expression(Value): <nil>
 | Statement: VariableStatement
 | | Token: pointNDSize
-| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Type): Indentifier (pointNDSize)
 | | Expression(Name): Identifier (w)
 | | Expression(Value): <nil>
 | Statement: AssignmentStatement
@@ -433,10 +439,10 @@ Program
 | | | | | | | | | | Expression: Identifier (z)
 | | | | | | Consequence:
 | | | | | | | Statement: BlockStatement
-| | | | | | | | Statement: VariableStatement
+| | | | | | | | Statement: AssignmentStatement
 | | | | | | | | | Token: add
-| | | | | | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | | | | | Expression(Name): Identifier (add)
+| | | | | | | | | Expression(Left):
+| | | | | | | | | | Expression: Identifier (add)
 | | | | | | | | | Expression(Value):
 | | | | | | | | | | Expression: InfixExpression (+)
 | | | | | | | | | | | Expression: InfixExpression (+)
@@ -451,10 +457,10 @@ Program
 | | | | | | | | | | | | | Expression: Identifier (w)
 | | | | | | Alternative:
 | | | | | | | Statement: BlockStatement
-| | | | | | | | Statement: VariableStatement
+| | | | | | | | Statement: AssignmentStatement
 | | | | | | | | | Token: add
-| | | | | | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | | | | | Expression(Name): Identifier (add)
+| | | | | | | | | Expression(Left):
+| | | | | | | | | | Expression: Identifier (add)
 | | | | | | | | | Expression(Value):
 | | | | | | | | | | Expression: InfixExpression (+)
 | | | | | | | | | | | Expression: InfixExpression (+)

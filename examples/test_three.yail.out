@@ -29,6 +29,20 @@ Program
 | | | | Expression(Type): Identifier (bool)
 | | Body:
 | | | Statement: BlockStatement
+| | | | Statement: LocalStatement
+| | | | | Token: local
+| | | | | Body:
+| | | | | | Statement: BlockStatement
+| | | | | | | Statement: VariableStatement
+| | | | | | | | Token: cylinder
+| | | | | | | | Expression(Type): Indentifier (cylinder)
+| | | | | | | | Expression(Name): Identifier (c1)
+| | | | | | | | Expression(Value): <nil>
+| | | | | | | Statement: VariableStatement
+| | | | | | | | Token: cylinder
+| | | | | | | | Expression(Type): Indentifier (cylinder)
+| | | | | | | | Expression(Name): Identifier (c2)
+| | | | | | | | Expression(Value): <nil>
 | | | | Statement: ExpressionStatement
 | | | | | Expression: CallExpression
 | | | | | | Function:
@@ -37,28 +51,28 @@ Program
 | | | | | | | Expression: StringLiteral
 | | | | | | | | Token: Introduza os dois cilindros
 | | | | | | | | Value: Introduza os dois cilindros
-| | | | Statement: VariableStatement
+| | | | Statement: AssignmentStatement
 | | | | | Token: c1
-| | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | Expression(Name): Identifier (c1)
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (c1)
 | | | | | Expression(Value):
 | | | | | | Expression: CallExpression
 | | | | | | | Function:
 | | | | | | | | Expression: Identifier (read_all)
 | | | | | | | Arguments:
-| | | | Statement: VariableStatement
+| | | | Statement: AssignmentStatement
 | | | | | Token: c2
-| | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | Expression(Name): Identifier (c2)
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (c2)
 | | | | | Expression(Value):
 | | | | | | Expression: CallExpression
 | | | | | | | Function:
 | | | | | | | | Expression: Identifier (read_all)
 | | | | | | | Arguments:
-| | | | Statement: VariableStatement
+| | | | Statement: AssignmentStatement
 | | | | | Token: main
-| | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | Expression(Name): Identifier (main)
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (main)
 | | | | | Expression(Value):
 | | | | | | Expression: Boolean (true)
 | Statement: ExpressionStatement
@@ -88,6 +102,14 @@ Program
 {Type:) Literal:)}
 {Type:IDENT Literal:bool}
 {Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:cylinder}
+{Type:IDENT Literal:c1}
+{Type:, Literal:,}
+{Type:IDENT Literal:c2}
+{Type:; Literal:;}
+{Type:} Literal:}}
 {Type:IDENT Literal:write}
 {Type:( Literal:(}
 {Type:STRING Literal:Introduza os dois cilindros}

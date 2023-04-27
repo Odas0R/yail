@@ -38,10 +38,10 @@ Program
 | | | | | | | | Token: introduza um número entre 0 e 
 | | | | | | | | Value: introduza um número entre 0 e 
 | | | | | | | Expression: Identifier (max)
-| | | | Statement: VariableStatement
+| | | | Statement: AssignmentStatement
 | | | | | Token: n
-| | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | Expression(Name): Identifier (n)
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (n)
 | | | | | Expression(Value):
 | | | | | | Expression: CallExpression
 | | | | | | | Function:
@@ -83,10 +83,10 @@ Program
 | | | | | | | | | | | | | Expression: Identifier (fact)
 | | | | | | | | | | | | Arguments:
 | | | | | | | | | | | | | Expression: Identifier (n)
-| | | | | | | | Statement: VariableStatement
+| | | | | | | | Statement: AssignmentStatement
 | | | | | | | | | Token: main
-| | | | | | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | | | | | Expression(Name): Identifier (main)
+| | | | | | | | | Expression(Left):
+| | | | | | | | | | Expression: Identifier (main)
 | | | | | | | | | Expression(Value):
 | | | | | | | | | | Expression: Boolean (true)
 | Statement: FunctionStatement
@@ -111,10 +111,10 @@ Program
 | | | | | | | Expression(Name): Identifier (i)
 | | | | | | | Expression(Value):
 | | | | | | | | Expression: IntegerLiteral (0)
-| | | | Statement: VariableStatement
+| | | | Statement: AssignmentStatement
 | | | | | Token: fact
-| | | | | Expression(Type): Indentifier (<unknown>)
-| | | | | Expression(Name): Identifier (fact)
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (fact)
 | | | | | Expression(Value):
 | | | | | | Expression: IntegerLiteral (1)
 | | | | Statement: ForStatement

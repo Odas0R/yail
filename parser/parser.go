@@ -278,8 +278,8 @@ func (p *Parser) parseVectorStatement(curToken token.Token, curType *ast.Identif
 			}
 
 			vecStmt.Values = &ast.VectorLiteral{
-				token.Token{Type: token.LBRACE, Literal: "{"},
-				values,
+				Token:  token.Token{Type: token.LBRACE, Literal: "{"},
+				Values: values,
 			}
 		}
 	} else {
@@ -296,8 +296,8 @@ func (p *Parser) parseVectorStatement(curToken token.Token, curType *ast.Identif
 		// Set the size if it wasn't set before
 		if vl, ok := vecStmt.Values.(*ast.VectorLiteral); ok {
 			vecStmt.Size = &ast.IntegerLiteral{
-				token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Values))},
-				int64(len(vl.Values)),
+				Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Values))},
+				Value: int64(len(vl.Values)),
 			}
 		}
 
@@ -1169,7 +1169,10 @@ func (p *Parser) parseType() *ast.Identifier {
 	case "bool":
 		return &ast.Identifier{Token: p.curToken, Value: "bool"}
 	default:
-		return &ast.Identifier{Token: p.curToken, Value: "<unknown>"}
+		if p.peekTokenIs(token.ASSIGN) {
+			return &ast.Identifier{Token: p.curToken, Value: "<unknown>"}
+		}
+		return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 	}
 }
 
