@@ -20,6 +20,21 @@ Program
 | | | | | | Vector: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
+| | | Expression: Struct
+| | | | Token: cylinder
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (point3D)
+| | | | | | Expression(Name): Identifier (base)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (radius)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (point3D)
+| | | | | | Expression(Name): Identifier (height)
 | Statement: FunctionStatement
 | | Token: main
 | | Parameters:
@@ -69,17 +84,91 @@ Program
 | | | | | | | Function:
 | | | | | | | | Expression: Identifier (read_all)
 | | | | | | | Arguments:
+| | | | Statement: ExpressionStatement
+| | | | | Expression: CallExpression
+| | | | | | Function:
+| | | | | | | Expression: Identifier (write)
+| | | | | | Arguments:
+| | | | | | | Expression: StringLiteral
+| | | | | | | | Token: O volume de intersecção entre o cilindro c1 e o cilindro c2 é: 
+| | | | | | | | Value: O volume de intersecção entre o cilindro c1 e o cilindro c2 é: 
+| | | | | | | Expression: CallExpression
+| | | | | | | | Function:
+| | | | | | | | | Expression: Identifier (intersectionVolume)
+| | | | | | | | Arguments:
+| | | | | | | | | Expression: Identifier (c1)
+| | | | | | | | | Expression: Identifier (c2)
 | | | | Statement: AssignmentStatement
 | | | | | Token: main
 | | | | | Expression(Left):
 | | | | | | Expression: Identifier (main)
 | | | | | Expression(Value):
 | | | | | | Expression: Boolean (true)
-| Statement: ExpressionStatement
-| | Expression: CallExpression
-| | | Function:
-| | | | Expression: Identifier (main)
-| | | Arguments:
+| Statement: AssignmentStatement
+| | Token: distance3D
+| | Expression(Left):
+| | | Expression: Identifier (distance3D)
+| | Expression(Value):
+| | | Expression: CallExpression
+| | | | Function:
+| | | | | Expression: Identifier (square_root)
+| | | | Arguments:
+| | | | | Expression: InfixExpression (+)
+| | | | | | Expression: InfixExpression (+)
+| | | | | | | Expression: CallExpression
+| | | | | | | | Function:
+| | | | | | | | | Expression: Identifier (pow)
+| | | | | | | | Arguments:
+| | | | | | | | | Expression: InfixExpression (-)
+| | | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | | Token: .
+| | | | | | | | | | | Expression(Left):
+| | | | | | | | | | | | Expression: Identifier (q)
+| | | | | | | | | | | Expression(Index):
+| | | | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | | Token: .
+| | | | | | | | | | | Expression(Left):
+| | | | | | | | | | | | Expression: Identifier (p)
+| | | | | | | | | | | Expression(Index):
+| | | | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | Expression: IntegerLiteral (2)
+| | | | | | | Expression: CallExpression
+| | | | | | | | Function:
+| | | | | | | | | Expression: Identifier (pow)
+| | | | | | | | Arguments:
+| | | | | | | | | Expression: InfixExpression (-)
+| | | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | | Token: .
+| | | | | | | | | | | Expression(Left):
+| | | | | | | | | | | | Expression: Identifier (q)
+| | | | | | | | | | | Expression(Index):
+| | | | | | | | | | | | Expression: Identifier (y)
+| | | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | | Token: .
+| | | | | | | | | | | Expression(Left):
+| | | | | | | | | | | | Expression: Identifier (p)
+| | | | | | | | | | | Expression(Index):
+| | | | | | | | | | | | Expression: Identifier (y)
+| | | | | | | | | Expression: IntegerLiteral (2)
+| | | | | | Expression: CallExpression
+| | | | | | | Function:
+| | | | | | | | Expression: Identifier (pow)
+| | | | | | | Arguments:
+| | | | | | | | Expression: InfixExpression (-)
+| | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | Token: .
+| | | | | | | | | | Expression(Left):
+| | | | | | | | | | | Expression: Identifier (q)
+| | | | | | | | | | Expression(Index):
+| | | | | | | | | | | Expression: Identifier (z)
+| | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | Token: .
+| | | | | | | | | | Expression(Left):
+| | | | | | | | | | | Expression: Identifier (p)
+| | | | | | | | | | Expression(Index):
+| | | | | | | | | | | Expression: Identifier (z)
+| | | | | | | | Expression: IntegerLiteral (2)
 
 ========================================= TOKENS =========================================
 
@@ -93,6 +182,18 @@ Program
 {Type:IDENT Literal:y}
 {Type:, Literal:,}
 {Type:IDENT Literal:z}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:IDENT Literal:cylinder}
+{Type:{ Literal:{}
+{Type:IDENT Literal:point3D}
+{Type:IDENT Literal:base}
+{Type:, Literal:,}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:radius}
+{Type:, Literal:,}
+{Type:IDENT Literal:height}
 {Type:; Literal:;}
 {Type:} Literal:}}
 {Type:; Literal:;}
@@ -127,13 +228,65 @@ Program
 {Type:( Literal:(}
 {Type:) Literal:)}
 {Type:; Literal:;}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:O volume de intersecção entre o cilindro c1 e o cilindro c2 é: }
+{Type:, Literal:,}
+{Type:IDENT Literal:intersectionVolume}
+{Type:( Literal:(}
+{Type:IDENT Literal:c1}
+{Type:, Literal:,}
+{Type:IDENT Literal:c2}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:; Literal:;}
 {Type:IDENT Literal:main}
 {Type:= Literal:=}
 {Type:TRUE Literal:true}
 {Type:; Literal:;}
 {Type:} Literal:}}
-{Type:IDENT Literal:main}
+{Type:IDENT Literal:distance3D}
+{Type:= Literal:=}
+{Type:IDENT Literal:square_root}
 {Type:( Literal:(}
+{Type:IDENT Literal:pow}
+{Type:( Literal:(}
+{Type:IDENT Literal:q}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:- Literal:-}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:) Literal:)}
+{Type:+ Literal:+}
+{Type:IDENT Literal:pow}
+{Type:( Literal:(}
+{Type:IDENT Literal:q}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:- Literal:-}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:) Literal:)}
+{Type:+ Literal:+}
+{Type:IDENT Literal:pow}
+{Type:( Literal:(}
+{Type:IDENT Literal:q}
+{Type:. Literal:.}
+{Type:IDENT Literal:z}
+{Type:- Literal:-}
+{Type:IDENT Literal:p}
+{Type:. Literal:.}
+{Type:IDENT Literal:z}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:) Literal:)}
 {Type:) Literal:)}
 {Type:; Literal:;}
 {Type:EOF Literal:}
