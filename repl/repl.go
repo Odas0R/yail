@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/odas0r/yail/lexer"
 	"github.com/odas0r/yail/parser"
@@ -20,11 +21,13 @@ const YAIL = `
    ██    ██   ██ ██ ███████ 
 `
 
-const PROMPT = "\n>> "
+const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	var inputLines []string
 
+	fmt.Fprint(out, "\n")
 	for {
 		fmt.Fprint(out, PROMPT)
 		scanned := scanner.Scan()
@@ -33,17 +36,27 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		line := scanner.Text()
-		l := lexer.New(line)
-		p := parser.New(l)
 
-		program := p.ParseProgram()
-		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
-			continue
+		// If an empty line is encountered, parse the accumulated input
+		if line == "" {
+			input := strings.Join(inputLines, "\n")
+			l := lexer.New(input)
+			p := parser.New(l)
+
+			program := p.ParseProgram()
+			if len(p.Errors()) != 0 {
+				printParserErrors(out, p.Errors())
+			} else {
+				io.WriteString(out, program.PrintAST())
+				io.WriteString(out, "\n")
+			}
+
+			// Reset the input lines
+			inputLines = []string{}
+		} else {
+			// Accumulate non-empty lines
+			inputLines = append(inputLines, line)
 		}
-
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
 	}
 }
 
