@@ -1,0 +1,125 @@
+
+========================================= AST =========================================
+
+
+Oh boy! Something clearly went wrong!
+
+parser errors:
+	Line 2: Expected next token to be ;, got } instead
+	Line 4: No prefix parse function for ; found
+	Line 5: No prefix parse function for } found
+	Line 6: Expected next token to be {, got IDENT instead
+	Line 10: No prefix parse function for ) found
+	Line 10: Expected next token to be ), got ; instead
+	Line 16: Expected next token to be {, got LOCAL instead
+	Line 16: No prefix parse function for LOCAL found
+	Line 16: No prefix parse function for { found
+	Line 17: No prefix parse function for } found
+	Line 20: No prefix parse function for } found
+
+========================================= TOKENS =========================================
+
+{Type:STRUCTS Literal:structs}
+{Type:{ Literal:{}
+{Type:IDENT Literal:vector3D}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:} Literal:}}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:IDENT Literal:bool}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:v1}
+{Type:, Literal:,}
+{Type:IDENT Literal:v2}
+{Type:; Literal:;}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:Introduza dois vetores}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:v1}
+{Type:= Literal:=}
+{Type:IDENT Literal:read_all}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:v2}
+{Type:IDENT Literal:read_all}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:O produto escalar dos vetores v1 e v2 é: }
+{Type:, Literal:,}
+{Type:IDENT Literal:dotProduct}
+{Type:( Literal:(}
+{Type:IDENT Literal:v1}
+{Type:, Literal:,}
+{Type:IDENT Literal:v2}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:main}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:dotProduct}
+{Type:( Literal:(}
+{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:v1}
+{Type:, Literal:,}
+{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:v2}
+{Type:) Literal:)}
+{Type:IDENT Literal:float}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:product}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:product}
+{Type:= Literal:=}
+{Type:IDENT Literal:v1}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:* Literal:*}
+{Type:IDENT Literal:v2}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:+ Literal:+}
+{Type:IDENT Literal:v1}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:* Literal:*}
+{Type:IDENT Literal:v2}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:+ Literal:+}
+{Type:IDENT Literal:v1}
+{Type:. Literal:.}
+{Type:IDENT Literal:z}
+{Type:* Literal:*}
+{Type:IDENT Literal:v2}
+{Type:. Literal:.}
+{Type:IDENT Literal:z}
+{Type:; Literal:;}
+{Type:IDENT Literal:dotProduct}
+{Type:= Literal:=}
+{Type:IDENT Literal:product}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:EOF Literal:}

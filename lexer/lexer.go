@@ -13,11 +13,12 @@ type Lexer struct {
 
 	// current char under examination; In order to support UTF-8, Unicode we need
 	// to use a rune instead of a byte.
-	Ch byte
+	Ch   byte
+	Line int // current line number
 }
 
 func New(input string) *Lexer {
-	l := &Lexer{input: input}
+	l := &Lexer{input: input, Line: 1}
 	l.readChar()
 	return l
 }
@@ -43,6 +44,12 @@ func (l *Lexer) readChar() {
 		// Otherwise, read the next character from the input text
 		l.Ch = l.input[l.ReadPosition]
 	}
+
+	// Increment the line number if the current character is a newline
+	if l.Ch == '\n' {
+		l.Line++
+	}
+
 	// Update the Lexer's position and readPosition fields to reflect the new character
 	l.Position = l.ReadPosition
 	l.ReadPosition += 1

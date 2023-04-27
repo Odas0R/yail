@@ -1,0 +1,22 @@
+global {
+  int x = 5;
+}
+
+main() bool {
+  local {
+    int y = 2
+  }
+
+  if (y > x) {
+    write("y número é maior que x!!");
+  } else {
+    if (x == y) {
+      write("y número é igual a x!!");
+    } else {
+      write("y número é menor que x!!");
+    }
+  }
+
+  main = true;
+}
+

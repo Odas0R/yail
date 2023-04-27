@@ -2,15 +2,24 @@
 ========================================= AST =========================================
 
 Program
-| Statement: ConstStatement
-| | Token: const
-| | Body:
-| | | Statement: VariableStatement
-| | | | Token: int
-| | | | Expression(Type): Indentifier (int)
-| | | | Expression(Name): Identifier (max)
-| | | | Expression(Value):
-| | | | | Expression: IntegerLiteral (100)
+| Statement: StructsStatement
+| | Token: structs
+| | Structs:
+| | | Expression: Struct
+| | | | Token: vector3D
+| | | | Attributes:
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (x)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (y)
+| | | | | Expression: Attribute
+| | | | | | Vector: false
+| | | | | | Expression(Type): Identifier (float)
+| | | | | | Expression(Name): Identifier (z)
 | Statement: FunctionStatement
 | | Token: main
 | | Parameters:
@@ -23,126 +32,156 @@ Program
 | | | | Statement: LocalStatement
 | | | | | Token: local
 | | | | | Body:
-| | | | | | Statement: VariableStatement
-| | | | | | | Token: int
-| | | | | | | Expression(Type): Indentifier (int)
-| | | | | | | Expression(Name): Identifier (n)
-| | | | | | | Expression(Value):
-| | | | | | | | Expression: IntegerLiteral (0)
+| | | | | | Statement: BlockStatement
+| | | | | | | Statement: VariableStatement
+| | | | | | | | Token: vector3D
+| | | | | | | | Expression(Type): Indentifier (vector3D)
+| | | | | | | | Expression(Name): Identifier (v1)
+| | | | | | | | Expression(Value): <nil>
+| | | | | | | Statement: VariableStatement
+| | | | | | | | Token: vector3D
+| | | | | | | | Expression(Type): Indentifier (vector3D)
+| | | | | | | | Expression(Name): Identifier (v2)
+| | | | | | | | Expression(Value): <nil>
 | | | | Statement: ExpressionStatement
 | | | | | Expression: CallExpression
 | | | | | | Function:
 | | | | | | | Expression: Identifier (write)
 | | | | | | Arguments:
 | | | | | | | Expression: StringLiteral
-| | | | | | | | Token: introduza um número entre 0 e 
-| | | | | | | | Value: introduza um número entre 0 e 
-| | | | | | | Expression: Identifier (max)
+| | | | | | | | Token: Introduza dois vetores
+| | | | | | | | Value: Introduza dois vetores
 | | | | Statement: AssignmentStatement
-| | | | | Token: n
+| | | | | Token: v1
 | | | | | Expression(Left):
-| | | | | | Expression: Identifier (n)
+| | | | | | Expression: Identifier (v1)
 | | | | | Expression(Value):
 | | | | | | Expression: CallExpression
 | | | | | | | Function:
-| | | | | | | | Expression: Identifier (read)
+| | | | | | | | Expression: Identifier (read_all)
+| | | | | | | Arguments:
+| | | | Statement: AssignmentStatement
+| | | | | Token: v2
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (v2)
+| | | | | Expression(Value):
+| | | | | | Expression: CallExpression
+| | | | | | | Function:
+| | | | | | | | Expression: Identifier (read_all)
 | | | | | | | Arguments:
 | | | | Statement: ExpressionStatement
-| | | | | Expression: IfExpression
-| | | | | | Condition:
-| | | | | | | Expression: InfixExpression (<)
-| | | | | | | | Expression: InfixExpression (or)
-| | | | | | | | | Expression: InfixExpression (>)
-| | | | | | | | | | Expression: Identifier (n)
-| | | | | | | | | | Expression: Identifier (max)
-| | | | | | | | | Expression: Identifier (n)
-| | | | | | | | Expression: IntegerLiteral (0)
-| | | | | | Consequence:
-| | | | | | | Statement: BlockStatement
-| | | | | | | | Statement: ExpressionStatement
-| | | | | | | | | Expression: CallExpression
-| | | | | | | | | | Function:
-| | | | | | | | | | | Expression: Identifier (write)
-| | | | | | | | | | Arguments:
-| | | | | | | | | | | Expression: StringLiteral
-| | | | | | | | | | | | Token: Erro!!!
-| | | | | | | | | | | | Value: Erro!!!
-| | | | | | Alternative:
-| | | | | | | Statement: BlockStatement
-| | | | | | | | Statement: ExpressionStatement
-| | | | | | | | | Expression: CallExpression
-| | | | | | | | | | Function:
-| | | | | | | | | | | Expression: Identifier (write)
-| | | | | | | | | | Arguments:
-| | | | | | | | | | | Expression: Identifier (n)
-| | | | | | | | | | | Expression: StringLiteral
-| | | | | | | | | | | | Token: !=
-| | | | | | | | | | | | Value: !=
-| | | | | | | | | | | Expression: CallExpression
-| | | | | | | | | | | | Function:
-| | | | | | | | | | | | | Expression: Identifier (fact)
-| | | | | | | | | | | | Arguments:
-| | | | | | | | | | | | | Expression: Identifier (n)
-| | | | | | | | Statement: AssignmentStatement
-| | | | | | | | | Token: main
-| | | | | | | | | Expression(Left):
-| | | | | | | | | | Expression: Identifier (main)
-| | | | | | | | | Expression(Value):
-| | | | | | | | | | Expression: Boolean (true)
+| | | | | Expression: CallExpression
+| | | | | | Function:
+| | | | | | | Expression: Identifier (write)
+| | | | | | Arguments:
+| | | | | | | Expression: StringLiteral
+| | | | | | | | Token: O produto escalar dos vetores v1 e v2 é: 
+| | | | | | | | Value: O produto escalar dos vetores v1 e v2 é: 
+| | | | | | | Expression: CallExpression
+| | | | | | | | Function:
+| | | | | | | | | Expression: Identifier (dotProduct)
+| | | | | | | | Arguments:
+| | | | | | | | | Expression: Identifier (v1)
+| | | | | | | | | Expression: Identifier (v2)
+| | | | Statement: AssignmentStatement
+| | | | | Token: main
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (main)
+| | | | | Expression(Value):
+| | | | | | Expression: Boolean (true)
 | Statement: FunctionStatement
-| | Token: fact
+| | Token: dotProduct
 | | Parameters:
 | | | Expression: Parameter
 | | | | Vector: false
-| | | | Expression(Type): Identifier (int)
-| | | | Expression(Name): Identifier (n)
+| | | | Expression(Type): Identifier (vector3D)
+| | | | Expression(Name): Identifier (v1)
+| | | Expression: Parameter
+| | | | Vector: false
+| | | | Expression(Type): Identifier (vector3D)
+| | | | Expression(Name): Identifier (v2)
 | | ReturnType:
 | | | | Vector: false
 | | | Expression: ReturnType
-| | | | Expression(Type): Identifier (int)
+| | | | Expression(Type): Identifier (float)
 | | Body:
 | | | Statement: BlockStatement
 | | | | Statement: LocalStatement
 | | | | | Token: local
 | | | | | Body:
 | | | | | | Statement: VariableStatement
-| | | | | | | Token: int
-| | | | | | | Expression(Type): Indentifier (int)
-| | | | | | | Expression(Name): Identifier (i)
+| | | | | | | Token: float
+| | | | | | | Expression(Type): Indentifier (float)
+| | | | | | | Expression(Name): Identifier (product)
 | | | | | | | Expression(Value):
-| | | | | | | | Expression: IntegerLiteral (0)
+| | | | | | | | Expression: FloatLiteral (0)
 | | | | Statement: AssignmentStatement
-| | | | | Token: fact
+| | | | | Token: product
 | | | | | Expression(Left):
-| | | | | | Expression: Identifier (fact)
+| | | | | | Expression: Identifier (product)
 | | | | | Expression(Value):
-| | | | | | Expression: IntegerLiteral (1)
-| | | | Statement: ForStatement
-| | | | | Var:
-| | | | | | Expression: IntegerLiteral (2)
-| | | | | Initial:
-| | | | | | Expression: IntegerLiteral (2)
-| | | | | End:
-| | | | | | Expression: Identifier (n)
-| | | | | Increment:
-| | | | | | Expression: IntegerLiteral (1)
-| | | | | Body:
-| | | | | | Statement: BlockStatement
-| | | | | | | Statement: MultEqualsStatement
-| | | | | | | | Token: *=
-| | | | | | | | Expression(Var):
-| | | | | | | | | Expression: Identifier (fact)
-| | | | | | | | Expression(Quantity):
-| | | | | | | | | Expression: Identifier (i)
+| | | | | | Expression: InfixExpression (+)
+| | | | | | | Expression: InfixExpression (+)
+| | | | | | | | Expression: InfixExpression (*)
+| | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | Token: .
+| | | | | | | | | | Expression(Left):
+| | | | | | | | | | | Expression: Identifier (v1)
+| | | | | | | | | | Expression(Index):
+| | | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | Token: .
+| | | | | | | | | | Expression(Left):
+| | | | | | | | | | | Expression: Identifier (v2)
+| | | | | | | | | | Expression(Index):
+| | | | | | | | | | | Expression: Identifier (x)
+| | | | | | | | Expression: InfixExpression (*)
+| | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | Token: .
+| | | | | | | | | | Expression(Left):
+| | | | | | | | | | | Expression: Identifier (v1)
+| | | | | | | | | | Expression(Index):
+| | | | | | | | | | | Expression: Identifier (y)
+| | | | | | | | | Expression: AccessorExpression
+| | | | | | | | | | Token: .
+| | | | | | | | | | Expression(Left):
+| | | | | | | | | | | Expression: Identifier (v2)
+| | | | | | | | | | Expression(Index):
+| | | | | | | | | | | Expression: Identifier (y)
+| | | | | | | Expression: InfixExpression (*)
+| | | | | | | | Expression: AccessorExpression
+| | | | | | | | | Token: .
+| | | | | | | | | Expression(Left):
+| | | | | | | | | | Expression: Identifier (v1)
+| | | | | | | | | Expression(Index):
+| | | | | | | | | | Expression: Identifier (z)
+| | | | | | | | Expression: AccessorExpression
+| | | | | | | | | Token: .
+| | | | | | | | | Expression(Left):
+| | | | | | | | | | Expression: Identifier (v2)
+| | | | | | | | | Expression(Index):
+| | | | | | | | | | Expression: Identifier (z)
+| | | | Statement: AssignmentStatement
+| | | | | Token: dotProduct
+| | | | | Expression(Left):
+| | | | | | Expression: Identifier (dotProduct)
+| | | | | Expression(Value):
+| | | | | | Expression: Identifier (product)
 
 ========================================= TOKENS =========================================
 
-{Type:CONST Literal:const}
+{Type:STRUCTS Literal:structs}
 {Type:{ Literal:{}
-{Type:IDENT Literal:int}
-{Type:IDENT Literal:max}
-{Type:= Literal:=}
-{Type:INT Literal:100}
+{Type:IDENT Literal:vector3D}
+{Type:{ Literal:{}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:x}
+{Type:, Literal:,}
+{Type:IDENT Literal:y}
+{Type:, Literal:,}
+{Type:IDENT Literal:z}
+{Type:; Literal:;}
+{Type:} Literal:}}
 {Type:; Literal:;}
 {Type:} Literal:}}
 {Type:IDENT Literal:main}
@@ -152,51 +191,38 @@ Program
 {Type:{ Literal:{}
 {Type:LOCAL Literal:local}
 {Type:{ Literal:{}
-{Type:IDENT Literal:int}
-{Type:IDENT Literal:n}
+{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:v1}
+{Type:, Literal:,}
+{Type:IDENT Literal:v2}
 {Type:; Literal:;}
 {Type:} Literal:}}
 {Type:IDENT Literal:write}
 {Type:( Literal:(}
-{Type:STRING Literal:introduza um número entre 0 e }
-{Type:, Literal:,}
-{Type:IDENT Literal:max}
+{Type:STRING Literal:Introduza dois vetores}
 {Type:) Literal:)}
 {Type:; Literal:;}
-{Type:IDENT Literal:n}
+{Type:IDENT Literal:v1}
 {Type:= Literal:=}
-{Type:IDENT Literal:read}
+{Type:IDENT Literal:read_all}
 {Type:( Literal:(}
 {Type:) Literal:)}
 {Type:; Literal:;}
-{Type:IF Literal:if}
+{Type:IDENT Literal:v2}
+{Type:= Literal:=}
+{Type:IDENT Literal:read_all}
 {Type:( Literal:(}
-{Type:IDENT Literal:n}
-{Type:> Literal:>}
-{Type:IDENT Literal:max}
-{Type:OR Literal:or}
-{Type:IDENT Literal:n}
-{Type:< Literal:<}
-{Type:INT Literal:0}
-{Type:) Literal:)}
-{Type:{ Literal:{}
-{Type:IDENT Literal:write}
-{Type:( Literal:(}
-{Type:STRING Literal:Erro!!!}
 {Type:) Literal:)}
 {Type:; Literal:;}
-{Type:} Literal:}}
-{Type:ELSE Literal:else}
-{Type:{ Literal:{}
 {Type:IDENT Literal:write}
 {Type:( Literal:(}
-{Type:IDENT Literal:n}
+{Type:STRING Literal:O produto escalar dos vetores v1 e v2 é: }
 {Type:, Literal:,}
-{Type:STRING Literal:!=}
-{Type:, Literal:,}
-{Type:IDENT Literal:fact}
+{Type:IDENT Literal:dotProduct}
 {Type:( Literal:(}
-{Type:IDENT Literal:n}
+{Type:IDENT Literal:v1}
+{Type:, Literal:,}
+{Type:IDENT Literal:v2}
 {Type:) Literal:)}
 {Type:) Literal:)}
 {Type:; Literal:;}
@@ -205,39 +231,51 @@ Program
 {Type:TRUE Literal:true}
 {Type:; Literal:;}
 {Type:} Literal:}}
-{Type:} Literal:}}
-{Type:IDENT Literal:fact}
+{Type:IDENT Literal:dotProduct}
 {Type:( Literal:(}
-{Type:IDENT Literal:int}
-{Type:IDENT Literal:n}
+{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:v1}
+{Type:, Literal:,}
+{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:v2}
 {Type:) Literal:)}
-{Type:IDENT Literal:int}
+{Type:IDENT Literal:float}
 {Type:{ Literal:{}
 {Type:LOCAL Literal:local}
 {Type:{ Literal:{}
-{Type:IDENT Literal:int}
-{Type:IDENT Literal:i}
+{Type:IDENT Literal:float}
+{Type:IDENT Literal:product}
 {Type:; Literal:;}
 {Type:} Literal:}}
-{Type:IDENT Literal:fact}
+{Type:IDENT Literal:product}
 {Type:= Literal:=}
-{Type:INT Literal:1}
+{Type:IDENT Literal:v1}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:* Literal:*}
+{Type:IDENT Literal:v2}
+{Type:. Literal:.}
+{Type:IDENT Literal:x}
+{Type:+ Literal:+}
+{Type:IDENT Literal:v1}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:* Literal:*}
+{Type:IDENT Literal:v2}
+{Type:. Literal:.}
+{Type:IDENT Literal:y}
+{Type:+ Literal:+}
+{Type:IDENT Literal:v1}
+{Type:. Literal:.}
+{Type:IDENT Literal:z}
+{Type:* Literal:*}
+{Type:IDENT Literal:v2}
+{Type:. Literal:.}
+{Type:IDENT Literal:z}
 {Type:; Literal:;}
-{Type:FOR Literal:for}
-{Type:( Literal:(}
-{Type:IDENT Literal:i}
-{Type:, Literal:,}
-{Type:INT Literal:2}
-{Type:, Literal:,}
-{Type:IDENT Literal:n}
-{Type:, Literal:,}
-{Type:INT Literal:1}
-{Type:) Literal:)}
-{Type:{ Literal:{}
-{Type:IDENT Literal:fact}
-{Type:*= Literal:*=}
-{Type:IDENT Literal:i}
+{Type:IDENT Literal:dotProduct}
+{Type:= Literal:=}
+{Type:IDENT Literal:product}
 {Type:; Literal:;}
-{Type:} Literal:}}
 {Type:} Literal:}}
 {Type:EOF Literal:}

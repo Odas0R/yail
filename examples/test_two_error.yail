@@ -1,17 +1,17 @@
 structs {
-  vector3D {float x, y, z;};
+  vector3D {float x, y, z}; # Missing ";" at the end of the struct definition
 }
 
 main() bool {
-  local {vector3D v1, v2;}
+  local vector3D v1, v2; # Missing curly braces for the local scope
   write("Introduza dois vetores");
   v1 = read_all();
-  v2 = read_all();
+  v2 read_all(); # Expected token '=' instead got '('
   write("O produto escalar dos vetores v1 e v2 é: ", dotProduct(v1, v2));
   main = true;
 }
 
-dotProduct(vector3D v1, vector3D v2) float {
+dotProduct(vector3D v1, vector3D v2) float # Expected '{' token
   local {float product;}
   product = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
   dotProduct = product;

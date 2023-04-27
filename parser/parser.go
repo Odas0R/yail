@@ -129,10 +129,10 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.IDENT:
 		if p.peekTokenIs(token.LPAREN) { // FUNCTION
-			if p.isNextTokenCallExpression() {
-				return p.parseExpressionStatement()
-			} else {
+			if p.isNextTokenFunctionStatement() {
 				return p.parseFunctionStatement()
+			} else {
+				return p.parseExpressionStatement()
 			}
 		} else if p.peekTokenIs(token.IDENT) || p.peekTokenIs(token.ASSIGN) { // VARIABLE
 			return p.parseVariableStatement()
@@ -683,24 +683,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	p.nextToken()
 
 	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
-		stmt := p.parseStatement()
-
-		if stmt != nil {
-			block.Statements = append(block.Statements, stmt)
-		}
-		p.nextToken()
-	}
-
-	return block
-}
-
-func (p *Parser) parseFunctionBlockStatement() *ast.BlockStatement {
-	block := &ast.BlockStatement{Token: p.curToken}
-	block.Statements = []ast.Statement{}
-
-	p.nextToken()
-
-	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
 		var stmt ast.Statement
 
 		if p.curTokenIs(token.LOCAL) {
@@ -736,7 +718,7 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 				_, isAssign := stmt.(*ast.AssignmentStatement)
 
 				if !isVariable && !isVector && !isAssign {
-					p.errors = append(p.errors, "only variable declarations are allowed in variable blocks")
+					p.addError("Only variable declarations are allowed in variable blocks")
 					p.nextToken()
 					return nil
 				}
@@ -747,7 +729,7 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 			_, isAssign := stmt.(*ast.AssignmentStatement)
 
 			if !isVariable && !isVector && !isAssign {
-				p.errors = append(p.errors, "only variable declarations are allowed in variable blocks")
+				p.addError("Only variable declarations are allowed in variable blocks")
 				p.nextToken()
 				return nil
 			}
@@ -763,27 +745,27 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 }
 
 func (p *Parser) parseFunctionStatement() ast.Statement {
-	lit := &ast.FunctionStatement{Token: p.curToken} // IDENT
+	fuc := &ast.FunctionStatement{Token: p.curToken} // IDENT
 
 	if !p.expectPeek(token.LPAREN) {
 		return nil
 	}
 
-	lit.Parameters = p.parseFunctionParameters()
+	fuc.Parameters = p.parseFunctionParameters()
 
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 
-	lit.ReturnType = p.parseFunctionReturnType()
+	fuc.ReturnType = p.parseFunctionReturnType()
 
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
 
-	lit.Body = p.parseFunctionBlockStatement()
+	fuc.Body = p.parseBlockStatement()
 
-	return lit
+	return fuc
 }
 
 func (p *Parser) parseFunctionParameters() []*ast.Parameter {
@@ -1176,7 +1158,7 @@ func (p *Parser) parseType() *ast.Identifier {
 	}
 }
 
-func (p *Parser) isNextTokenCallExpression() bool {
+func (p *Parser) isNextTokenFunctionStatement() bool {
 	// Save the current lexer state
 	backupPosition := p.l.Position
 	backupReadPosition := p.l.ReadPosition
@@ -1184,18 +1166,16 @@ func (p *Parser) isNextTokenCallExpression() bool {
 	backupCurToken := p.curToken
 	backupPeekToken := p.peekToken
 
-	var isCallExpression bool
-
-	p.nextToken()
-	if p.peekTokenIs(token.RPAREN) {
+	counter := 10000
+	for !p.curTokenIs(token.RPAREN) {
 		p.nextToken()
-		isCallExpression = p.peekToken.Literal != "int" && p.peekToken.Literal != "float" && p.peekToken.Literal != "bool"
-	} else {
-		// token isn't a call expression if there's no type identifier (int, float, bool)
-		isCallExpression = p.peekToken.Literal != "int" &&
-			p.peekToken.Literal != "float" &&
-			p.peekToken.Literal != "bool"
+		counter--
+		if counter == 0 {
+			panic("Oops, expected ) but never found it...")
+		}
 	}
+
+	isFunction := p.peekTokenIs(token.IDENT)
 
 	// Restore the lexer state
 	p.l.Position = backupPosition
@@ -1204,17 +1184,22 @@ func (p *Parser) isNextTokenCallExpression() bool {
 	p.curToken = backupCurToken
 	p.peekToken = backupPeekToken
 
-	return isCallExpression
+	return isFunction
 }
 
 // ---------------------- errors ----------------------
+func (p *Parser) addError(errorMsg string) {
+	msg := "Line %d: %s"
+	p.errors = append(p.errors, fmt.Sprintf(msg, p.l.Line, errorMsg))
+}
 
 func (p *Parser) peekError(t token.TokenType) {
-	msg := "expected next token to be %s, got %s instead"
-	p.errors = append(p.errors, fmt.Sprintf(msg, t, p.peekToken.Type))
+	msg := "Line %d: Expected next token to be %s, got %s instead"
+	p.errors = append(p.errors, fmt.Sprintf(msg, p.l.Line, t, p.peekToken.Type))
 }
+
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
-	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	msg := fmt.Sprintf("Line %d: No prefix parse function for %s found", p.l.Line, t)
 	p.errors = append(p.errors, msg)
 }
 

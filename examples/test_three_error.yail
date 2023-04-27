@@ -1,0 +1,42 @@
+const {
+  int max = 100;
+  add(int a, int b) int { # Only variable declarations are allowed in variable blocks
+    return a + b; # No prefix parse function for + found (since no function is parsed)
+  }
+}
+
+main() bool {
+  local {
+    int n;
+  }
+
+  write("introduza um número entre 0 e ", max);
+
+  n = read();
+
+  if (n > max or n << 0) { # No prefix parse function for < found
+    write("Erro!!!");
+  } else {
+    write(n, "!=", fact(n));
+    main = true;
+  }
+}
+
+fact (int n) int {
+  local {
+    int i, fact[?]; # No prefix parse function for ILLEGAL found
+  }
+
+  fact = ,; # No prefix parse function for , found
+
+  for (i,2,n,1,4) {
+       # for-statement only has 4 arguments
+       #
+       # Line 34: Expected next token to be ), got , instead
+       # Line 34: No prefix parse function for , found
+       # Line 35: No prefix parse function for ) found
+       # Line 35: No prefix parse function for { found
+       # Line 38: No prefix parse function for } found
+    fact *= i;
+  }
+}

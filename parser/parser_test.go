@@ -1367,6 +1367,20 @@ func TestFunctionParameterParsing(t *testing.T) {
 			},
 		},
 		},
+		{input: "distance3D(point3D p, point3D q) float {}", expectedParams: []struct {
+			Name string
+			Type string
+		}{
+			{
+				Type: "point3D",
+				Name: "p",
+			},
+			{
+				Type: "point3D",
+				Name: "q",
+			},
+		},
+		},
 	}
 
 	for _, tt := range tests {

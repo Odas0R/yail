@@ -1,0 +1,61 @@
+
+========================================= AST =========================================
+
+
+Oh boy! Something clearly went wrong!
+
+parser errors:
+	Line 6: Expected next token to be {, got IDENT instead
+	Line 8: Expected next token to be (, got IDENT instead
+	Line 9: No prefix parse function for { found
+	Line 12: No prefix parse function for ELSE found
+	Line 12: No prefix parse function for { found
+	Line 16: No prefix parse function for } found
+	Line 18: No prefix parse function for } found
+
+========================================= TOKENS =========================================
+
+{Type:GLOBAL Literal:global}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:x}
+{Type:= Literal:=}
+{Type:INT Literal:5}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:IDENT Literal:bool}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:y}
+{Type:= Literal:=}
+{Type:INT Literal:2}
+{Type:; Literal:;}
+{Type:IF Literal:if}
+{Type:IDENT Literal:y}
+{Type:> Literal:>}
+{Type:IDENT Literal:x}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:y número é maior que x!!}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:ELSE Literal:else}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:y número é menor que x!!}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:EOF Literal:}

@@ -1,0 +1,155 @@
+
+========================================= AST =========================================
+
+
+Oh boy! Something clearly went wrong!
+
+parser errors:
+	Line 4: No prefix parse function for + found
+	Line 7: Only variable declarations are allowed in variable blocks
+	Line 18: No prefix parse function for < found
+	Line 18: Expected next token to be ), got INT instead
+	Line 18: No prefix parse function for ) found
+	Line 19: No prefix parse function for { found
+	Line 22: No prefix parse function for ELSE found
+	Line 22: No prefix parse function for { found
+	Line 26: No prefix parse function for } found
+	Line 27: No prefix parse function for } found
+	Line 29: No prefix parse function for ILLEGAL found
+	Line 32: No prefix parse function for , found
+	Line 34: Expected next token to be ), got , instead
+	Line 34: No prefix parse function for , found
+	Line 35: No prefix parse function for ) found
+	Line 42: No prefix parse function for { found
+	Line 45: No prefix parse function for } found
+
+========================================= TOKENS =========================================
+
+{Type:CONST Literal:const}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:max}
+{Type:= Literal:=}
+{Type:INT Literal:100}
+{Type:; Literal:;}
+{Type:IDENT Literal:add}
+{Type:( Literal:(}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:a}
+{Type:, Literal:,}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:b}
+{Type:) Literal:)}
+{Type:IDENT Literal:int}
+{Type:{ Literal:{}
+{Type:IDENT Literal:return}
+{Type:IDENT Literal:a}
+{Type:+ Literal:+}
+{Type:IDENT Literal:b}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:} Literal:}}
+{Type:IDENT Literal:main}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:IDENT Literal:bool}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:n}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:introduza um número entre 0 e }
+{Type:, Literal:,}
+{Type:IDENT Literal:max}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:n}
+{Type:= Literal:=}
+{Type:IDENT Literal:read}
+{Type:( Literal:(}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IF Literal:if}
+{Type:( Literal:(}
+{Type:IDENT Literal:n}
+{Type:> Literal:>}
+{Type:IDENT Literal:max}
+{Type:OR Literal:or}
+{Type:IDENT Literal:n}
+{Type:< Literal:<}
+{Type:< Literal:<}
+{Type:INT Literal:0}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:STRING Literal:Erro!!!}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:ELSE Literal:else}
+{Type:{ Literal:{}
+{Type:IDENT Literal:write}
+{Type:( Literal:(}
+{Type:IDENT Literal:n}
+{Type:, Literal:,}
+{Type:STRING Literal:!=}
+{Type:, Literal:,}
+{Type:IDENT Literal:fact}
+{Type:( Literal:(}
+{Type:IDENT Literal:n}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:; Literal:;}
+{Type:IDENT Literal:main}
+{Type:= Literal:=}
+{Type:TRUE Literal:true}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:} Literal:}}
+{Type:IDENT Literal:fact}
+{Type:( Literal:(}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:n}
+{Type:) Literal:)}
+{Type:IDENT Literal:int}
+{Type:{ Literal:{}
+{Type:LOCAL Literal:local}
+{Type:{ Literal:{}
+{Type:IDENT Literal:int}
+{Type:IDENT Literal:i}
+{Type:, Literal:,}
+{Type:IDENT Literal:fact}
+{Type:[ Literal:[}
+{Type:ILLEGAL Literal:?}
+{Type:] Literal:]}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:IDENT Literal:fact}
+{Type:= Literal:=}
+{Type:, Literal:,}
+{Type:; Literal:;}
+{Type:FOR Literal:for}
+{Type:( Literal:(}
+{Type:IDENT Literal:i}
+{Type:, Literal:,}
+{Type:INT Literal:2}
+{Type:, Literal:,}
+{Type:IDENT Literal:n}
+{Type:, Literal:,}
+{Type:INT Literal:1}
+{Type:, Literal:,}
+{Type:INT Literal:4}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:IDENT Literal:fact}
+{Type:*= Literal:*=}
+{Type:IDENT Literal:i}
+{Type:; Literal:;}
+{Type:} Literal:}}
+{Type:} Literal:}}
+{Type:EOF Literal:}
