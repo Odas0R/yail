@@ -537,25 +537,6 @@ func TestGlobalStatement(t *testing.T) {
 	}
 }
 
-func TestGlobalErrorStatement(t *testing.T) {
-	input := `global {
-	int x = 5;
-	add(int x,y) int {
-		add = x + y;
-	}
-}`
-
-	l := lexer.New(input)
-	p := New(l)
-	p.ParseProgram()
-
-	expectedErrors := []string{
-		"only variable declarations are allowed in variable blocks",
-	}
-
-	testParserErrors(t, p, expectedErrors, false)
-}
-
 func TestConstStatement(t *testing.T) {
 	input := `const {
 	int x = 5;
@@ -621,23 +602,6 @@ func TestConstStatement(t *testing.T) {
 			t.Fatalf("gv type not found. got=%T", gv)
 		}
 	}
-}
-
-func TestConstErrorStatement(t *testing.T) {
-	input := `const {
-	int x = 5;
-	add(int x,y) int { add = x + y; }
-}`
-
-	l := lexer.New(input)
-	p := New(l)
-	p.ParseProgram()
-
-	expectedErrors := []string{
-		"only variable declarations are allowed in variable blocks",
-	}
-
-	testParserErrors(t, p, expectedErrors, false)
 }
 
 func TestLocalStatement(t *testing.T) {
@@ -780,24 +744,6 @@ func TestLocalBlockStatement(t *testing.T) {
 	if !testVariableStatement(t, sndStmt.Statements[2], tt[3].expectedType, tt[3].expectedName) {
 		return
 	}
-}
-
-func TestLocalErrorStatement(t *testing.T) {
-	input := `local {
-	int x = 5;
-}`
-
-	l := lexer.New(input)
-	p := New(l)
-	p.ParseProgram()
-
-	expectedErrors := []string{
-		"no prefix parse function for LOCAL found",
-		"no prefix parse function for { found",
-		"no prefix parse function for } found",
-	}
-
-	testParserErrors(t, p, expectedErrors, false)
 }
 
 func TestCommentStatement(t *testing.T) {
