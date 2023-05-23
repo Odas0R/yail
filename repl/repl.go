@@ -53,7 +53,7 @@ func Start(in io.Reader, out io.Writer) {
 				printParserErrors(out, p.Errors())
 			} else {
 				io.WriteString(out, "\n")
-				io.WriteString(out, program.PrintAST())
+				io.WriteString(out, program.Stringify(1))
 			}
 
 			// Reset
@@ -132,7 +132,7 @@ func RunFile(path string) {
 		os.Exit(1)
 	} else {
 		out.WriteString("\n")
-		out.WriteString(program.PrintAST())
+		out.WriteString(program.Stringify(1))
 		out.WriteString("\n")
 	}
 

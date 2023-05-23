@@ -12,7 +12,7 @@ import (
 type Node interface {
 	TokenLiteral() string
 	String() string
-	StringAST(level int) string
+	Stringify(level int) string
 }
 
 type Statement interface {
@@ -54,13 +54,13 @@ func (p *Program) String() string {
 // | | Expression: Identifier (myVar)
 // | | Expression: IntegerLiteral (5)
 // ...
-func (p *Program) PrintAST() string {
+func (p *Program) Stringify(level int) string {
 	var out bytes.Buffer
 
 	out.WriteString("Program\n")
 
 	for _, s := range p.Statements {
-		out.WriteString(s.StringAST(1))
+		out.WriteString(s.Stringify(level))
 	}
 
 	return out.String()
@@ -74,7 +74,7 @@ type Identifier struct {
 func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
-func (i *Identifier) StringAST(level int) string {
+func (i *Identifier) Stringify(level int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", level))
@@ -111,7 +111,7 @@ func (vs *VariableStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
-func (vs *VariableStatement) StringAST(level int) string {
+func (vs *VariableStatement) Stringify(level int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", level))
@@ -134,7 +134,7 @@ func (vs *VariableStatement) StringAST(level int) string {
 
 	if vs.Value != nil {
 		out.WriteString("\n")
-		out.WriteString(vs.Value.StringAST(level + 2))
+		out.WriteString(vs.Value.Stringify(level + 2))
 	} else {
 		out.WriteString(" <nil>\n")
 	}
@@ -156,14 +156,14 @@ func (es *ExpressionStatement) String() string {
 
 	return ""
 }
-func (es *ExpressionStatement) StringAST(indent int) string {
+func (es *ExpressionStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Statement: ExpressionStatement\n")
 
 	if es.Expression != nil {
-		out.WriteString(es.Expression.StringAST(indent + 1))
+		out.WriteString(es.Expression.Stringify(indent + 1))
 	}
 
 	return out.String()
@@ -177,7 +177,7 @@ type IntegerLiteral struct {
 func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
-func (il *IntegerLiteral) StringAST(indent int) string {
+func (il *IntegerLiteral) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -196,7 +196,7 @@ type FloatLiteral struct {
 func (fl *FloatLiteral) expressionNode()      {}
 func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
 func (fl *FloatLiteral) String() string       { return fl.Token.Literal }
-func (fl *FloatLiteral) StringAST(indent int) string {
+func (fl *FloatLiteral) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -230,14 +230,14 @@ func (vl *VectorLiteral) String() string {
 
 	return out.String()
 }
-func (vl *VectorLiteral) StringAST(indent int) string {
+func (vl *VectorLiteral) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression: VectorLiteral\n")
 
 	for _, value := range vl.Values {
-		out.WriteString(value.StringAST(indent + 1))
+		out.WriteString(value.Stringify(indent + 1))
 	}
 
 	return out.String()
@@ -274,7 +274,7 @@ func (vs *VectorStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
-func (vs *VectorStatement) StringAST(indent int) string {
+func (vs *VectorStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -306,7 +306,7 @@ func (vs *VectorStatement) StringAST(indent int) string {
 		out.WriteString(strings.Repeat("| ", indent+1))
 		out.WriteString("nil\n")
 	} else {
-		out.WriteString(vs.Values.StringAST(indent + 1))
+		out.WriteString(vs.Values.Stringify(indent + 1))
 	}
 
 	return out.String()
@@ -320,7 +320,7 @@ type Boolean struct {
 func (b *Boolean) expressionNode()      {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
 func (b *Boolean) String() string       { return b.Token.Literal }
-func (b *Boolean) StringAST(indent int) string {
+func (b *Boolean) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -349,7 +349,7 @@ func (pe *PrefixExpression) String() string {
 
 	return out.String()
 }
-func (pe *PrefixExpression) StringAST(indent int) string {
+func (pe *PrefixExpression) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -357,7 +357,7 @@ func (pe *PrefixExpression) StringAST(indent int) string {
 	out.WriteString(pe.Operator)
 	out.WriteString(")\n")
 
-	out.WriteString(pe.Right.StringAST(indent + 1))
+	out.WriteString(pe.Right.Stringify(indent + 1))
 
 	return out.String()
 }
@@ -382,7 +382,7 @@ func (ie *InfixExpression) String() string {
 
 	return out.String()
 }
-func (ie *InfixExpression) StringAST(indent int) string {
+func (ie *InfixExpression) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -390,8 +390,8 @@ func (ie *InfixExpression) StringAST(indent int) string {
 	out.WriteString(ie.Operator)
 	out.WriteString(")\n")
 
-	out.WriteString(ie.Left.StringAST(indent + 1))
-	out.WriteString(ie.Right.StringAST(indent + 1))
+	out.WriteString(ie.Left.Stringify(indent + 1))
+	out.WriteString(ie.Right.Stringify(indent + 1))
 
 	return out.String()
 }
@@ -412,14 +412,14 @@ func (bs *BlockStatement) String() string {
 
 	return out.String()
 }
-func (bs *BlockStatement) StringAST(indent int) string {
+func (bs *BlockStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Statement: BlockStatement\n")
 
 	for _, s := range bs.Statements {
-		out.WriteString(s.StringAST(indent + 1))
+		out.WriteString(s.Stringify(indent + 1))
 	}
 
 	return out.String()
@@ -449,7 +449,7 @@ func (ie *IfExpression) String() string {
 
 	return out.String()
 }
-func (ie *IfExpression) StringAST(indent int) string {
+func (ie *IfExpression) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -457,16 +457,16 @@ func (ie *IfExpression) StringAST(indent int) string {
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Condition:\n")
-	out.WriteString(ie.Condition.StringAST(indent + 2))
+	out.WriteString(ie.Condition.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Consequence:\n")
-	out.WriteString(ie.Consequence.StringAST(indent + 2))
+	out.WriteString(ie.Consequence.Stringify(indent + 2))
 
 	if ie.Alternative != nil {
 		out.WriteString(strings.Repeat("| ", indent+1))
 		out.WriteString("Alternative:\n")
-		out.WriteString(ie.Alternative.StringAST(indent + 2))
+		out.WriteString(ie.Alternative.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -491,7 +491,7 @@ func (ws *WhileStatement) String() string {
 
 	return out.String()
 }
-func (ws *WhileStatement) StringAST(indent int) string {
+func (ws *WhileStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -499,11 +499,11 @@ func (ws *WhileStatement) StringAST(indent int) string {
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Condition:\n")
-	out.WriteString(ws.Condition.StringAST(indent + 2))
+	out.WriteString(ws.Condition.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Body:\n")
-	out.WriteString(ws.Body.StringAST(indent + 2))
+	out.WriteString(ws.Body.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -536,7 +536,7 @@ func (fs *ForStatement) String() string {
 
 	return out.String()
 }
-func (fs *ForStatement) StringAST(indent int) string {
+func (fs *ForStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -544,23 +544,23 @@ func (fs *ForStatement) StringAST(indent int) string {
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Var:\n")
-	out.WriteString(fs.Start.StringAST(indent + 2))
+	out.WriteString(fs.Start.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Initial:\n")
-	out.WriteString(fs.Start.StringAST(indent + 2))
+	out.WriteString(fs.Start.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("End:\n")
-	out.WriteString(fs.End.StringAST(indent + 2))
+	out.WriteString(fs.End.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Increment:\n")
-	out.WriteString(fs.Increment.StringAST(indent + 2))
+	out.WriteString(fs.Increment.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Body:\n")
-	out.WriteString(fs.Body.StringAST(indent + 2))
+	out.WriteString(fs.Body.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -592,7 +592,7 @@ func (a *Attribute) String() string {
 
 	return out.String()
 }
-func (a *Attribute) StringAST(indent int) string {
+func (a *Attribute) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -611,14 +611,14 @@ func (a *Attribute) StringAST(indent int) string {
 		if a.Size != nil {
 			out.WriteString(strings.Repeat("| ", indent+1))
 			out.WriteString("Expression(Size):\n")
-			out.WriteString(a.Size.StringAST(indent + 2))
+			out.WriteString(a.Size.Stringify(indent + 2))
 		}
 	}
 
 	if a.Value != nil {
 		out.WriteString(strings.Repeat("| ", indent+1))
 		out.WriteString("Expression(Value):\n")
-		out.WriteString(a.Value.StringAST(indent + 2))
+		out.WriteString(a.Value.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -647,7 +647,7 @@ func (rt *ReturnType) String() string {
 
 	return out.String()
 }
-func (rt *ReturnType) StringAST(indent int) string {
+func (rt *ReturnType) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent+1))
@@ -663,7 +663,7 @@ func (rt *ReturnType) StringAST(indent int) string {
 		if rt.Size != nil {
 			out.WriteString(strings.Repeat("| ", indent+1))
 			out.WriteString("Size:\n")
-			out.WriteString(rt.Size.StringAST(indent + 2))
+			out.WriteString(rt.Size.Stringify(indent + 2))
 		}
 	}
 
@@ -696,7 +696,7 @@ func (p *Parameter) String() string {
 
 	return out.String()
 }
-func (p *Parameter) StringAST(indent int) string {
+func (p *Parameter) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -714,7 +714,7 @@ func (p *Parameter) StringAST(indent int) string {
 	if p.Size != nil {
 		out.WriteString(strings.Repeat("| ", indent+1))
 		out.WriteString("Expression(Size):\n")
-		out.WriteString(p.Size.StringAST(indent + 2))
+		out.WriteString(p.Size.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -747,7 +747,7 @@ func (fs *FunctionStatement) String() string {
 
 	return out.String()
 }
-func (fs *FunctionStatement) StringAST(indent int) string {
+func (fs *FunctionStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -757,16 +757,16 @@ func (fs *FunctionStatement) StringAST(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Parameters:\n")
 	for _, p := range fs.Parameters {
-		out.WriteString(p.StringAST(indent + 2))
+		out.WriteString(p.Stringify(indent + 2))
 	}
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("ReturnType:\n")
-	out.WriteString(fs.ReturnType.StringAST(indent + 2))
+	out.WriteString(fs.ReturnType.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Body:\n")
-	out.WriteString(fs.Body.StringAST(indent + 2))
+	out.WriteString(fs.Body.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -794,19 +794,19 @@ func (ce *CallExpression) String() string {
 
 	return out.String()
 }
-func (ce *CallExpression) StringAST(indent int) string {
+func (ce *CallExpression) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression: CallExpression\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Function:\n")
-	out.WriteString(ce.Function.StringAST(indent + 2))
+	out.WriteString(ce.Function.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Arguments:\n")
 	for _, a := range ce.Arguments {
-		out.WriteString(a.StringAST(indent + 2))
+		out.WriteString(a.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -820,7 +820,7 @@ type StringLiteral struct {
 func (sl *StringLiteral) expressionNode()      {}
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
-func (sl *StringLiteral) StringAST(indent int) string {
+func (sl *StringLiteral) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -859,7 +859,7 @@ func (sd *StructsStatement) String() string {
 
 	return out.String()
 }
-func (sd *StructsStatement) StringAST(indent int) string {
+func (sd *StructsStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -872,7 +872,7 @@ func (sd *StructsStatement) StringAST(indent int) string {
 	out.WriteString("Structs:\n")
 
 	for _, str := range sd.Structs {
-		out.WriteString(str.StringAST(indent + 2))
+		out.WriteString(str.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -901,7 +901,7 @@ func (s *Struct) String() string {
 
 	return out.String()
 }
-func (s *Struct) StringAST(indent int) string {
+func (s *Struct) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -914,7 +914,7 @@ func (s *Struct) StringAST(indent int) string {
 	out.WriteString("Attributes:\n")
 
 	for _, attr := range s.Attributes {
-		out.WriteString(attr.StringAST(indent + 2))
+		out.WriteString(attr.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -938,7 +938,7 @@ func (gs *GlobalStatement) String() string {
 
 	return out.String()
 }
-func (gs *GlobalStatement) StringAST(indent int) string {
+func (gs *GlobalStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -950,7 +950,7 @@ func (gs *GlobalStatement) StringAST(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Body:\n")
 	for _, v := range gs.Body.Statements {
-		out.WriteString(v.StringAST(indent + 2))
+		out.WriteString(v.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -974,7 +974,7 @@ func (cs *ConstStatement) String() string {
 
 	return out.String()
 }
-func (cs *ConstStatement) StringAST(indent int) string {
+func (cs *ConstStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -987,7 +987,7 @@ func (cs *ConstStatement) StringAST(indent int) string {
 	out.WriteString("Body:\n")
 
 	for _, v := range cs.Body.Statements {
-		out.WriteString(v.StringAST(indent + 2))
+		out.WriteString(v.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -1011,7 +1011,7 @@ func (ls *LocalStatement) String() string {
 
 	return out.String()
 }
-func (ls *LocalStatement) StringAST(indent int) string {
+func (ls *LocalStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1024,7 +1024,7 @@ func (ls *LocalStatement) StringAST(indent int) string {
 	out.WriteString("Body:\n")
 
 	for _, v := range ls.Body.Statements {
-		out.WriteString(v.StringAST(indent + 2))
+		out.WriteString(v.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -1049,7 +1049,7 @@ func (ie *IndexExpression) String() string {
 
 	return out.String()
 }
-func (ie *IndexExpression) StringAST(indent int) string {
+func (ie *IndexExpression) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1060,12 +1060,12 @@ func (ie *IndexExpression) StringAST(indent int) string {
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Left):\n")
-	out.WriteString(ie.Left.StringAST(indent + 2))
+	out.WriteString(ie.Left.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Index):\n")
 
-	out.WriteString(ie.Index.StringAST(indent + 2))
+	out.WriteString(ie.Index.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -1093,7 +1093,7 @@ func (ae *AccessorExpression) String() string {
 
 	return out.String()
 }
-func (ae *AccessorExpression) StringAST(indent int) string {
+func (ae *AccessorExpression) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1102,11 +1102,11 @@ func (ae *AccessorExpression) StringAST(indent int) string {
 	out.WriteString("Token: " + ae.TokenLiteral() + "\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Left):\n")
-	out.WriteString(ae.Left.StringAST(indent + 2))
+	out.WriteString(ae.Left.Stringify(indent + 2))
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Index):\n")
 	for _, i := range ae.Index {
-		out.WriteString(i.StringAST(indent + 2))
+		out.WriteString(i.Stringify(indent + 2))
 	}
 
 	return out.String()
@@ -1130,7 +1130,7 @@ func (ae *AssignmentStatement) String() string {
 
 	return out.String()
 }
-func (ae *AssignmentStatement) StringAST(indent int) string {
+func (ae *AssignmentStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1142,12 +1142,12 @@ func (ae *AssignmentStatement) StringAST(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Left):\n")
 
-	out.WriteString(ae.Left.StringAST(indent + 2))
+	out.WriteString(ae.Left.Stringify(indent + 2))
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Value):\n")
 
-	out.WriteString(ae.Value.StringAST(indent + 2))
+	out.WriteString(ae.Value.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -1168,7 +1168,7 @@ func (is *IncrementStatement) String() string {
 
 	return out.String()
 }
-func (is *IncrementStatement) StringAST(indent int) string {
+func (is *IncrementStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1177,7 +1177,7 @@ func (is *IncrementStatement) StringAST(indent int) string {
 	out.WriteString("Token: " + is.TokenLiteral() + "\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Var):\n")
-	out.WriteString(is.Var.StringAST(indent + 2))
+	out.WriteString(is.Var.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -1198,7 +1198,7 @@ func (ds *DecrementStatement) String() string {
 
 	return out.String()
 }
-func (ds *DecrementStatement) StringAST(indent int) string {
+func (ds *DecrementStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1207,7 +1207,7 @@ func (ds *DecrementStatement) StringAST(indent int) string {
 	out.WriteString("Token: " + ds.TokenLiteral() + "\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Var):\n")
-	out.WriteString(ds.Var.StringAST(indent + 2))
+	out.WriteString(ds.Var.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -1230,7 +1230,7 @@ func (ps *PlusEqualsStatement) String() string {
 
 	return out.String()
 }
-func (ps *PlusEqualsStatement) StringAST(indent int) string {
+func (ps *PlusEqualsStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1239,10 +1239,10 @@ func (ps *PlusEqualsStatement) StringAST(indent int) string {
 	out.WriteString("Token: " + ps.TokenLiteral() + "\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Var):\n")
-	out.WriteString(ps.Var.StringAST(indent + 2))
+	out.WriteString(ps.Var.Stringify(indent + 2))
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Quantity):\n")
-	out.WriteString(ps.Quantity.StringAST(indent + 2))
+	out.WriteString(ps.Quantity.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -1265,7 +1265,7 @@ func (mes *MultEqualsStatement) String() string {
 
 	return out.String()
 }
-func (mes *MultEqualsStatement) StringAST(indent int) string {
+func (mes *MultEqualsStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1274,10 +1274,10 @@ func (mes *MultEqualsStatement) StringAST(indent int) string {
 	out.WriteString("Token: " + mes.TokenLiteral() + "\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Var):\n")
-	out.WriteString(mes.Var.StringAST(indent + 2))
+	out.WriteString(mes.Var.Stringify(indent + 2))
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Quantity):\n")
-	out.WriteString(mes.Quantity.StringAST(indent + 2))
+	out.WriteString(mes.Quantity.Stringify(indent + 2))
 
 	return out.String()
 }
@@ -1300,7 +1300,7 @@ func (ms *MinusEqualsStatement) String() string {
 
 	return out.String()
 }
-func (ms *MinusEqualsStatement) StringAST(indent int) string {
+func (ms *MinusEqualsStatement) Stringify(indent int) string {
 	var out bytes.Buffer
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -1309,10 +1309,10 @@ func (ms *MinusEqualsStatement) StringAST(indent int) string {
 	out.WriteString("Token: " + ms.TokenLiteral() + "\n")
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Var):\n")
-	out.WriteString(ms.Var.StringAST(indent + 2))
+	out.WriteString(ms.Var.Stringify(indent + 2))
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Quantity):\n")
-	out.WriteString(ms.Quantity.StringAST(indent + 2))
+	out.WriteString(ms.Quantity.Stringify(indent + 2))
 
 	return out.String()
 }
