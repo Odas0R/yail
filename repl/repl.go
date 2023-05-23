@@ -21,21 +21,26 @@ const YAIL = `
    ██    ██   ██ ██ ███████ 
 `
 
-const PROMPT = ">> "
+const PROMPT = "yail> "
+const PROMPT_KEEP_WRITING = " ...> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	var inputLines []string
 
 	fmt.Fprint(out, "\n")
+	fmt.Fprint(out, PROMPT)
 	for {
-		fmt.Fprint(out, PROMPT)
 		scanned := scanner.Scan()
 		if !scanned {
 			return
 		}
 
 		line := scanner.Text()
+
+		if line == "exit" || line == "quit" {
+			os.Exit(0)
+		}
 
 		// If an empty line is encountered, parse the accumulated input
 		if line == "" {
@@ -47,15 +52,18 @@ func Start(in io.Reader, out io.Writer) {
 			if len(p.Errors()) != 0 {
 				printParserErrors(out, p.Errors())
 			} else {
-				io.WriteString(out, program.PrintAST())
 				io.WriteString(out, "\n")
+				io.WriteString(out, program.PrintAST())
 			}
 
-			// Reset the input lines
+			// Reset
 			inputLines = []string{}
+			fmt.Fprint(out, "\n")
+			fmt.Fprint(out, PROMPT)
 		} else {
 			// Accumulate non-empty lines
 			inputLines = append(inputLines, line)
+			fmt.Fprint(out, PROMPT_KEEP_WRITING)
 		}
 	}
 }
