@@ -24,18 +24,27 @@ const (
 	OpDiv
 	OpTrue
 	OpFalse
+	OpEqual
+	OpNotEqual
+
+	// We don't have a less than operator, we can use greater than and swap the
+	// operands
+	OpGreaterThan
 )
 
 // These are the definitions of the opcodes that we support.
 var definitions = map[Opcode]*Definition{
-	OpConstant: {"OpConstant", []int{2}}, // 2 bytes = 16 bits (allows  0 to 65535 to be represented)
-	OpAdd:      {"OpAdd", []int{}},       // no operands
-	OpPop:      {"OpPop", []int{}},       // no operands
-	OpSub:      {"OpSub", []int{}},       // no operands
-	OpMul:      {"OpMul", []int{}},       // no operands
-	OpDiv:      {"OpDiv", []int{}},       // no operands
-	OpTrue:     {"OpTrue", []int{}},      // no operands
-	OpFalse:    {"OpFalse", []int{}},     // no operands
+	OpConstant:    {"OpConstant", []int{2}},   // 2 bytes = 16 bits (allows  0 to 65535 to be represented)
+	OpAdd:         {"OpAdd", []int{}},         // no operands
+	OpPop:         {"OpPop", []int{}},         // no operands
+	OpSub:         {"OpSub", []int{}},         // no operands
+	OpMul:         {"OpMul", []int{}},         // no operands
+	OpDiv:         {"OpDiv", []int{}},         // no operands
+	OpTrue:        {"OpTrue", []int{}},        // no operands
+	OpFalse:       {"OpFalse", []int{}},       // no operands
+	OpEqual:       {"OpEqual", []int{}},       // no operands
+	OpNotEqual:    {"OpNotEqual", []int{}},    // no operands
+	OpGreaterThan: {"OpGreaterThan", []int{}}, // no operands
 }
 
 func Lookup(op byte) (*Definition, error) {
