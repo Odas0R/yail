@@ -8,9 +8,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/odas0r/yail/compiler"
 	"github.com/odas0r/yail/lexer"
 	"github.com/odas0r/yail/parser"
 	"github.com/odas0r/yail/token"
+	"github.com/odas0r/yail/vm"
 )
 
 const YAIL = `
@@ -24,7 +26,7 @@ const YAIL = `
 const PROMPT = "yail> "
 const PROMPT_KEEP_WRITING = " ...> "
 
-func Start(in io.Reader, out io.Writer) {
+func RunAst(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	var inputLines []string
 
@@ -65,6 +67,41 @@ func Start(in io.Reader, out io.Writer) {
 			inputLines = append(inputLines, line)
 			fmt.Fprint(out, PROMPT_KEEP_WRITING)
 		}
+	}
+}
+
+func RunVm(in io.Reader, out io.Writer) {
+	scanner := bufio.NewScanner(in)
+
+	for {
+		fmt.Fprint(out, PROMPT)
+		scanned := scanner.Scan()
+		if !scanned {
+			return
+		}
+		line := scanner.Text()
+		l := lexer.New(line)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		if len(p.Errors()) != 0 {
+			printParserErrors(out, p.Errors())
+			continue
+		}
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+			continue
+		}
+		machine := vm.New(comp.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+			continue
+		}
+		lastPopped := machine.LastPoppedStackElem()
+		io.WriteString(out, lastPopped.Inspect())
+		io.WriteString(out, "\n")
 	}
 }
 
