@@ -86,7 +86,7 @@ func (i *Identifier) Stringify(level int) string {
 }
 
 type VariableStatement struct {
-	Token token.Token // The token.TYPE_INT, token.TYPE_FLOAT, or token.TYPE_BOOL token
+	Token token.Token 
 	Type  *Identifier // The type of the variable (e.g., int, float, or bool)
 	Name  *Identifier // The variable name (e.g., x, y, or z)
 	Value Expression  // The value assigned to the variable, can be nil
@@ -209,7 +209,7 @@ func (fl *FloatLiteral) Stringify(indent int) string {
 
 type ArrayLiteral struct {
 	Token  token.Token
-	Values []Expression
+	Elements []Expression
 }
 
 func (vl *ArrayLiteral) expressionNode()      {}
@@ -218,10 +218,10 @@ func (vl *ArrayLiteral) String() string {
 	var out bytes.Buffer
 
 	out.WriteString("{")
-	if len(vl.Values) > 0 {
-		for i, value := range vl.Values {
+	if len(vl.Elements) > 0 {
+		for i, value := range vl.Elements {
 			out.WriteString(value.String())
-			if i < len(vl.Values)-1 {
+			if i < len(vl.Elements)-1 {
 				out.WriteString(", ")
 			}
 		}
@@ -236,7 +236,7 @@ func (vl *ArrayLiteral) Stringify(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression: ArrayLiteral\n")
 
-	for _, value := range vl.Values {
+	for _, value := range vl.Elements {
 		out.WriteString(value.Stringify(indent + 1))
 	}
 

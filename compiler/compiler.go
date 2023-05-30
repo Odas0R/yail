@@ -186,6 +186,15 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.changeOperand(jumpPos, afterAlternativePos)
 
 	// Types
+	case *ast.ArrayLiteral:
+		fmt.Println("array literal")
+		for _, e := range node.Elements {
+			err := c.Compile(e)
+			if err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpArray, len(node.Elements))
 	case *ast.Boolean:
 		if node.Value {
 			c.emit(code.OpTrue)

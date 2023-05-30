@@ -260,26 +260,26 @@ func (p *Parser) parseVariableStatement() ast.Statement {
 }
 
 func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifier, name *ast.Identifier) ast.Statement {
-	vecSize := p.parseArraySize()
+	arrLen := p.parseArraySize()
 
-	vecStmt := &ast.ArrayStatement{
+	arrStmt := &ast.ArrayStatement{
 		Token: curToken,
 		Name:  name,
-		Size:  vecSize,
+		Size:  arrLen,
 		Type:  curType,
 	}
 
 	if !p.peekTokenIs(token.ASSIGN) {
-		sizeLiteral, ok := vecStmt.Size.(*ast.IntegerLiteral)
+		sizeLiteral, ok := arrStmt.Size.(*ast.IntegerLiteral)
 		if ok {
 			values := make([]ast.Expression, sizeLiteral.Value)
 			for i := 0; i < int(sizeLiteral.Value); i++ {
-				values[i] = p.defaultValueForType(vecStmt.Token)
+				values[i] = p.defaultValueForType(arrStmt.Token)
 			}
 
-			vecStmt.Values = &ast.ArrayLiteral{
+			arrStmt.Values = &ast.ArrayLiteral{
 				Token:  token.Token{Type: token.LBRACE, Literal: "{"},
-				Values: values,
+				Elements: values,
 			}
 		}
 	} else {
@@ -291,13 +291,13 @@ func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifi
 		}
 		p.nextToken()
 
-		vecStmt.Values = p.parseArrayLiteral()
+		arrStmt.Values = p.parseArrayLiteral()
 
 		// Set the size if it wasn't set before
-		if vl, ok := vecStmt.Values.(*ast.ArrayLiteral); ok {
-			vecStmt.Size = &ast.IntegerLiteral{
-				Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Values))},
-				Value: int64(len(vl.Values)),
+		if vl, ok := arrStmt.Values.(*ast.ArrayLiteral); ok {
+			arrStmt.Size = &ast.IntegerLiteral{
+				Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Elements))},
+				Value: int64(len(vl.Elements)),
 			}
 		}
 
@@ -307,7 +307,7 @@ func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifi
 		}
 	}
 
-	return vecStmt
+	return arrStmt
 }
 
 func (p *Parser) parseVariableAssignStatment() ast.Statement {
@@ -380,7 +380,7 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 	expressions := []ast.Expression{}
 
 	if p.curTokenIs(token.RBRACE) {
-		return &ast.ArrayLiteral{Token: curToken, Values: expressions}
+		return &ast.ArrayLiteral{Token: curToken, Elements: expressions}
 	}
 
 	expressions = append(expressions, p.parseExpression(LOWEST))
@@ -391,7 +391,7 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 		expressions = append(expressions, p.parseExpression(LOWEST))
 	}
 
-	return &ast.ArrayLiteral{Token: curToken, Values: expressions}
+	return &ast.ArrayLiteral{Token: curToken, Elements: expressions}
 }
 
 func (p *Parser) parseStructsStatement() *ast.StructsStatement {

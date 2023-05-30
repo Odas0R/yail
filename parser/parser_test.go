@@ -159,7 +159,7 @@ func TestArrayStatements(t *testing.T) {
 			return
 		}
 
-		for i, v := range stmt.(*ast.ArrayStatement).Values.(*ast.ArrayLiteral).Values {
+		for i, v := range stmt.(*ast.ArrayStatement).Values.(*ast.ArrayLiteral).Elements {
 			switch tt.expectedValue.(type) {
 			case []int64:
 				testLiteralExpression(t, v, tt.expectedValue.([]int64)[i])
@@ -258,18 +258,18 @@ func TestStructsDeclaration(t *testing.T) {
 	expectedStructs := []struct {
 		Name       string
 		Attributes []struct {
-			Type     string
-			Name     string
-			Size     interface{}
+			Type    string
+			Name    string
+			Size    interface{}
 			IsArray bool
 		}
 	}{
 		{
 			Name: "point2D",
 			Attributes: []struct {
-				Type     string
-				Name     string
-				Size     interface{}
+				Type    string
+				Name    string
+				Size    interface{}
 				IsArray bool
 			}{
 				{
@@ -285,9 +285,9 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "point3D",
 			Attributes: []struct {
-				Type     string
-				Name     string
-				Size     interface{}
+				Type    string
+				Name    string
+				Size    interface{}
 				IsArray bool
 			}{
 				{
@@ -307,9 +307,9 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "point4D",
 			Attributes: []struct {
-				Type     string
-				Name     string
-				Size     interface{}
+				Type    string
+				Name    string
+				Size    interface{}
 				IsArray bool
 			}{
 				{
@@ -333,15 +333,15 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "pointND",
 			Attributes: []struct {
-				Type     string
-				Name     string
-				Size     interface{}
+				Type    string
+				Name    string
+				Size    interface{}
 				IsArray bool
 			}{
 				{
-					Type:     "float",
-					Name:     "x",
-					Size:     1,
+					Type:    "float",
+					Name:    "x",
+					Size:    1,
 					IsArray: true,
 				},
 			},
@@ -349,15 +349,15 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "pointNDSize",
 			Attributes: []struct {
-				Type     string
-				Name     string
-				Size     interface{}
+				Type    string
+				Name    string
+				Size    interface{}
 				IsArray bool
 			}{
 				{
-					Type:     "float",
-					Name:     "x",
-					Size:     "5",
+					Type:    "float",
+					Name:    "x",
+					Size:    "5",
 					IsArray: true,
 				},
 			},
@@ -365,27 +365,27 @@ func TestStructsDeclaration(t *testing.T) {
 		{
 			Name: "pointNDSizeM",
 			Attributes: []struct {
-				Type     string
-				Name     string
-				Size     interface{}
+				Type    string
+				Name    string
+				Size    interface{}
 				IsArray bool
 			}{
 				{
-					Type:     "float",
-					Name:     "x",
-					Size:     "5",
+					Type:    "float",
+					Name:    "x",
+					Size:    "5",
 					IsArray: true,
 				},
 				{
-					Type:     "float",
-					Name:     "y",
-					Size:     "2",
+					Type:    "float",
+					Name:    "y",
+					Size:    "2",
 					IsArray: true,
 				},
 				{
-					Type:     "float",
-					Name:     "z",
-					Size:     1,
+					Type:    "float",
+					Name:    "z",
+					Size:    1,
 					IsArray: true,
 				},
 			},
@@ -1514,41 +1514,41 @@ func testAssignmentStatement(t *testing.T, s ast.Statement, name string) bool {
 }
 
 func testArrayStatement(t *testing.T, s ast.Statement, typ string, name string, size interface{}) bool {
-	vecStmt, ok := s.(*ast.ArrayStatement)
+	arrStmt, ok := s.(*ast.ArrayStatement)
 	if !ok {
 		t.Errorf("statment not *ast.ArrayStatement. got=%T", s)
 		return false
 	}
 
-	if fmt.Sprintf("%v", vecStmt.Size) != fmt.Sprintf("%v", size) {
-		t.Errorf("vecStmt.Size not %v. got=%v", size, vecStmt.Size)
+	if fmt.Sprintf("%v", arrStmt.Size) != fmt.Sprintf("%v", size) {
+		t.Errorf("arrStmt.Size not %v. got=%v", size, arrStmt.Size)
 		return false
 	}
 
-	if vecStmt.Type.Value != typ {
-		t.Errorf("vecStmt.Type.Value not '%s'. got=%q", typ, vecStmt.Type.Value)
+	if arrStmt.Type.Value != typ {
+		t.Errorf("arrStmt.Type.Value not '%s'. got=%q", typ, arrStmt.Type.Value)
 		return false
 	}
 
-	if vecStmt.Type.Value == "<unknown>" {
-		if vecStmt.Type.TokenLiteral() != name {
-			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", name, vecStmt.Type.TokenLiteral())
+	if arrStmt.Type.Value == "<unknown>" {
+		if arrStmt.Type.TokenLiteral() != name {
+			t.Errorf("arrStmt.Type.TokenLiteral() not '%s'. got=%q", name, arrStmt.Type.TokenLiteral())
 			return false
 		}
 	} else {
-		if vecStmt.Type.TokenLiteral() != typ {
-			t.Errorf("vecStmt.Type.TokenLiteral() not '%s'. got=%q", typ, vecStmt.Type.TokenLiteral())
+		if arrStmt.Type.TokenLiteral() != typ {
+			t.Errorf("arrStmt.Type.TokenLiteral() not '%s'. got=%q", typ, arrStmt.Type.TokenLiteral())
 			return false
 		}
 	}
 
-	if vecStmt.Name.Value != name {
-		t.Errorf("vecStmt.Name.Value not '%s'. got=%s", name, vecStmt.Name.Value)
+	if arrStmt.Name.Value != name {
+		t.Errorf("arrStmt.Name.Value not '%s'. got=%s", name, arrStmt.Name.Value)
 		return false
 	}
 
-	if vecStmt.Name.TokenLiteral() != name {
-		t.Errorf("vecStmt.Name not '%s'. got=%s", name, vecStmt.Name)
+	if arrStmt.Name.TokenLiteral() != name {
+		t.Errorf("arrStmt.Name not '%s'. got=%s", name, arrStmt.Name)
 		return false
 	}
 
