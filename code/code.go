@@ -42,6 +42,8 @@ const (
 
 	OpGetGlobal
 	OpSetGlobal
+
+	OpVector
 )
 
 // These are the definitions of the opcodes that we support.

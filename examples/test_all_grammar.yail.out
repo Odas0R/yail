@@ -56,39 +56,39 @@ Program
 | | | Expression: Identifier (x)
 | | Expression(Value):
 | | | Expression: Boolean (true)
-| Statement: VectorStatement
+| Statement: ArrayStatement
 | | Expression(Type): Indentifier (int)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (5)
 | | Expression(Values):
-| | | Expression: VectorLiteral
+| | | Expression: ArrayLiteral
 | | | | Expression: IntegerLiteral (1)
 | | | | Expression: IntegerLiteral (2)
 | | | | Expression: IntegerLiteral (3)
 | | | | Expression: IntegerLiteral (4)
 | | | | Expression: IntegerLiteral (5)
-| Statement: VectorStatement
+| Statement: ArrayStatement
 | | Expression(Type): Indentifier (float)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (2)
 | | Expression(Values):
-| | | Expression: VectorLiteral
+| | | Expression: ArrayLiteral
 | | | | Expression: FloatLiteral (1.3)
 | | | | Expression: FloatLiteral (1.2)
-| Statement: VectorStatement
+| Statement: ArrayStatement
 | | Expression(Type): Indentifier (bool)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (2)
 | | Expression(Values):
-| | | Expression: VectorLiteral
+| | | Expression: ArrayLiteral
 | | | | Expression: Boolean (false)
 | | | | Expression: Boolean (true)
-| Statement: VectorStatement
+| Statement: ArrayStatement
 | | Expression(Type): Indentifier (int)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (5)
 | | Expression(Values):
-| | | Expression: VectorLiteral
+| | | Expression: ArrayLiteral
 | | | | Expression: IntegerLiteral (1)
 | | | | Expression: IntegerLiteral (2)
 | | | | Expression: IntegerLiteral (3)
@@ -99,7 +99,7 @@ Program
 | | Expression(Left):
 | | | Expression: Identifier (x)
 | | Expression(Value):
-| | | Expression: VectorLiteral
+| | | Expression: ArrayLiteral
 | | | | Expression: Boolean (false)
 | | | | Expression: Boolean (true)
 | | | | Expression: Boolean (false)
@@ -108,7 +108,7 @@ Program
 | | Expression(Left):
 | | | Expression: Identifier (x)
 | | Expression(Value):
-| | | Expression: VectorLiteral
+| | | Expression: ArrayLiteral
 | | | | Expression: FloatLiteral (1.2424)
 | | | | Expression: FloatLiteral (2.12412512)
 | | | | Expression: FloatLiteral (3.10284091284901824)
@@ -149,52 +149,52 @@ Program
 | | | | Token: point2D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | Expression: Struct
 | | | | Token: point3D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
 | | | Expression: Struct
 | | | | Token: point4D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (int)
 | | | | | | Expression(Name): Identifier (j)
 | | | Expression: Struct
 | | | | Token: pointND
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: true
+| | | | | | Array: true
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | | Expression(Size):
@@ -203,7 +203,7 @@ Program
 | | | | Token: pointNDSize
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: true
+| | | | | | Array: true
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | | Expression(Size):
@@ -212,19 +212,19 @@ Program
 | | | | Token: pointNDSizeM
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: true
+| | | | | | Array: true
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | | Expression(Size):
 | | | | | | | Expression: IntegerLiteral (5)
 | | | | | Expression: Attribute
-| | | | | | Vector: true
+| | | | | | Array: true
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | | | | Expression(Size):
 | | | | | | | Expression: IntegerLiteral (2)
 | | | | | Expression: Attribute
-| | | | | | Vector: true
+| | | | | | Array: true
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
 | | | | | | Expression(Size):
@@ -397,19 +397,19 @@ Program
 | | Token: add
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (int)
 | | | | Expression(Name): Identifier (x)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (int)
 | | | | Expression(Name): Identifier (y)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (int)
 | | | | Expression(Name): Identifier (z)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (int)
 | | Body:

@@ -125,7 +125,7 @@ func TestMultiVariableStatements(t *testing.T) {
 	}
 }
 
-func TestVectorStatements(t *testing.T) {
+func TestArrayStatements(t *testing.T) {
 	tests := []struct {
 		input         string
 		expectedType  string
@@ -155,11 +155,11 @@ func TestVectorStatements(t *testing.T) {
 
 		stmt := program.Statements[0]
 
-		if !testVectorStatement(t, stmt, tt.expectedType, tt.expectedName, tt.expectedSize) {
+		if !testArrayStatement(t, stmt, tt.expectedType, tt.expectedName, tt.expectedSize) {
 			return
 		}
 
-		for i, v := range stmt.(*ast.VectorStatement).Values.(*ast.VectorLiteral).Values {
+		for i, v := range stmt.(*ast.ArrayStatement).Values.(*ast.ArrayLiteral).Values {
 			switch tt.expectedValue.(type) {
 			case []int64:
 				testLiteralExpression(t, v, tt.expectedValue.([]int64)[i])
@@ -174,7 +174,7 @@ func TestVectorStatements(t *testing.T) {
 	}
 }
 
-func TestParsingVectorIndexSetterExpressions(t *testing.T) {
+func TestParsingArrayIndexSetterExpressions(t *testing.T) {
 	input := "x[0] = 5.4;"
 	l := lexer.New(input)
 	p := New(l)
@@ -201,7 +201,7 @@ func TestParsingVectorIndexSetterExpressions(t *testing.T) {
 }
 
 func TestParsingIndexExpressions(t *testing.T) {
-	input := "myVector[1 + 1]"
+	input := "myArray[1 + 1]"
 
 	l := lexer.New(input)
 	p := New(l)
@@ -215,7 +215,7 @@ func TestParsingIndexExpressions(t *testing.T) {
 		t.Fatalf("exp not *ast.IndexExpression. got=%T", stmt.Expression)
 	}
 
-	if !testIdentifier(t, indexExp.Left, "myVector") {
+	if !testIdentifier(t, indexExp.Left, "myArray") {
 		return
 	}
 
@@ -261,7 +261,7 @@ func TestStructsDeclaration(t *testing.T) {
 			Type     string
 			Name     string
 			Size     interface{}
-			IsVector bool
+			IsArray bool
 		}
 	}{
 		{
@@ -270,7 +270,7 @@ func TestStructsDeclaration(t *testing.T) {
 				Type     string
 				Name     string
 				Size     interface{}
-				IsVector bool
+				IsArray bool
 			}{
 				{
 					Type: "float",
@@ -288,7 +288,7 @@ func TestStructsDeclaration(t *testing.T) {
 				Type     string
 				Name     string
 				Size     interface{}
-				IsVector bool
+				IsArray bool
 			}{
 				{
 					Type: "float",
@@ -310,7 +310,7 @@ func TestStructsDeclaration(t *testing.T) {
 				Type     string
 				Name     string
 				Size     interface{}
-				IsVector bool
+				IsArray bool
 			}{
 				{
 					Type: "float",
@@ -336,13 +336,13 @@ func TestStructsDeclaration(t *testing.T) {
 				Type     string
 				Name     string
 				Size     interface{}
-				IsVector bool
+				IsArray bool
 			}{
 				{
 					Type:     "float",
 					Name:     "x",
 					Size:     1,
-					IsVector: true,
+					IsArray: true,
 				},
 			},
 		},
@@ -352,13 +352,13 @@ func TestStructsDeclaration(t *testing.T) {
 				Type     string
 				Name     string
 				Size     interface{}
-				IsVector bool
+				IsArray bool
 			}{
 				{
 					Type:     "float",
 					Name:     "x",
 					Size:     "5",
-					IsVector: true,
+					IsArray: true,
 				},
 			},
 		},
@@ -368,25 +368,25 @@ func TestStructsDeclaration(t *testing.T) {
 				Type     string
 				Name     string
 				Size     interface{}
-				IsVector bool
+				IsArray bool
 			}{
 				{
 					Type:     "float",
 					Name:     "x",
 					Size:     "5",
-					IsVector: true,
+					IsArray: true,
 				},
 				{
 					Type:     "float",
 					Name:     "y",
 					Size:     "2",
-					IsVector: true,
+					IsArray: true,
 				},
 				{
 					Type:     "float",
 					Name:     "z",
 					Size:     1,
-					IsVector: true,
+					IsArray: true,
 				},
 			},
 		},
@@ -417,8 +417,8 @@ func TestStructsDeclaration(t *testing.T) {
 				}
 			}
 
-			if a.IsVector != attr.IsVector {
-				t.Errorf("p.IsVector not %t. got=%t", attr.IsVector, a.IsVector)
+			if a.IsArray != attr.IsArray {
+				t.Errorf("p.IsArray not %t. got=%t", attr.IsArray, a.IsArray)
 			}
 		}
 	}
@@ -523,8 +523,8 @@ func TestGlobalStatement(t *testing.T) {
 			if !testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName) {
 				return
 			}
-		case *ast.VectorStatement:
-			if !testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
+		case *ast.ArrayStatement:
+			if !testArrayStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
 				return
 			}
 		case *ast.AssignmentStatement:
@@ -590,8 +590,8 @@ func TestConstStatement(t *testing.T) {
 			if !testVariableStatement(t, gv, tt[i].expectedType, tt[i].expectedName) {
 				return
 			}
-		case *ast.VectorStatement:
-			if !testVectorStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
+		case *ast.ArrayStatement:
+			if !testArrayStatement(t, gv, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
 				return
 			}
 		case *ast.AssignmentStatement:
@@ -654,8 +654,8 @@ func TestLocalStatement(t *testing.T) {
 			if !testVariableStatement(t, s, tt[i].expectedType, tt[i].expectedName) {
 				return
 			}
-		case *ast.VectorStatement:
-			if !testVectorStatement(t, s, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
+		case *ast.ArrayStatement:
+			if !testArrayStatement(t, s, tt[i].expectedType, tt[i].expectedName, tt[i].expectedSize) {
 				return
 			}
 		case *ast.AssignmentStatement:
@@ -1385,8 +1385,8 @@ func TestFunctionLiteralParsing(t *testing.T) {
 	testTokenType(t, function.Parameters[1].Type, "int")
 
 	testTokenType(t, function.ReturnType.Type, "int")
-	if function.ReturnType.IsVector {
-		t.Errorf("function.ReturnType.IsVector is not false. got=%t", function.ReturnType.IsVector)
+	if function.ReturnType.IsArray {
+		t.Errorf("function.ReturnType.IsArray is not false. got=%t", function.ReturnType.IsArray)
 	}
 
 	if len(function.Body.Statements) != 1 {
@@ -1513,10 +1513,10 @@ func testAssignmentStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 }
 
-func testVectorStatement(t *testing.T, s ast.Statement, typ string, name string, size interface{}) bool {
-	vecStmt, ok := s.(*ast.VectorStatement)
+func testArrayStatement(t *testing.T, s ast.Statement, typ string, name string, size interface{}) bool {
+	vecStmt, ok := s.(*ast.ArrayStatement)
 	if !ok {
-		t.Errorf("statment not *ast.VectorStatement. got=%T", s)
+		t.Errorf("statment not *ast.ArrayStatement. got=%T", s)
 		return false
 	}
 

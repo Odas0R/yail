@@ -21,7 +21,7 @@ parser errors:
 
 {Type:STRUCTS Literal:structs}
 {Type:{ Literal:{}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:{ Literal:{}
 {Type:IDENT Literal:float}
 {Type:IDENT Literal:x}
@@ -38,7 +38,7 @@ parser errors:
 {Type:IDENT Literal:bool}
 {Type:{ Literal:{}
 {Type:LOCAL Literal:local}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:IDENT Literal:v1}
 {Type:, Literal:,}
 {Type:IDENT Literal:v2}
@@ -78,10 +78,10 @@ parser errors:
 {Type:} Literal:}}
 {Type:IDENT Literal:dotProduct}
 {Type:( Literal:(}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:IDENT Literal:v1}
 {Type:, Literal:,}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:IDENT Literal:v2}
 {Type:) Literal:)}
 {Type:IDENT Literal:float}

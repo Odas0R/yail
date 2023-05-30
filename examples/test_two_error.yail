@@ -1,9 +1,9 @@
 structs {
-  vector3D {float x, y, z}; # Missing ";" at the end of the struct definition
+  array3D {float x, y, z}; # Missing ";" at the end of the struct definition
 }
 
 main() bool {
-  local vector3D v1, v2; # Missing curly braces for the local scope
+  local array3D v1, v2; # Missing curly braces for the local scope
   write("Introduza dois vetores");
   v1 = read_all();
   v2 read_all(); # Expected token '=' instead got '('
@@ -11,7 +11,7 @@ main() bool {
   main = true;
 }
 
-dotProduct(vector3D v1, vector3D v2) float # Expected '{' token
+dotProduct(array3D v1, array3D v2) float # Expected '{' token
   local {float product;}
   product = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
   dotProduct = product;

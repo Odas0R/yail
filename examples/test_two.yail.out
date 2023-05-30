@@ -6,25 +6,25 @@ Program
 | | Token: structs
 | | Structs:
 | | | Expression: Struct
-| | | | Token: vector3D
+| | | | Token: array3D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
 | Statement: FunctionStatement
 | | Token: main
 | | Parameters:
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (bool)
 | | Body:
@@ -34,13 +34,13 @@ Program
 | | | | | Body:
 | | | | | | Statement: BlockStatement
 | | | | | | | Statement: VariableStatement
-| | | | | | | | Token: vector3D
-| | | | | | | | Expression(Type): Indentifier (vector3D)
+| | | | | | | | Token: array3D
+| | | | | | | | Expression(Type): Indentifier (array3D)
 | | | | | | | | Expression(Name): Identifier (v1)
 | | | | | | | | Expression(Value): <nil>
 | | | | | | | Statement: VariableStatement
-| | | | | | | | Token: vector3D
-| | | | | | | | Expression(Type): Indentifier (vector3D)
+| | | | | | | | Token: array3D
+| | | | | | | | Expression(Type): Indentifier (array3D)
 | | | | | | | | Expression(Name): Identifier (v2)
 | | | | | | | | Expression(Value): <nil>
 | | | | Statement: ExpressionStatement
@@ -93,15 +93,15 @@ Program
 | | Token: dotProduct
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
-| | | | Expression(Type): Identifier (vector3D)
+| | | | Array: false
+| | | | Expression(Type): Identifier (array3D)
 | | | | Expression(Name): Identifier (v1)
 | | | Expression: Parameter
-| | | | Vector: false
-| | | | Expression(Type): Identifier (vector3D)
+| | | | Array: false
+| | | | Expression(Type): Identifier (array3D)
 | | | | Expression(Name): Identifier (v2)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:
@@ -172,7 +172,7 @@ Program
 
 {Type:STRUCTS Literal:structs}
 {Type:{ Literal:{}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:{ Literal:{}
 {Type:IDENT Literal:float}
 {Type:IDENT Literal:x}
@@ -191,7 +191,7 @@ Program
 {Type:{ Literal:{}
 {Type:LOCAL Literal:local}
 {Type:{ Literal:{}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:IDENT Literal:v1}
 {Type:, Literal:,}
 {Type:IDENT Literal:v2}
@@ -233,10 +233,10 @@ Program
 {Type:} Literal:}}
 {Type:IDENT Literal:dotProduct}
 {Type:( Literal:(}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:IDENT Literal:v1}
 {Type:, Literal:,}
-{Type:IDENT Literal:vector3D}
+{Type:IDENT Literal:array3D}
 {Type:IDENT Literal:v2}
 {Type:) Literal:)}
 {Type:IDENT Literal:float}

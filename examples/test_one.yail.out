@@ -15,7 +15,7 @@ Program
 | | Token: main
 | | Parameters:
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (bool)
 | | Body:

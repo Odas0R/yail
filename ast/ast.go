@@ -207,14 +207,14 @@ func (fl *FloatLiteral) Stringify(indent int) string {
 	return out.String()
 }
 
-type VectorLiteral struct {
+type ArrayLiteral struct {
 	Token  token.Token
 	Values []Expression
 }
 
-func (vl *VectorLiteral) expressionNode()      {}
-func (vl *VectorLiteral) TokenLiteral() string { return vl.Token.Literal }
-func (vl *VectorLiteral) String() string {
+func (vl *ArrayLiteral) expressionNode()      {}
+func (vl *ArrayLiteral) TokenLiteral() string { return vl.Token.Literal }
+func (vl *ArrayLiteral) String() string {
 	var out bytes.Buffer
 
 	out.WriteString("{")
@@ -230,11 +230,11 @@ func (vl *VectorLiteral) String() string {
 
 	return out.String()
 }
-func (vl *VectorLiteral) Stringify(indent int) string {
+func (vl *ArrayLiteral) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
-	out.WriteString("Expression: VectorLiteral\n")
+	out.WriteString("Expression: ArrayLiteral\n")
 
 	for _, value := range vl.Values {
 		out.WriteString(value.Stringify(indent + 1))
@@ -243,17 +243,17 @@ func (vl *VectorLiteral) Stringify(indent int) string {
 	return out.String()
 }
 
-type VectorStatement struct {
+type ArrayStatement struct {
 	Token  token.Token // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
-	Size   Expression  // The size of the vector, can be integer or expression
-	Type   *Identifier // The type of the vector (e.g., int, float, or bool)
+	Size   Expression  // The size of the array, can be integer or expression
+	Type   *Identifier // The type of the array (e.g., int, float, or bool)
 	Name   *Identifier // The variable name (e.g., x, y, or z)
-	Values Expression  // The values assigned to the vector, can be nil or an array of expressions
+	Values Expression  // The values assigned to the array, can be nil or an array of expressions
 }
 
-func (vl *VectorStatement) statementNode()       {}
-func (vs *VectorStatement) TokenLiteral() string { return vs.Token.Literal }
-func (vs *VectorStatement) String() string {
+func (vl *ArrayStatement) statementNode()       {}
+func (vs *ArrayStatement) TokenLiteral() string { return vs.Token.Literal }
+func (vs *ArrayStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(vs.Type.String() + " ")
@@ -274,11 +274,11 @@ func (vs *VectorStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
-func (vs *VectorStatement) Stringify(indent int) string {
+func (vs *ArrayStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
-	out.WriteString("Statement: VectorStatement\n")
+	out.WriteString("Statement: ArrayStatement\n")
 
 	indent++
 
@@ -569,7 +569,7 @@ type Attribute struct {
 	Token    token.Token
 	Name     *Identifier
 	Type     *Identifier // Type of the parameter
-	IsVector bool
+	IsArray bool
 	Size     Expression // Can be nil if the size is not specified
 	Value    Expression // Can be nil if the value is not specified
 }
@@ -582,7 +582,7 @@ func (a *Attribute) String() string {
 	out.WriteString(a.Type.String())
 	out.WriteString(" ")
 	out.WriteString(a.Name.String())
-	if a.IsVector {
+	if a.IsArray {
 		out.WriteString("[")
 		if a.Size != nil {
 			out.WriteString(a.Size.String())
@@ -599,7 +599,7 @@ func (a *Attribute) Stringify(indent int) string {
 	out.WriteString("Expression: Attribute\n")
 
 	out.WriteString(strings.Repeat("| ", indent+1))
-	out.WriteString("Vector: " + strconv.FormatBool(a.IsVector) + "\n")
+	out.WriteString("Array: " + strconv.FormatBool(a.IsArray) + "\n")
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Type): Identifier (" + a.Type.String() + ")\n")
@@ -607,7 +607,7 @@ func (a *Attribute) Stringify(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Name): Identifier (" + a.Name.String() + ")\n")
 
-	if a.IsVector {
+	if a.IsArray {
 		if a.Size != nil {
 			out.WriteString(strings.Repeat("| ", indent+1))
 			out.WriteString("Expression(Size):\n")
@@ -627,7 +627,7 @@ func (a *Attribute) Stringify(indent int) string {
 type ReturnType struct {
 	Token    token.Token
 	Type     *Identifier // Type of the parameter
-	IsVector bool
+	IsArray bool
 	Size     Expression
 }
 
@@ -637,7 +637,7 @@ func (rt *ReturnType) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(rt.Type.String())
-	if rt.IsVector {
+	if rt.IsArray {
 		out.WriteString("[")
 		if rt.Size != nil {
 			out.WriteString(rt.Size.String())
@@ -651,7 +651,7 @@ func (rt *ReturnType) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent+1))
-	out.WriteString("Vector: " + strconv.FormatBool(rt.IsVector) + "\n")
+	out.WriteString("Array: " + strconv.FormatBool(rt.IsArray) + "\n")
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression: ReturnType\n")
@@ -659,7 +659,7 @@ func (rt *ReturnType) Stringify(indent int) string {
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Type): Identifier (" + rt.Type.String() + ")\n")
 
-	if rt.IsVector {
+	if rt.IsArray {
 		if rt.Size != nil {
 			out.WriteString(strings.Repeat("| ", indent+1))
 			out.WriteString("Size:\n")
@@ -674,7 +674,7 @@ type Parameter struct {
 	Token    token.Token
 	Name     *Identifier
 	Type     *Identifier // Type of the parameter
-	IsVector bool
+	IsArray bool
 	Size     Expression // Can be nil if the size is not specified
 }
 
@@ -686,7 +686,7 @@ func (p *Parameter) String() string {
 	out.WriteString(p.Type.String())
 	out.WriteString(" ")
 	out.WriteString(p.Name.String())
-	if p.IsVector {
+	if p.IsArray {
 		out.WriteString("[")
 		if p.Size != nil {
 			out.WriteString(p.Size.String())
@@ -703,7 +703,7 @@ func (p *Parameter) Stringify(indent int) string {
 	out.WriteString("Expression: Parameter\n")
 
 	out.WriteString(strings.Repeat("| ", indent+1))
-	out.WriteString("Vector: " + strconv.FormatBool(p.IsVector) + "\n")
+	out.WriteString("Array: " + strconv.FormatBool(p.IsArray) + "\n")
 
 	out.WriteString(strings.Repeat("| ", indent+1))
 	out.WriteString("Expression(Type): Identifier (" + p.Type.String() + ")\n")

@@ -9,55 +9,55 @@ Program
 | | | | Token: point2D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | Expression: Struct
 | | | | Token: circle
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (point2D)
 | | | | | | Expression(Name): Identifier (center)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (radius)
 | | | Expression: Struct
 | | | | Token: point3D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
 | | | Expression: Struct
 | | | | Token: sphere
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (point3D)
 | | | | | | Expression(Name): Identifier (center)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (radius)
 | Statement: FunctionStatement
 | | Token: main
 | | Parameters:
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (bool)
 | | Body:
@@ -177,15 +177,15 @@ Program
 | | Token: intersectionArea
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (circle)
 | | | | Expression(Name): Identifier (c1)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (circle)
 | | | | Expression(Name): Identifier (c2)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:
@@ -425,15 +425,15 @@ Program
 | | Token: intersectionVolume
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (sphere)
 | | | | Expression(Name): Identifier (s1)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (sphere)
 | | | | Expression(Name): Identifier (s2)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:
@@ -669,15 +669,15 @@ Program
 | | Token: distance2D
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (point2D)
 | | | | Expression(Name): Identifier (p)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (point2D)
 | | | | Expression(Name): Identifier (q)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:
@@ -732,15 +732,15 @@ Program
 | | Token: distance3D
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (point3D)
 | | | | Expression(Name): Identifier (p)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (point3D)
 | | | | Expression(Name): Identifier (q)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:

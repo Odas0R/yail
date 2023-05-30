@@ -15,7 +15,7 @@ Program
 | | Token: main
 | | Parameters:
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (bool)
 | | Body:
@@ -93,11 +93,11 @@ Program
 | | Token: fact
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (int)
 | | | | Expression(Name): Identifier (n)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (int)
 | | Body:

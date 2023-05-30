@@ -9,37 +9,37 @@ Program
 | | | | Token: point3D
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (x)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (y)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (z)
 | | | Expression: Struct
 | | | | Token: cylinder
 | | | | Attributes:
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (point3D)
 | | | | | | Expression(Name): Identifier (base)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (float)
 | | | | | | Expression(Name): Identifier (radius)
 | | | | | Expression: Attribute
-| | | | | | Vector: false
+| | | | | | Array: false
 | | | | | | Expression(Type): Identifier (point3D)
 | | | | | | Expression(Name): Identifier (height)
 | Statement: FunctionStatement
 | | Token: main
 | | Parameters:
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (bool)
 | | Body:
@@ -108,15 +108,15 @@ Program
 | | Token: intersectionVolume
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (cylinder)
 | | | | Expression(Name): Identifier (c1)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (cylinder)
 | | | | Expression(Name): Identifier (c2)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:
@@ -303,15 +303,15 @@ Program
 | | Token: distance3D
 | | Parameters:
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (point3D)
 | | | | Expression(Name): Identifier (p)
 | | | Expression: Parameter
-| | | | Vector: false
+| | | | Array: false
 | | | | Expression(Type): Identifier (point3D)
 | | | | Expression(Name): Identifier (q)
 | | ReturnType:
-| | | | Vector: false
+| | | | Array: false
 | | | Expression: ReturnType
 | | | | Expression(Type): Identifier (float)
 | | Body:

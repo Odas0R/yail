@@ -27,7 +27,7 @@ const (
 	FUNCTION_OBJ = "FUNCTION"
 	BUILTIN_OBJ  = "BUILTIN"
 
-	VECTOR_OBJ = "VECTOR"
+	ARRAY_OBJ = "ARRAY"
 )
 
 type HashKey struct {
@@ -147,12 +147,12 @@ type Builtin struct {
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
 func (b *Builtin) Inspect() string  { return "builtin function" }
 
-type Vector struct {
+type Array struct {
 	Elements []Object
 }
 
-func (ao *Vector) Type() ObjectType { return VECTOR_OBJ }
-func (ao *Vector) Inspect() string {
+func (ao *Array) Type() ObjectType { return ARRAY_OBJ }
+func (ao *Array) Inspect() string {
 	var out bytes.Buffer
 
 	elements := []string{}

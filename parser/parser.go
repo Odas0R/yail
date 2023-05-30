@@ -202,11 +202,11 @@ func (p *Parser) parseVariableStatement() ast.Statement {
 		name := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 		// ----------------
-		// Vector
+		// Array
 		// ----------------
 
 		if p.peekTokenIs(token.LBRACKET) {
-			statements = append(statements, p.parseVectorStatement(curToken, curType, name))
+			statements = append(statements, p.parseArrayStatement(curToken, curType, name))
 		} else {
 
 			// ----------------
@@ -259,10 +259,10 @@ func (p *Parser) parseVariableStatement() ast.Statement {
 	}
 }
 
-func (p *Parser) parseVectorStatement(curToken token.Token, curType *ast.Identifier, name *ast.Identifier) ast.Statement {
-	vecSize := p.parseVectorSize()
+func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifier, name *ast.Identifier) ast.Statement {
+	vecSize := p.parseArraySize()
 
-	vecStmt := &ast.VectorStatement{
+	vecStmt := &ast.ArrayStatement{
 		Token: curToken,
 		Name:  name,
 		Size:  vecSize,
@@ -277,7 +277,7 @@ func (p *Parser) parseVectorStatement(curToken token.Token, curType *ast.Identif
 				values[i] = p.defaultValueForType(vecStmt.Token)
 			}
 
-			vecStmt.Values = &ast.VectorLiteral{
+			vecStmt.Values = &ast.ArrayLiteral{
 				Token:  token.Token{Type: token.LBRACE, Literal: "{"},
 				Values: values,
 			}
@@ -291,10 +291,10 @@ func (p *Parser) parseVectorStatement(curToken token.Token, curType *ast.Identif
 		}
 		p.nextToken()
 
-		vecStmt.Values = p.parseVectorLiteral()
+		vecStmt.Values = p.parseArrayLiteral()
 
 		// Set the size if it wasn't set before
-		if vl, ok := vecStmt.Values.(*ast.VectorLiteral); ok {
+		if vl, ok := vecStmt.Values.(*ast.ArrayLiteral); ok {
 			vecStmt.Size = &ast.IntegerLiteral{
 				Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Values))},
 				Value: int64(len(vl.Values)),
@@ -321,7 +321,7 @@ func (p *Parser) parseVariableAssignStatment() ast.Statement {
 		p.nextToken()
 		p.nextToken()
 
-		values := p.parseVectorLiteral()
+		values := p.parseArrayLiteral()
 
 		if !p.expectPeek(token.RBRACE) {
 			return nil
@@ -354,7 +354,7 @@ func (p *Parser) parseVariableAssignStatment() ast.Statement {
 	}
 }
 
-func (p *Parser) parseVectorSize() ast.Expression {
+func (p *Parser) parseArraySize() ast.Expression {
 	if !p.expectPeek(token.LBRACKET) {
 		return nil
 	}
@@ -375,12 +375,12 @@ func (p *Parser) parseVectorSize() ast.Expression {
 	return size
 }
 
-func (p *Parser) parseVectorLiteral() ast.Expression {
+func (p *Parser) parseArrayLiteral() ast.Expression {
 	curToken := p.curToken
 	expressions := []ast.Expression{}
 
 	if p.curTokenIs(token.RBRACE) {
-		return &ast.VectorLiteral{Token: curToken, Values: expressions}
+		return &ast.ArrayLiteral{Token: curToken, Values: expressions}
 	}
 
 	expressions = append(expressions, p.parseExpression(LOWEST))
@@ -391,7 +391,7 @@ func (p *Parser) parseVectorLiteral() ast.Expression {
 		expressions = append(expressions, p.parseExpression(LOWEST))
 	}
 
-	return &ast.VectorLiteral{Token: curToken, Values: expressions}
+	return &ast.ArrayLiteral{Token: curToken, Values: expressions}
 }
 
 func (p *Parser) parseStructsStatement() *ast.StructsStatement {
@@ -463,7 +463,7 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 				return nil
 			}
 		}
-		topAttr.IsVector = true
+		topAttr.IsArray = true
 	}
 
 	attributes = append(attributes, topAttr)
@@ -504,7 +504,7 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 				}
 			}
 
-			attr.IsVector = true
+			attr.IsArray = true
 		}
 
 		attributes = append(attributes, attr)
@@ -714,10 +714,10 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 		if isBlock {
 			for _, s := range stmt.(*ast.BlockStatement).Statements {
 				_, isVariable := s.(*ast.VariableStatement)
-				_, isVector := s.(*ast.VectorStatement)
+				_, isArray := s.(*ast.ArrayStatement)
 				_, isAssign := stmt.(*ast.AssignmentStatement)
 
-				if !isVariable && !isVector && !isAssign {
+				if !isVariable && !isArray && !isAssign {
 					p.addError("Only variable declarations are allowed in variable blocks")
 					p.nextToken()
 					return nil
@@ -725,10 +725,10 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 			}
 		} else {
 			_, isVariable := stmt.(*ast.VariableStatement)
-			_, isVector := stmt.(*ast.VectorStatement)
+			_, isArray := stmt.(*ast.ArrayStatement)
 			_, isAssign := stmt.(*ast.AssignmentStatement)
 
-			if !isVariable && !isVector && !isAssign {
+			if !isVariable && !isArray && !isAssign {
 				p.addError("Only variable declarations are allowed in variable blocks")
 				p.nextToken()
 				return nil
@@ -801,7 +801,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Parameter {
 				return nil
 			}
 		}
-		topParam.IsVector = true
+		topParam.IsArray = true
 	}
 
 	parameters = append(parameters, topParam)
@@ -842,7 +842,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Parameter {
 				}
 			}
 
-			param.IsVector = true
+			param.IsArray = true
 		}
 
 		parameters = append(parameters, param)
@@ -874,7 +874,7 @@ func (p *Parser) parseFunctionReturnType() *ast.ReturnType {
 				return nil
 			}
 		}
-		returnType.IsVector = true
+		returnType.IsArray = true
 	}
 
 	return returnType
