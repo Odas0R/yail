@@ -201,7 +201,7 @@ func TestParsingVectorIndexSetterExpressions(t *testing.T) {
 }
 
 func TestParsingIndexExpressions(t *testing.T) {
-	input := "myArray[1 + 1]"
+	input := "myVector[1 + 1]"
 
 	l := lexer.New(input)
 	p := New(l)
@@ -215,7 +215,7 @@ func TestParsingIndexExpressions(t *testing.T) {
 		t.Fatalf("exp not *ast.IndexExpression. got=%T", stmt.Expression)
 	}
 
-	if !testIdentifier(t, indexExp.Left, "myArray") {
+	if !testIdentifier(t, indexExp.Left, "myVector") {
 		return
 	}
 

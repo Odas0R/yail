@@ -94,6 +94,14 @@ func testExpectedObject(
 		if actual != Null {
 			t.Errorf("object is not Null. got=%T (%+v)", actual, actual)
 		}
+	case string:
+		if str, ok := actual.(*object.String); ok {
+			if str.Value != expected {
+				t.Errorf("String has wrong value. got=%q, want=%q", str.Value, expected)
+			}
+		} else {
+			t.Errorf("object is not String. got=%T (%+v)", actual, actual)
+		}
 	}
 }
 
@@ -198,6 +206,15 @@ func TestGlobalVarStatement(t *testing.T) {
 			one + two;
 			`, 3,
 		},
+	}
+	runVmTests(t, tests)
+}
+
+func TestStringExpressions(t *testing.T) {
+	tests := []vmTestCase{
+		{`"monkey"`, "monkey"},
+		{`"mon" + "key"`, "monkey"},
+		{`"mon" + "key" + "banana"`, "monkeybanana"},
 	}
 	runVmTests(t, tests)
 }

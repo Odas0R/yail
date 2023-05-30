@@ -31,7 +31,7 @@ intersectionArea(circle c1, circle c2) float {
 
   if (d >= r1 + r2) {
     area = 0;
-  } 
+  }
 
   if (d <= abs(r1 - r2)) {
     area = pi * min(r1, r2) * min(r1, r2);
@@ -53,7 +53,7 @@ intersectionVolume(sphere s1, sphere s2) float {
 
   if (d >= r1 + r2) {
     vol = 0;
-  } 
+  }
 
   if (d <= abs(r1 - r2)) {
     vol = (4/3) * pi * pow(min(r1, r2), 3);

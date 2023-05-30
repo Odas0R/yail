@@ -145,18 +145,6 @@ func (c *Compiler) Compile(node ast.Node) error {
 		default:
 			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
-	case *ast.Boolean:
-		if node.Value {
-			c.emit(code.OpTrue)
-		} else {
-			c.emit(code.OpFalse)
-		}
-	case *ast.FloatLiteral:
-		float := &object.Float{Value: node.Value}
-		c.emit(code.OpConstant, c.addConstant(float))
-	case *ast.IntegerLiteral:
-		integer := &object.Integer{Value: node.Value}
-		c.emit(code.OpConstant, c.addConstant(integer))
 	case *ast.IfExpression:
 		err := c.Compile(node.Condition)
 		if err != nil {
@@ -196,6 +184,23 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		afterAlternativePos := len(c.instructions)
 		c.changeOperand(jumpPos, afterAlternativePos)
+
+	// Types
+	case *ast.Boolean:
+		if node.Value {
+			c.emit(code.OpTrue)
+		} else {
+			c.emit(code.OpFalse)
+		}
+	case *ast.StringLiteral:
+		string := &object.String{Value: node.Value}
+		c.emit(code.OpConstant, c.addConstant(string))
+	case *ast.FloatLiteral:
+		float := &object.Float{Value: node.Value}
+		c.emit(code.OpConstant, c.addConstant(float))
+	case *ast.IntegerLiteral:
+		integer := &object.Integer{Value: node.Value}
+		c.emit(code.OpConstant, c.addConstant(integer))
 	}
 	return nil
 }
