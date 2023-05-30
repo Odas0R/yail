@@ -86,10 +86,10 @@ func (i *Identifier) Stringify(level int) string {
 }
 
 type VariableStatement struct {
-	Token token.Token 
+	Token token.Token
 	Type  *Identifier // The type of the variable (e.g., int, float, or bool)
 	Name  *Identifier // The variable name (e.g., x, y, or z)
-	Value Expression  // The value assigned to the variable, can be nil
+	Value Expression  // The elements of the array, can be nil
 }
 
 func (vs *VariableStatement) statementNode()       {}
@@ -207,74 +207,48 @@ func (fl *FloatLiteral) Stringify(indent int) string {
 	return out.String()
 }
 
-type ArrayLiteral struct {
-	Token  token.Token
+type ArrayStatement struct {
+	Token    token.Token
+	Size     Expression  // The size of the array, can be integer or expression
+	Type     *Identifier // The type of the array (e.g., int, float, or bool)
+	Name     *Identifier // The variable name (e.g., x, y, or z)
 	Elements []Expression
 }
 
-func (vl *ArrayLiteral) expressionNode()      {}
-func (vl *ArrayLiteral) TokenLiteral() string { return vl.Token.Literal }
-func (vl *ArrayLiteral) String() string {
+func (as *ArrayStatement) statementNode()       {}
+func (as *ArrayStatement) TokenLiteral() string { return as.Token.Literal }
+func (as *ArrayStatement) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("{")
-	if len(vl.Elements) > 0 {
-		for i, value := range vl.Elements {
-			out.WriteString(value.String())
-			if i < len(vl.Elements)-1 {
-				out.WriteString(", ")
-			}
-		}
-		out.WriteString("}")
-	}
-
-	return out.String()
-}
-func (vl *ArrayLiteral) Stringify(indent int) string {
-	var out strings.Builder
-
-	out.WriteString(strings.Repeat("| ", indent))
-	out.WriteString("Expression: ArrayLiteral\n")
-
-	for _, value := range vl.Elements {
-		out.WriteString(value.Stringify(indent + 1))
-	}
-
-	return out.String()
-}
-
-type ArrayStatement struct {
-	Token  token.Token // The token.TYPE_INT, token.TYPE_FLOAT or token.TYPE_BOOL token
-	Size   Expression  // The size of the array, can be integer or expression
-	Type   *Identifier // The type of the array (e.g., int, float, or bool)
-	Name   *Identifier // The variable name (e.g., x, y, or z)
-	Values Expression  // The values assigned to the array, can be nil or an array of expressions
-}
-
-func (vl *ArrayStatement) statementNode()       {}
-func (vs *ArrayStatement) TokenLiteral() string { return vs.Token.Literal }
-func (vs *ArrayStatement) String() string {
-	var out bytes.Buffer
-
-	out.WriteString(vs.Type.String() + " ")
-	out.WriteString(vs.Name.String())
+	out.WriteString(as.Type.String() + " ")
+	out.WriteString(as.Name.String())
 	out.WriteString("[")
 
-	if vs.Size != nil {
-		out.WriteString(vs.Size.String())
+	if as.Size != nil {
+		out.WriteString(as.Size.String())
 	}
 
 	out.WriteString("]")
-	out.WriteString(" = ")
 
-	if vs.Values != nil {
-		out.WriteString(vs.Values.String())
+	if len(as.Elements) > 0 {
+		out.WriteString(" = ")
+
+		out.WriteString("{")
+		if len(as.Elements) > 0 {
+			for i, value := range as.Elements {
+				out.WriteString(value.String())
+				if i < len(as.Elements)-1 {
+					out.WriteString(", ")
+				}
+			}
+			out.WriteString("}")
+		}
 	}
 
 	out.WriteString(";")
 	return out.String()
 }
-func (vs *ArrayStatement) Stringify(indent int) string {
+func (as *ArrayStatement) Stringify(indent int) string {
 	var out strings.Builder
 
 	out.WriteString(strings.Repeat("| ", indent))
@@ -284,29 +258,31 @@ func (vs *ArrayStatement) Stringify(indent int) string {
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression(Type): Indentifier (")
-	out.WriteString(vs.Type.String())
+	out.WriteString(as.Type.String())
 	out.WriteString(")\n")
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression(Name): Identifier (")
-	out.WriteString(vs.Name.String())
+	out.WriteString(as.Name.String())
 	out.WriteString(")\n")
 
 	out.WriteString(strings.Repeat("| ", indent))
-	out.WriteString(fmt.Sprintf("Expression(Size): %T (", vs.Size))
-	if vs.Size != nil {
-		out.WriteString(vs.Size.String())
+	out.WriteString(fmt.Sprintf("Expression(Size): %T (", as.Size))
+	if as.Size != nil {
+		out.WriteString(as.Size.String())
 	}
 	out.WriteString(")\n")
 
 	out.WriteString(strings.Repeat("| ", indent))
 	out.WriteString("Expression(Values):\n")
 
-	if vs.Values == nil {
+	if len(as.Elements) > 0 {
+		for _, value := range as.Elements {
+			out.WriteString(value.Stringify(indent + 1))
+		}
+	} else {
 		out.WriteString(strings.Repeat("| ", indent+1))
 		out.WriteString("nil\n")
-	} else {
-		out.WriteString(vs.Values.Stringify(indent + 1))
 	}
 
 	return out.String()
@@ -566,12 +542,12 @@ func (fs *ForStatement) Stringify(indent int) string {
 }
 
 type Attribute struct {
-	Token    token.Token
-	Name     *Identifier
-	Type     *Identifier // Type of the parameter
+	Token   token.Token
+	Name    *Identifier
+	Type    *Identifier // Type of the parameter
 	IsArray bool
-	Size     Expression // Can be nil if the size is not specified
-	Value    Expression // Can be nil if the value is not specified
+	Size    Expression // Can be nil if the size is not specified
+	Value   Expression // Can be nil if the value is not specified
 }
 
 func (a *Attribute) expressionNode()      {}
@@ -625,10 +601,10 @@ func (a *Attribute) Stringify(indent int) string {
 }
 
 type ReturnType struct {
-	Token    token.Token
-	Type     *Identifier // Type of the parameter
+	Token   token.Token
+	Type    *Identifier // Type of the parameter
 	IsArray bool
-	Size     Expression
+	Size    Expression
 }
 
 func (rt *ReturnType) expressionNode()      {}
@@ -671,11 +647,11 @@ func (rt *ReturnType) Stringify(indent int) string {
 }
 
 type Parameter struct {
-	Token    token.Token
-	Name     *Identifier
-	Type     *Identifier // Type of the parameter
+	Token   token.Token
+	Name    *Identifier
+	Type    *Identifier // Type of the parameter
 	IsArray bool
-	Size     Expression // Can be nil if the size is not specified
+	Size    Expression // Can be nil if the size is not specified
 }
 
 func (p *Parameter) expressionNode()      {}

@@ -277,10 +277,7 @@ func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifi
 				values[i] = p.defaultValueForType(arrStmt.Token)
 			}
 
-			arrStmt.Values = &ast.ArrayLiteral{
-				Token:  token.Token{Type: token.LBRACE, Literal: "{"},
-				Elements: values,
-			}
+			arrStmt.Elements = values
 		}
 	} else {
 		p.nextToken()
@@ -289,21 +286,40 @@ func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifi
 		if !p.expectPeek(token.LBRACE) {
 			return nil
 		}
+
+		if p.peekTokenIs(token.RBRACE) {
+			p.nextToken()
+
+			arrStmt.Size = &ast.IntegerLiteral{
+				Token: token.Token{Type: token.INT, Literal: "1"},
+				Value: 1,
+			}
+			arrStmt.Elements = []ast.Expression{p.defaultValueForType(arrStmt.Token)}
+
+			if p.peekTokenIs(token.SEMICOLON) {
+				p.nextToken()
+			}
+
+			return arrStmt
+		}
+
 		p.nextToken()
 
-		arrStmt.Values = p.parseArrayLiteral()
+		arrStmt.Elements = p.parseArrayElements()
 
 		// Set the size if it wasn't set before
-		if vl, ok := arrStmt.Values.(*ast.ArrayLiteral); ok {
-			arrStmt.Size = &ast.IntegerLiteral{
-				Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(vl.Elements))},
-				Value: int64(len(vl.Elements)),
-			}
+		arrStmt.Size = &ast.IntegerLiteral{
+			Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(arrStmt.Elements))},
+			Value: int64(len(arrStmt.Elements)),
 		}
 
 		// Expect the '}' token
 		if !p.expectPeek(token.RBRACE) {
 			return nil
+		}
+
+		if p.peekTokenIs(token.SEMICOLON) {
+			p.nextToken()
 		}
 	}
 
@@ -311,7 +327,8 @@ func (p *Parser) parseArrayStatement(curToken token.Token, curType *ast.Identifi
 }
 
 func (p *Parser) parseVariableAssignStatment() ast.Statement {
-	curToken := p.curToken
+	firstToken := p.curToken
+	curType := p.parseType()
 
 	name := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
@@ -319,9 +336,28 @@ func (p *Parser) parseVariableAssignStatment() ast.Statement {
 
 	if p.peekTokenIs(token.LBRACE) {
 		p.nextToken()
+
+		if p.peekTokenIs(token.RBRACE) {
+			p.nextToken()
+			if p.peekTokenIs(token.SEMICOLON) {
+				p.nextToken()
+			}
+
+			return &ast.ArrayStatement{
+				Token: firstToken,
+				Type:  curType,
+				Size: &ast.IntegerLiteral{
+					Token: token.Token{Type: token.INT, Literal: "1"},
+					Value: 1,
+				},
+				Name:     name,
+				Elements: []ast.Expression{p.defaultValueForType(firstToken)},
+			}
+		}
+
 		p.nextToken()
 
-		values := p.parseArrayLiteral()
+		values := p.parseArrayElements()
 
 		if !p.expectPeek(token.RBRACE) {
 			return nil
@@ -331,10 +367,15 @@ func (p *Parser) parseVariableAssignStatment() ast.Statement {
 			p.nextToken()
 		}
 
-		return &ast.AssignmentStatement{
-			Token: curToken,
-			Left:  name,
-			Value: values,
+		return &ast.ArrayStatement{
+			Token: firstToken,
+			Type:  curType,
+			Size: &ast.IntegerLiteral{
+				Token: token.Token{Type: token.INT, Literal: strconv.Itoa(len(values))},
+				Value: int64(len(values)),
+			},
+			Name:     name,
+			Elements: values,
 		}
 	} else {
 		p.nextToken()
@@ -347,7 +388,7 @@ func (p *Parser) parseVariableAssignStatment() ast.Statement {
 		}
 
 		return &ast.AssignmentStatement{
-			Token: curToken,
+			Token: firstToken,
 			Left:  name,
 			Value: value,
 		}
@@ -375,12 +416,11 @@ func (p *Parser) parseArraySize() ast.Expression {
 	return size
 }
 
-func (p *Parser) parseArrayLiteral() ast.Expression {
-	curToken := p.curToken
+func (p *Parser) parseArrayElements() []ast.Expression {
 	expressions := []ast.Expression{}
 
 	if p.curTokenIs(token.RBRACE) {
-		return &ast.ArrayLiteral{Token: curToken, Elements: expressions}
+		return expressions
 	}
 
 	expressions = append(expressions, p.parseExpression(LOWEST))
@@ -391,7 +431,7 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 		expressions = append(expressions, p.parseExpression(LOWEST))
 	}
 
-	return &ast.ArrayLiteral{Token: curToken, Elements: expressions}
+	return expressions
 }
 
 func (p *Parser) parseStructsStatement() *ast.StructsStatement {

@@ -422,13 +422,14 @@ func TestStringExpressions(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
-func TestArrayLiterals(t *testing.T) {
+func TestArrayStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input:             "int v[] = {};",
-			expectedConstants: []interface{}{},
+			input:             "int v[];",
+			expectedConstants: []interface{}{0},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.OpArray, 0),
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpArray, 1),
 				code.Make(code.OpPop),
 			},
 		},

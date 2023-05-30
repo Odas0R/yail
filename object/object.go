@@ -160,9 +160,9 @@ func (ao *Array) Inspect() string {
 		elements = append(elements, e.Inspect())
 	}
 
-	out.WriteString("[")
+	out.WriteString("{")
 	out.WriteString(strings.Join(elements, ", "))
-	out.WriteString("]")
+	out.WriteString("}")
 
 	return out.String()
 }

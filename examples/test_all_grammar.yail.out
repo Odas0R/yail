@@ -61,57 +61,51 @@ Program
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (5)
 | | Expression(Values):
-| | | Expression: ArrayLiteral
-| | | | Expression: IntegerLiteral (1)
-| | | | Expression: IntegerLiteral (2)
-| | | | Expression: IntegerLiteral (3)
-| | | | Expression: IntegerLiteral (4)
-| | | | Expression: IntegerLiteral (5)
+| | | Expression: IntegerLiteral (1)
+| | | Expression: IntegerLiteral (2)
+| | | Expression: IntegerLiteral (3)
+| | | Expression: IntegerLiteral (4)
+| | | Expression: IntegerLiteral (5)
 | Statement: ArrayStatement
 | | Expression(Type): Indentifier (float)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (2)
 | | Expression(Values):
-| | | Expression: ArrayLiteral
-| | | | Expression: FloatLiteral (1.3)
-| | | | Expression: FloatLiteral (1.2)
+| | | Expression: FloatLiteral (1.3)
+| | | Expression: FloatLiteral (1.2)
 | Statement: ArrayStatement
 | | Expression(Type): Indentifier (bool)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (2)
 | | Expression(Values):
-| | | Expression: ArrayLiteral
-| | | | Expression: Boolean (false)
-| | | | Expression: Boolean (true)
+| | | Expression: Boolean (false)
+| | | Expression: Boolean (true)
 | Statement: ArrayStatement
 | | Expression(Type): Indentifier (int)
 | | Expression(Name): Identifier (x)
 | | Expression(Size): *ast.IntegerLiteral (5)
 | | Expression(Values):
-| | | Expression: ArrayLiteral
-| | | | Expression: IntegerLiteral (1)
-| | | | Expression: IntegerLiteral (2)
-| | | | Expression: IntegerLiteral (3)
-| | | | Expression: IntegerLiteral (4)
-| | | | Expression: IntegerLiteral (5)
-| Statement: AssignmentStatement
-| | Token: x
-| | Expression(Left):
-| | | Expression: Identifier (x)
-| | Expression(Value):
-| | | Expression: ArrayLiteral
-| | | | Expression: Boolean (false)
-| | | | Expression: Boolean (true)
-| | | | Expression: Boolean (false)
-| Statement: AssignmentStatement
-| | Token: x
-| | Expression(Left):
-| | | Expression: Identifier (x)
-| | Expression(Value):
-| | | Expression: ArrayLiteral
-| | | | Expression: FloatLiteral (1.2424)
-| | | | Expression: FloatLiteral (2.12412512)
-| | | | Expression: FloatLiteral (3.10284091284901824)
+| | | Expression: IntegerLiteral (1)
+| | | Expression: IntegerLiteral (2)
+| | | Expression: IntegerLiteral (3)
+| | | Expression: IntegerLiteral (4)
+| | | Expression: IntegerLiteral (5)
+| Statement: ArrayStatement
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (3)
+| | Expression(Values):
+| | | Expression: Boolean (false)
+| | | Expression: Boolean (true)
+| | | Expression: Boolean (false)
+| Statement: ArrayStatement
+| | Expression(Type): Indentifier (<unknown>)
+| | Expression(Name): Identifier (x)
+| | Expression(Size): *ast.IntegerLiteral (3)
+| | Expression(Values):
+| | | Expression: FloatLiteral (1.2424)
+| | | Expression: FloatLiteral (2.12412512)
+| | | Expression: FloatLiteral (3.10284091284901824)
 | Statement: ConstStatement
 | | Token: const
 | | Body:

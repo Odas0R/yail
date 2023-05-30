@@ -134,6 +134,7 @@ func TestArrayStatements(t *testing.T) {
 		expectedValue interface{}
 	}{
 		{"int a[];", "int", "a", 1, []int64{0}},
+		{"int v[] = {};", "int", "v", 1, []int64{0}},
 		{"bool b[];", "bool", "b", 1, []bool{false}},
 		{"float c[];", "float", "c", 1, []float64{0}},
 		{"int x[3]={1, 2, 3};", "int", "x", 3, []int64{1, 2, 3}},
@@ -159,7 +160,7 @@ func TestArrayStatements(t *testing.T) {
 			return
 		}
 
-		for i, v := range stmt.(*ast.ArrayStatement).Values.(*ast.ArrayLiteral).Elements {
+		for i, v := range stmt.(*ast.ArrayStatement).Elements {
 			switch tt.expectedValue.(type) {
 			case []int64:
 				testLiteralExpression(t, v, tt.expectedValue.([]int64)[i])
