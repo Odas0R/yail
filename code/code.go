@@ -54,6 +54,7 @@ const (
 	OpReturnValue
 	OpReturn
 	OpGetBuiltin
+	OpGetAttribute
 )
 
 // These are the definitions of the opcodes that we support.
@@ -85,6 +86,7 @@ var definitions = map[Opcode]*Definition{
 	OpReturnValue:   {"OpReturnValue", []int{}},
 	OpReturn:        {"OpReturnValue", []int{}},
 	OpGetBuiltin:    {"OpGetBuiltin", []int{1}},
+	OpGetAttribute:  {"OpGetAttribute", []int{1}},
 }
 
 func Lookup(op byte) (*Definition, error) {

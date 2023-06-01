@@ -497,12 +497,10 @@ func TestStructStatements(t *testing.T) {
 				point2D {int x;};
 			}
 		`,
-			expectedConstants: []interface{}{"point2D", "x", 0},
+			expectedConstants: []interface{}{0},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
-				code.Make(code.OpConstant, 1),
-				code.Make(code.OpConstant, 2),
-				code.Make(code.OpStruct, 2),
+				code.Make(code.OpStruct, 1),
 			},
 		},
 		{
@@ -512,32 +510,42 @@ func TestStructStatements(t *testing.T) {
 				point3D {float x, y, z;};
 			}
 		`,
-			expectedConstants: []interface{}{"circle", "center", 0, "radius", 0, "point3D", "x", 0.0, "y", 0.0, "z", 0.0},
+			expectedConstants: []interface{}{0, 0, 0.0, 0.0, 0.0},
 			expectedInstructions: []code.Instructions{
-				// circle
 				code.Make(code.OpConstant, 0),
-				// center
 				code.Make(code.OpConstant, 1),
+				code.Make(code.OpStruct, 2),
 				code.Make(code.OpConstant, 2),
-				// radius
 				code.Make(code.OpConstant, 3),
 				code.Make(code.OpConstant, 4),
-				// set struct
-				code.Make(code.OpStruct, 4),
-
-				// point3D
-				code.Make(code.OpConstant, 5),
-				// x
-				code.Make(code.OpConstant, 6),
-				code.Make(code.OpConstant, 7),
-				// y
-				code.Make(code.OpConstant, 8),
-				code.Make(code.OpConstant, 9),
-				// z
-				code.Make(code.OpConstant, 10),
-				code.Make(code.OpConstant, 11),
-
-				code.Make(code.OpStruct, 6),
+				code.Make(code.OpStruct, 3),
+			},
+		},
+		{
+			input: `
+			structs {
+				circle {int center, int radius;};
+			}
+			global {
+				circle c;
+			}
+			c.center;
+		`,
+			expectedConstants: []interface{}{0, 0, &object.Struct{
+				Attributes: map[string]object.Object{
+					"center": &object.Integer{Value: 0},
+					"radius": &object.Integer{Value: 0},
+				},
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpStruct, 2),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpGetAttribute, 0),
+				code.Make(code.OpPop),
 			},
 		},
 	}
@@ -875,7 +883,7 @@ func TestBuiltins(t *testing.T) {
 				code.Make(code.OpPop),
 			},
 		},
-			{
+		{
 			input: `
 			global {
 				int v[] = {1,2,3};
@@ -898,7 +906,6 @@ func TestBuiltins(t *testing.T) {
 				code.Make(code.OpSetGlobal, 0),
 				code.Make(code.OpConstant, 3),
 				code.Make(code.OpSetGlobal, 1),
-
 			},
 		},
 	}

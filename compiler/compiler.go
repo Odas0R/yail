@@ -209,6 +209,81 @@ func (c *Compiler) Compile(node ast.Node) error {
 				return fmt.Errorf("global statement must contain only variable statements")
 			}
 		}
+	case *ast.StructsStatement:
+		for _, st := range node.Structs {
+			err := c.Compile(st)
+			if err != nil {
+				return err
+			}
+		}
+	case *ast.Struct:
+		structName := node.Name.Value
+
+		for _, attr := range node.Attributes {
+			attrName := attr.Name.Value
+			// compile the attribute value
+			err := c.Compile(attr.Value)
+			if err != nil {
+				return err
+			}
+
+			var obj object.Object
+			switch attr.Value.(type) {
+			case *ast.IntegerLiteral:
+				obj = &object.Integer{Value: 0}
+			case *ast.Boolean:
+				obj = &object.Boolean{Value: false}
+			case *ast.StringLiteral:
+				obj = &object.String{Value: ""}
+			case *ast.ArrayStatement:
+				// based on the array type, we should create an array object with
+				// the correct type
+				arrType := attr.Type.Value
+				switch arrType {
+				case "int":
+					obj = &object.Array{Elements: []object.Object{
+						&object.Integer{Value: 0},
+					}}
+				case "bool":
+					obj = &object.Array{Elements: []object.Object{
+						&object.Boolean{Value: false},
+					}}
+				case "float":
+					obj = &object.Array{Elements: []object.Object{
+						&object.Float{Value: 0.0},
+					}}
+				case "string":
+					obj = &object.Array{Elements: []object.Object{
+						&object.String{Value: ""},
+					}}
+				default:
+					obj = &object.Array{Elements: []object.Object{
+						&object.Null{},
+					}}
+				}
+			}
+
+			c.symbolTable.DefineAttribute(structName, attrName, obj)
+		}
+
+		// emit the OpStruct instruction
+		c.emit(code.OpStruct, len(node.Attributes))
+	case *ast.AccessorExpression:
+		err := c.Compile(node.Left)
+		if err != nil {
+			return err
+		}
+
+		// TODO: this is not working!
+
+		// attr, ok := node.Index[0].(*ast.Identifier)
+		// if !ok {
+		// 	return fmt.Errorf("accessor expression must contain an identifier")
+		// }
+
+		// emit the OpGetAttr instruction
+		c.emit(code.OpGetAttribute, 0)
+
 	case *ast.ForStatement:
 		// TODO
 	case *ast.WhileStatement:
@@ -278,6 +353,19 @@ func (c *Compiler) Compile(node ast.Node) error {
 		err := c.Compile(node.Value)
 		if err != nil {
 			return err
+		}
+
+		// check if varType exists in the symbol table
+		symb, ok := c.symbolTable.ResolveStruct(node.Type.Value)
+		if ok {
+			// we should compile the struct and emit an OpConstant with the
+			// object struct
+			strct := &object.Struct{
+				Attributes: symb.Atributes,
+			}
+
+			// emit the OpConstant
+			c.emit(code.OpConstant, c.addConstant(strct))
 		}
 
 	case *ast.IndexExpression:
@@ -419,33 +507,6 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 		c.emit(code.OpCall, len(node.Arguments))
-
-	case *ast.StructsStatement:
-		for _, st := range node.Structs {
-			err := c.Compile(st)
-			if err != nil {
-				return err
-			}
-		}
-	case *ast.Struct:
-		// compile the name Identifier
-		name := node.Name.Value
-		c.emit(code.OpConstant, c.addConstant(&object.String{Value: name}))
-
-		for _, attr := range node.Attributes {
-			// compile the attribute name
-			name := attr.Name.Value
-			c.emit(code.OpConstant, c.addConstant(&object.String{Value: name}))
-
-			// compile the attribute value
-			err := c.Compile(attr.Value)
-			if err != nil {
-				return err
-			}
-		}
-
-		// emit the OpStruct instruction
-		c.emit(code.OpStruct, len(node.Attributes)*2)
 
 	// Types
 	case *ast.ArrayStatement:
