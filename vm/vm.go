@@ -143,11 +143,20 @@ func (vm *VM) Run() error {
 				return err
 			}
 		case code.OpCall:
-			fn, ok := vm.stack[vm.sp-1].(*object.CompiledFunction)
+			numArgs := int(code.ReadUint8(ins[ip+1:]))
+			vm.currentFrame().ip += 1
+
+			fn, ok := vm.stack[vm.sp-1-int(numArgs)].(*object.CompiledFunction)
 			if !ok {
 				return fmt.Errorf("calling non-function object: %T", vm.stack[vm.sp-1])
 			}
-			frame := NewFrame(fn, vm.sp)
+
+			if numArgs != fn.NumParameters {
+				return fmt.Errorf("wrong number of arguments: want=%d, got=%d",
+					fn.NumParameters, numArgs)
+			}
+
+			frame := NewFrame(fn, vm.sp-numArgs)
 			vm.pushFrame(frame)
 			vm.sp = frame.basePointer + fn.NumLocals
 
