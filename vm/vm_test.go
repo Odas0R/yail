@@ -131,6 +131,16 @@ func testExpectedObject(
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
 		}
+	case *object.Error:
+		errObj, ok := actual.(*object.Error)
+		if !ok {
+			t.Errorf("object is not Error: %T (%+v)", actual, actual)
+			return
+		}
+		if errObj.Message != expected.Message {
+			t.Errorf("wrong error message. expected=%q, got=%q",
+				expected.Message, errObj.Message)
+		}
 	case [][]object.Object:
 		// gotStruct, ok := actual.(*object.Struct)
 		// if !ok {
@@ -602,4 +612,38 @@ func TestCallingFunctionsWithWrongArguments(t *testing.T) {
 			t.Fatalf("wrong VM error: want=%q, got=%q", tt.expected, err)
 		}
 	}
+}
+
+func TestBuiltInFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{`len("")`, 0},
+		{`len("four")`, 4},
+		{`len("hello world")`, 11},
+		{
+			`len(1)`,
+			&object.Error{
+				Message: "argument to `len` not supported, got INTEGER",
+			},
+		},
+		{`len("one", "two")`,
+			&object.Error{
+				Message: "wrong number of arguments. got=2, want=1",
+			},
+		},
+		{`
+			global {
+				int v[] = {1,2,3};
+			}
+			len(v);
+			`, 3,
+		},
+		{`
+			global {
+				int v[];
+			}
+			len(v);
+			`, 1,
+		},
+	}
+	runVmTests(t, tests)
 }

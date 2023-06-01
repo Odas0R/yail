@@ -53,6 +53,7 @@ const (
 	OpCall
 	OpReturnValue
 	OpReturn
+	OpGetBuiltin
 )
 
 // These are the definitions of the opcodes that we support.
@@ -83,6 +84,7 @@ var definitions = map[Opcode]*Definition{
 	OpCall:          {"OpCall", []int{1}},
 	OpReturnValue:   {"OpReturnValue", []int{}},
 	OpReturn:        {"OpReturnValue", []int{}},
+	OpGetBuiltin:    {"OpGetBuiltin", []int{1}},
 }
 
 func Lookup(op byte) (*Definition, error) {

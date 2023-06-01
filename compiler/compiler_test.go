@@ -852,3 +852,56 @@ func TestVariableStatementsScopes(t *testing.T) {
 
 	runCompilerTests(t, tests)
 }
+
+func TestBuiltins(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			global {
+				int v[] = {1,2,3};
+			}
+			len(v);
+			`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetBuiltin, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpCall, 1),
+				code.Make(code.OpPop),
+			},
+		},
+			{
+			input: `
+			global {
+				int v[] = {1,2,3};
+			}
+			wow() int {
+				wow = len(v);
+			}
+			`,
+			expectedConstants: []interface{}{1, 2, 3, []code.Instructions{
+				code.Make(code.OpGetBuiltin, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpCall, 1),
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSetGlobal, 1),
+
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
