@@ -11,6 +11,7 @@ import (
 const (
 	StackSize   = 2048
 	GlobalsSize = 65536
+	MaxFrames   = 1024
 )
 
 // Errors
@@ -32,16 +33,27 @@ type VM struct {
 	stack   []object.Object
 	sp      int // Always points to the next value. Top of stack is stack[sp-1]
 	globals []object.Object
+
+	frames     []*Frame
+	frameIndex int
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
+	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
+	mainFrame := NewFrame(mainFn, 0)
+
+	frames := make([]*Frame, MaxFrames)
+	frames[0] = mainFrame
+
 	return &VM{
 		constants:    bytecode.Constants,
 		instructions: bytecode.Instructions,
 
-		stack:   make([]object.Object, StackSize),
-		sp:      0,
-		globals: make([]object.Object, GlobalsSize),
+		stack:      make([]object.Object, StackSize),
+		sp:         0,
+		globals:    make([]object.Object, GlobalsSize),
+		frames:     frames,
+		frameIndex: 1,
 	}
 }
 
@@ -53,13 +65,24 @@ func NewWithGlobalsStore(bytecode *compiler.Bytecode, s []object.Object) *VM {
 
 // fetch - decode - execute cycle
 func (vm *VM) Run() error {
-	for ip := 0; ip < len(vm.instructions); ip++ {
-		op := code.Opcode(vm.instructions[ip])
+	var ip int
+	var ins code.Instructions
+	var op code.Opcode
+
+	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
+		vm.currentFrame().ip++
+
+		ip = vm.currentFrame().ip
+		ins = vm.currentFrame().Instructions()
+
+		// fetch the op code
+		op = code.Opcode(ins[ip])
+
 		switch op {
 		case code.OpConstant:
 			// decode
-			constIndex := code.ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			constIndex := code.ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 
 			// execute
 			err := vm.push(vm.constants[constIndex])
@@ -96,9 +119,21 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpJump:
+			pos := int(code.ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip = pos - 1
+
+		case code.OpJumpNotTruthy:
+			pos := int(code.ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
+
+			condition := vm.pop()
+			if !isTruthy(condition) {
+				vm.currentFrame().ip = pos - 1
+			}
 		case code.OpArray:
-			numElements := int(code.ReadUint16(vm.instructions[ip+1:]))
-			ip += 2
+			numElements := int(code.ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
 
 			array := vm.buildArray(vm.sp-numElements, vm.sp)
 			vm.sp = vm.sp - numElements
@@ -107,30 +142,94 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
-		case code.OpJump:
-			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
-			ip = pos - 1
-		case code.OpJumpNotTruthy:
-			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
-			ip += 2
+		case code.OpCall:
+			fn, ok := vm.stack[vm.sp-1].(*object.CompiledFunction)
+			if !ok {
+				return fmt.Errorf("calling non-function object: %T", vm.stack[vm.sp-1])
+			}
+			frame := NewFrame(fn, vm.sp)
+			vm.pushFrame(frame)
+			vm.sp = frame.basePointer + fn.NumLocals
 
-			condition := vm.pop()
-			if !isTruthy(condition) {
-				ip = pos - 1
+		case code.OpReturnValue:
+			returnValue := vm.pop()
+
+			frame := vm.popFrame()
+			vm.sp = frame.basePointer - 1
+
+			err := vm.push(returnValue)
+			if err != nil {
+				return err
+			}
+		case code.OpReturn:
+			frame := vm.popFrame()
+			vm.sp = frame.basePointer - 1
+
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+
+		case code.OpStruct:
+			numElements := int(code.ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
+
+			startIndex := vm.sp - numElements
+			endIndex := vm.sp
+
+			strct, err := vm.buildStruct(startIndex, endIndex)
+			if err != nil {
+				return err
+			}
+
+			// Adjust the stack pointer to remove the attribute names and values
+			vm.sp = startIndex
+
+			err = vm.push(strct)
+			if err != nil {
+				return err
+			}
+		case code.OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+
+			err := vm.executeIndexExpression(left, index)
+			if err != nil {
+				return err
 			}
 		case code.OpGetGlobal:
-			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			globalIndex := code.ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 
 			err := vm.push(vm.globals[globalIndex])
 			if err != nil {
 				return err
 			}
 		case code.OpSetGlobal:
-			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			globalIndex := code.ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 
 			vm.globals[globalIndex] = vm.pop()
+
+		case code.OpGetLocal:
+			localIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
+
+			frame := vm.currentFrame()
+
+			err := vm.push(vm.stack[frame.basePointer+int(localIndex)])
+			if err != nil {
+				return err
+			}
+
+		case code.OpSetLocal:
+			localIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
+
+			frame := vm.currentFrame()
+
+			vm.stack[frame.basePointer+int(localIndex)] = vm.pop()
+
 		case code.OpNull:
 			err := vm.push(Null)
 			if err != nil {
@@ -290,12 +389,48 @@ func (vm *VM) executeMinusOperator() error {
 	return vm.push(&object.Integer{Value: -value})
 }
 
+func (vm *VM) executeIndexExpression(left, index object.Object) error {
+	switch {
+	case left.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
+		return vm.executeArrayIndex(left, index)
+	// case left.Type() == object.STRUCT_OBJ:
+	// 	return vm.executeStructIndex(left, index)
+	default:
+		return fmt.Errorf("index operator not supported: %s", left.Type())
+	}
+}
+
+func (vm *VM) executeArrayIndex(array, index object.Object) error {
+	arrayObject := array.(*object.Array)
+	indexObject := index.(*object.Integer)
+	max := int64(len(arrayObject.Elements) - 1)
+	if indexObject.Value < 0 || indexObject.Value > max {
+		return vm.push(Null)
+	}
+	return vm.push(arrayObject.Elements[indexObject.Value])
+}
+
 func (vm *VM) buildArray(startIndex, endIndex int) object.Object {
 	elements := make([]object.Object, endIndex-startIndex)
 	for i := startIndex; i < endIndex; i++ {
 		elements[i-startIndex] = vm.stack[i]
 	}
 	return &object.Array{Elements: elements}
+}
+
+func (vm *VM) buildStruct(startIndex, endIndex int) (object.Object, error) {
+	attributes := make(map[string]object.Object)
+
+	for i := startIndex; i < endIndex; i += 2 {
+		key, ok := vm.stack[i].(*object.String)
+		if !ok {
+			return nil, fmt.Errorf("key must be string: %s", vm.stack[i].Type())
+		}
+
+		attributes[key.Value] = vm.stack[i+1]
+	}
+
+	return &object.Struct{Attributes: attributes}, nil
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
@@ -314,4 +449,20 @@ func isTruthy(obj object.Object) bool {
 	default:
 		return true
 	}
+}
+
+// Frames
+
+func (vm *VM) pushFrame(f *Frame) {
+	vm.frames[vm.frameIndex] = f
+	vm.frameIndex++
+}
+
+func (vm *VM) popFrame() *Frame {
+	vm.frameIndex--
+	return vm.frames[vm.frameIndex]
+}
+
+func (vm *VM) currentFrame() *Frame {
+	return vm.frames[vm.frameIndex-1]
 }

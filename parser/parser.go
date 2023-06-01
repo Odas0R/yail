@@ -445,7 +445,10 @@ func (p *Parser) parseStructsStatement() *ast.StructsStatement {
 	var structs []*ast.Struct
 
 	for !p.peekTokenIs(token.RBRACE) {
-		sl := &ast.Struct{Token: p.curToken}
+		sl := &ast.Struct{
+			Token: p.curToken,
+			Name:  &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal},
+		}
 
 		if !p.expectPeek(token.LBRACE) {
 			return nil
@@ -482,6 +485,7 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 	topAttr := &ast.Attribute{
 		Token: p.curToken,
 		Type:  p.parseType(),
+		Value: p.defaultValueForType(p.curToken),
 	}
 
 	if !p.expectPeek(token.IDENT) {
@@ -503,7 +507,17 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 				return nil
 			}
 		}
+
 		topAttr.IsArray = true
+		topAttr.Value = &ast.ArrayStatement{
+			Token: topAttr.Token,
+			Type:  topAttr.Type,
+			Size:  topAttr.Size,
+			Name:  topAttr.Name,
+			Elements: []ast.Expression{
+				p.defaultValueForType(topAttr.Token),
+			},
+		}
 	}
 
 	attributes = append(attributes, topAttr)
@@ -518,9 +532,12 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 
 		if !p.peekTokenIs(token.IDENT) {
 			attr.Type = topAttr.Type // set type top attribute type
+			attr.Value = p.defaultValueForType(topAttr.Type.Token)
 			attr.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
 		} else {
 			attr.Type = p.parseType()
+			attr.Value = p.defaultValueForType(p.curToken)
 
 			if !p.expectPeek(token.IDENT) {
 				return nil
@@ -545,6 +562,15 @@ func (p *Parser) parseStructAttributes() []*ast.Attribute {
 			}
 
 			attr.IsArray = true
+			attr.Value = &ast.ArrayStatement{
+				Token: topAttr.Token,
+				Type:  topAttr.Type,
+				Size:  topAttr.Size,
+				Name:  topAttr.Name,
+				Elements: []ast.Expression{
+					p.defaultValueForType(topAttr.Token),
+				},
+			}
 		}
 
 		attributes = append(attributes, attr)
@@ -785,7 +811,13 @@ func (p *Parser) parseVariableBlockStatement() *ast.BlockStatement {
 }
 
 func (p *Parser) parseFunctionStatement() ast.Statement {
-	fuc := &ast.FunctionStatement{Token: p.curToken} // IDENT
+	fuc := &ast.FunctionStatement{
+		Token: p.curToken,
+		Name: &ast.Identifier{
+			Token: p.curToken,
+			Value: p.curToken.Literal,
+		},
+	}
 
 	if !p.expectPeek(token.LPAREN) {
 		return nil
@@ -1174,7 +1206,7 @@ func (p *Parser) defaultValueForType(t token.Token) ast.Expression {
 	case "int":
 		return &ast.IntegerLiteral{Token: token.Token{Type: token.INT, Literal: "0"}, Value: 0}
 	case "float":
-		return &ast.FloatLiteral{Token: token.Token{Type: token.FLOAT, Literal: "0"}, Value: 0}
+		return &ast.FloatLiteral{Token: token.Token{Type: token.FLOAT, Literal: "0.0"}, Value: 0.0}
 	case "bool":
 		return &ast.Boolean{Token: token.Token{Type: token.FALSE, Literal: "false"}, Value: false}
 	default:

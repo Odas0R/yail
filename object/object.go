@@ -3,10 +3,10 @@ package object
 import (
 	"bytes"
 	"fmt"
-	"hash/fnv"
 	"strings"
 
 	"github.com/odas0r/yail/ast"
+	"github.com/odas0r/yail/code"
 )
 
 type BuiltinFunction func(args ...Object) Object
@@ -28,16 +28,11 @@ const (
 	BUILTIN_OBJ  = "BUILTIN"
 
 	ARRAY_OBJ = "ARRAY"
+
+	STRUCT_OBJ = "STRUCT"
+
+	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 )
-
-type HashKey struct {
-	Type  ObjectType
-	Value uint64
-}
-
-type Hashable interface {
-	HashKey() HashKey
-}
 
 type Object interface {
 	Type() ObjectType
@@ -50,20 +45,13 @@ type Integer struct {
 
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
-func (i *Integer) HashKey() HashKey {
-	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
-}
 
 type Float struct {
 	Value float64
-
 }
 
 func (i *Float) Type() ObjectType { return FLOAT_OBJ }
 func (i *Float) Inspect() string  { return fmt.Sprintf("%f", i.Value) }
-func (i *Float) HashKey() HashKey {
-	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
-}
 
 type Boolean struct {
 	Value bool
@@ -71,17 +59,6 @@ type Boolean struct {
 
 func (b *Boolean) Type() ObjectType { return BOOLEAN_OBJ }
 func (b *Boolean) Inspect() string  { return fmt.Sprintf("%t", b.Value) }
-func (b *Boolean) HashKey() HashKey {
-	var value uint64
-
-	if b.Value {
-		value = 1
-	} else {
-		value = 0
-	}
-
-	return HashKey{Type: b.Type(), Value: value}
-}
 
 type Null struct{}
 
@@ -133,12 +110,6 @@ type String struct {
 
 func (s *String) Type() ObjectType { return STRING_OBJ }
 func (s *String) Inspect() string  { return s.Value }
-func (s *String) HashKey() HashKey {
-	h := fnv.New64a()
-	h.Write([]byte(s.Value))
-
-	return HashKey{Type: s.Type(), Value: h.Sum64()}
-}
 
 type Builtin struct {
 	Fn BuiltinFunction
@@ -165,4 +136,40 @@ func (ao *Array) Inspect() string {
 	out.WriteString("}")
 
 	return out.String()
+}
+
+type Struct struct {
+	Attributes map[string]Object
+}
+
+func (s *Struct) Type() ObjectType { return STRUCT_OBJ }
+func (s *Struct) Inspect() string {
+	var out bytes.Buffer
+
+	entries := []string{}
+	for k, v := range s.Attributes {
+		entries = append(entries, k+": "+v.Inspect())
+	}
+
+	out.WriteString("struct {")
+	if len(entries) > 0 {
+		out.WriteString(" ")
+	}
+	out.WriteString(strings.Join(entries, "; "))
+	if len(entries) > 0 {
+		out.WriteString(";")
+	}
+	out.WriteString(" }")
+
+	return out.String()
+}
+
+type CompiledFunction struct {
+	Instructions code.Instructions
+	NumLocals    int
+}
+
+func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }
+func (cf *CompiledFunction) Inspect() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }

@@ -216,6 +216,7 @@ type ArrayStatement struct {
 }
 
 func (as *ArrayStatement) statementNode()       {}
+func (as *ArrayStatement) expressionNode()      {}
 func (as *ArrayStatement) TokenLiteral() string { return as.Token.Literal }
 func (as *ArrayStatement) String() string {
 	var out bytes.Buffer
@@ -698,6 +699,7 @@ func (p *Parameter) Stringify(indent int) string {
 
 type FunctionStatement struct {
 	Token      token.Token     // The function name token
+	Name       *Identifier     // The function name
 	Parameters []*Parameter    // The function parameters
 	ReturnType *ReturnType     // The function return type
 	Body       *BlockStatement // The function body
@@ -856,6 +858,7 @@ func (sd *StructsStatement) Stringify(indent int) string {
 
 type Struct struct {
 	Token      token.Token
+	Name       *Identifier
 	Attributes []*Attribute
 }
 

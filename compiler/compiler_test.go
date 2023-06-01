@@ -84,6 +84,17 @@ func testConstants(
 				return fmt.Errorf("constant %d - testStringObject failed: %s",
 					i, err)
 			}
+		case []code.Instructions:
+			fn, ok := actual[i].(*object.CompiledFunction)
+			if !ok {
+				return fmt.Errorf("constant %d - object is not CompiledFunction. got=%T (%+v)",
+					i, actual[i], actual[i])
+			}
+			err := testInstructions(constant, fn.Instructions)
+			if err != nil {
+				return fmt.Errorf("constant %d - testInstructions failed: %s",
+					i, err)
+			}
 		}
 	}
 	return nil
@@ -342,6 +353,87 @@ func TestBooleanExpressions(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestStringExpressions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input:             `"monkey"`,
+			expectedConstants: []interface{}{"monkey"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             `"mon"	+ "key"`,
+			expectedConstants: []interface{}{"mon", "key"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestArrayStatements(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			global {
+				int v[];
+			}
+		`,
+			expectedConstants: []interface{}{0},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpArray, 1),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `
+			global {
+				int v[] = {1, 2, 3};
+			}
+		`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `
+			global {
+				int v[] = {1 + 2, 3 - 4, 5 * 6};
+			}
+		`,
+			expectedConstants: []interface{}{1, 2, 3, 4, 5, 6},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSub),
+				code.Make(code.OpConstant, 4),
+				code.Make(code.OpConstant, 5),
+				code.Make(code.OpMul),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestGlobalVarStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{
@@ -397,23 +489,83 @@ func TestGlobalVarStatements(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
-func TestStringExpressions(t *testing.T) {
+func TestStructStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input:             `"monkey"`,
-			expectedConstants: []interface{}{"monkey"},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.OpConstant, 0),
-				code.Make(code.OpPop),
-			},
-		},
-		{
-			input:             `"mon"	+ "key"`,
-			expectedConstants: []interface{}{"mon", "key"},
+			input: `
+			structs {
+				point2D {int x;};
+			}
+		`,
+			expectedConstants: []interface{}{"point2D", "x", 0},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpStruct, 2),
+			},
+		},
+		{
+			input: `
+			structs {
+				circle {int center, int radius;};
+				point3D {float x, y, z;};
+			}
+		`,
+			expectedConstants: []interface{}{"circle", "center", 0, "radius", 0, "point3D", "x", 0.0, "y", 0.0, "z", 0.0},
+			expectedInstructions: []code.Instructions{
+				// circle
+				code.Make(code.OpConstant, 0),
+				// center
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				// radius
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpConstant, 4),
+				// set struct
+				code.Make(code.OpStruct, 4),
+
+				// point3D
+				code.Make(code.OpConstant, 5),
+				// x
+				code.Make(code.OpConstant, 6),
+				code.Make(code.OpConstant, 7),
+				// y
+				code.Make(code.OpConstant, 8),
+				code.Make(code.OpConstant, 9),
+				// z
+				code.Make(code.OpConstant, 10),
+				code.Make(code.OpConstant, 11),
+
+				code.Make(code.OpStruct, 6),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestIndexExpressions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			global {
+				int a[3] = {1,2,3};
+			}
+			a[1 + 1];
+			`,
+			expectedConstants: []interface{}{1, 2, 3, 1, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpConstant, 4),
 				code.Make(code.OpAdd),
+				code.Make(code.OpIndex),
 				code.Make(code.OpPop),
 			},
 		},
@@ -422,43 +574,236 @@ func TestStringExpressions(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
-func TestArrayStatements(t *testing.T) {
+func TestCompilerScopes(t *testing.T) {
+	compiler := New()
+	if compiler.scopeIndex != 0 {
+		t.Errorf("scopeIndex wrong. got=%d, want=%d", compiler.scopeIndex, 0)
+	}
+	globalSymbolTable := compiler.symbolTable
+
+	compiler.emit(code.OpMul)
+
+	compiler.enterScope()
+	if compiler.scopeIndex != 1 {
+		t.Errorf("scopeIndex wrong. got=%d, want=%d", compiler.scopeIndex, 1)
+	}
+
+	compiler.emit(code.OpSub)
+	if len(compiler.scopes[compiler.scopeIndex].instructions) != 1 {
+		t.Errorf("instructions length wrong. got=%d",
+			len(compiler.scopes[compiler.scopeIndex].instructions))
+	}
+
+	last := compiler.scopes[compiler.scopeIndex].lastInstruction
+	if last.Opcode != code.OpSub {
+		t.Errorf("lastInstruction.Opcode wrong. got=%d, want=%d",
+			last.Opcode, code.OpSub)
+	}
+	if compiler.symbolTable.Outer != globalSymbolTable {
+		t.Errorf("compiler did not enclose symbolTable")
+	}
+
+	compiler.leaveScope()
+	if compiler.scopeIndex != 0 {
+		t.Errorf("scopeIndex wrong. got=%d, want=%d",
+			compiler.scopeIndex, 0)
+	}
+	if compiler.symbolTable != globalSymbolTable {
+		t.Errorf("compiler did not restore global symbol table")
+	}
+	if compiler.symbolTable.Outer != nil {
+		t.Errorf("compiler modified global symbol table incorrectly")
+	}
+
+	compiler.emit(code.OpAdd)
+	if len(compiler.scopes[compiler.scopeIndex].instructions) != 2 {
+		t.Errorf("instructions length wrong. got=%d",
+			len(compiler.scopes[compiler.scopeIndex].instructions))
+	}
+
+	last = compiler.scopes[compiler.scopeIndex].lastInstruction
+	if last.Opcode != code.OpAdd {
+		t.Errorf("lastInstruction.Opcode wrong. got=%d, want=%d",
+			last.Opcode, code.OpAdd)
+	}
+
+	previous := compiler.scopes[compiler.scopeIndex].previousInstruction
+	if previous.Opcode != code.OpMul {
+		t.Errorf("previousInstruction.Opcode wrong. got=%d, want=%d",
+			previous.Opcode, code.OpMul)
+	}
+}
+func TestFunctions(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input:             "int v[];",
-			expectedConstants: []interface{}{0},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.OpConstant, 0),
-				code.Make(code.OpArray, 1),
-				code.Make(code.OpPop),
-			},
-		},
-		{
-			input:             "int v[] = {1, 2, 3};",
-			expectedConstants: []interface{}{1, 2, 3},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.OpConstant, 0),
-				code.Make(code.OpConstant, 1),
-				code.Make(code.OpConstant, 2),
-				code.Make(code.OpArray, 3),
-				code.Make(code.OpPop),
-			},
-		},
-		{
-			input:             "int v[] = {1 + 2, 3 - 4, 5 * 6};",
-			expectedConstants: []interface{}{1, 2, 3, 4, 5, 6},
-			expectedInstructions: []code.Instructions{
+			input: `
+			add() int {
+				add = 5 + 10;
+			}
+			`,
+			expectedConstants: []interface{}{5, 10, []code.Instructions{
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpConstant, 1),
 				code.Make(code.OpAdd),
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 2),
-				code.Make(code.OpConstant, 3),
-				code.Make(code.OpSub),
-				code.Make(code.OpConstant, 4),
-				code.Make(code.OpConstant, 5),
-				code.Make(code.OpMul),
-				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `
+			add() int {
+				5 + 10;
+			}
+			`,
+			expectedConstants: []interface{}{5, 10, 0, []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
 				code.Make(code.OpPop),
+				code.Make(code.OpConstant, 2), // implicit return
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `
+			add() int {
+				1; 2
+			}
+			`,
+			expectedConstants: []interface{}{1, 2, 0, []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpPop),
+				code.Make(code.OpConstant, 2), // implicit return
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `
+			add() int {
+			}
+			`,
+			expectedConstants: []interface{}{0, []code.Instructions{
+				code.Make(code.OpConstant, 0), // implicit return
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestFunctionCalls(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			add() int {
+				24;
+			}
+			add();
+			`,
+			expectedConstants: []interface{}{24, 0, []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpCall),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestVariableStatementsScopes(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			global {
+				int a = 33;
+			}
+			num() int {
+				num = a;
+			}
+			`,
+			expectedConstants: []interface{}{33, []code.Instructions{
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `
+			num() int {
+				local {
+					int a = 33;
+				}
+				num = a;
+			}
+			`,
+			expectedConstants: []interface{}{33, []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetLocal, 0),
+				code.Make(code.OpGetLocal, 0),
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `
+			num() int {
+				local {
+					int a = 33;
+					int b = 33;
+				}
+				num = a + b;
+			}
+			`,
+			expectedConstants: []interface{}{33, 33, []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetLocal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSetLocal, 1),
+
+				code.Make(code.OpGetLocal, 0),
+				code.Make(code.OpGetLocal, 1),
+				code.Make(code.OpAdd),
+
+				code.Make(code.OpReturnValue),
+			}},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 	}

@@ -1354,7 +1354,7 @@ func TestFunctionParameterParsing(t *testing.T) {
 	}
 }
 
-func TestFunctionLiteralParsing(t *testing.T) {
+func TestFunctionStatementParsing(t *testing.T) {
 	input := `add(int x, int y) int {
 	x + y;
 }`

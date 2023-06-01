@@ -30,6 +30,19 @@ func testIntegerObject(expected int64, actual object.Object) error {
 	return nil
 }
 
+func testFloatObject(expected float64, actual object.Object) error {
+	result, ok := actual.(*object.Float)
+	if !ok {
+		return fmt.Errorf("object is not Float. got=%T (%+v)", actual, actual)
+	}
+
+	if result.Value != expected {
+		return fmt.Errorf("object has wrong value. got=%f, want=%f", result.Value, expected)
+	}
+
+	return nil
+}
+
 func testBooleanObject(expected bool, actual object.Object) error {
 	result, ok := actual.(*object.Boolean)
 	if !ok {
@@ -118,6 +131,12 @@ func testExpectedObject(
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
 		}
+	case [][]object.Object:
+		// gotStruct, ok := actual.(*object.Struct)
+		// if !ok {
+		// 	t.Errorf("object is not Struct. got=%T (%+v)", actual, actual)
+		// }
+		// fmt.Println("STRUCT: " + actual.Inspect())
 	}
 }
 
@@ -194,6 +213,45 @@ func TestConditionals(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestStringExpressions(t *testing.T) {
+	tests := []vmTestCase{
+		{`"monkey"`, "monkey"},
+		{`"mon" + "key"`, "monkey"},
+		{`"mon" + "key" + "banana"`, "monkeybanana"},
+	}
+	runVmTests(t, tests)
+}
+
+func TestArrayStatements(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			`
+			global {
+				int v[];
+			}
+			v;
+			`, []int{0},
+		},
+		{
+			`
+			global {
+				int v[] = {1,2,3};
+			}
+			v;
+			`, []int{1, 2, 3},
+		},
+		{
+			`
+			global {
+				int v[] = {1+2,3-4,5*6};
+			}
+			v;
+			`, []int{3, -1, 30},
+		},
+	}
+	runVmTests(t, tests)
+}
+
 func TestGlobalVarStatement(t *testing.T) {
 	tests := []vmTestCase{
 		{
@@ -226,20 +284,212 @@ func TestGlobalVarStatement(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TestStringExpressions(t *testing.T) {
+func TestIndexStatement(t *testing.T) {
 	tests := []vmTestCase{
-		{`"monkey"`, "monkey"},
-		{`"mon" + "key"`, "monkey"},
-		{`"mon" + "key" + "banana"`, "monkeybanana"},
+		{
+			`
+			global {
+				int v[3] = {1,2,3};
+			}
+			v[1]
+			`, 2,
+		},
+		{
+			`
+			global {
+				int v[3] = {1,2,3};
+			}
+			v[0 + 2]
+			`, 3,
+		},
+		{
+			`
+			global {
+				int v[];
+			}
+			v[0]
+			`, 0,
+		},
+		{
+			`
+			global {
+				int v[] = {1,2,3};
+			}
+			v[99]
+			`, Null,
+		},
+		{
+			`
+			global {
+				int v[] = {1,2,3};
+			}
+			v[-1]
+			`, Null,
+		},
 	}
 	runVmTests(t, tests)
 }
 
-func TestArrayStatements(t *testing.T) {
+// TODO: finish this later
+// func TestStructStatement(t *testing.T) {
+// 	tests := []vmTestCase{
+// 		{
+// 			`
+// 			structs {
+// 				point2D {int x;};
+// 			}
+// 			point2D p;
+// 			`, 0,
+// 		},
+// 		{
+// 			`
+// 			structs {
+// 				circle {int center, int radius;};
+// 				point3D {float x, y, z;};
+// 			}
+// 			circle c;
+// 			`, 0,
+// 		},
+// 	}
+// 	runVmTests(t, tests)
+// }
+
+func TestCallingFunctionsWithoutArguments(t *testing.T) {
 	tests := []vmTestCase{
-		{"int v[];", []int{0}},
-		{"int v[] = {1, 2, 3};", []int{1, 2, 3}},
-		{"int v[] = {1 + 2, 3 - 4, 5 * 6};", []int{3, -1, 30}},
+		{
+			`
+			add() int {
+				add = 5 + 10;
+			}
+			add();
+			`, 15,
+		},
+		{
+			`
+			add() int {
+				add = 5 + 10;
+				# FIXME: DOESN'T WORK
+			  # add = add + 15;
+			}
+			add();
+			`, 15,
+		},
+		{
+			`
+			a() int {
+				a = 1;
+			}
+			b() int {
+				b = a() + 1;
+			}
+			c() int {
+				c = b() + 1;
+			}
+			c();
+			`, 3,
+		},
+	}
+	runVmTests(t, tests)
+}
+
+func TestCallingFunctionsWithoutReturn(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			`
+			noReturn() int { }
+			noReturn();
+			`, 0,
+		},
+		{
+			`
+			noReturn() int[] { }
+			noReturn();
+			`, []int{0},
+		},
+		{
+			`
+			noReturn() int { }
+			noReturnTwo() int { noReturnTwo = noReturn(); }
+			noReturn();
+			noReturnTwo();
+			`, 0,
+		},
+		{
+			`
+			noReturn() bool { }
+			noReturnTwo() int { noReturnTwo = noReturn(); }
+			noReturn();
+			noReturnTwo();
+			`, false,
+		},
+		{
+			`
+			noReturn() float { }
+			noReturnTwo() int { noReturnTwo = noReturn(); }
+			noReturn();
+			noReturnTwo();
+			`, 0.0,
+		},
+	}
+	runVmTests(t, tests)
+}
+
+func TestCallingFunctionsWithBindings(t *testing.T) {
+	tests := []vmTestCase{
+
+		{
+			`
+			wow() int {
+				local {
+					int a = 30;
+					int b = 30;
+				}
+				wow = a + b;
+			}
+			wow();
+			`, 60,
+		},
+		{
+			`
+			oneAndTwo() int {
+				local {
+					int one = 1;
+					int two = 2;
+				}
+				oneAndTwo = one + two;
+			}
+			threeAndFour() int {
+				local {
+					int three = 3;
+					int four = 4;
+				}
+				threeAndFour = three + four;
+			}
+			oneAndTwo() + threeAndFour();
+			`, 10,
+		},
+		{
+			`
+			global {
+				int globalSeed = 50;
+			}
+
+			minusOne() int {
+				local {
+					int num = 1;
+				}
+				minusOne = globalSeed - num;
+			}
+
+			minusTwo() int {
+				local {
+					int num = 2;
+				}
+				minusTwo = globalSeed - num;
+			}
+			minusOne() + minusTwo();
+			`, 97,
+		},
 	}
 	runVmTests(t, tests)
 }
