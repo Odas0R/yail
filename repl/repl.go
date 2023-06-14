@@ -112,6 +112,89 @@ func RunVm(in io.Reader, out io.Writer) {
 	}
 }
 
+func RunFileVm(path string) {
+	constants := []object.Object{}
+	symbolTable := compiler.NewSymbolTable()
+
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Printf("Error opening file: %s (%s) ", path, err)
+	}
+	defer file.Close()
+
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Printf("Error reading file: %s (%s) ", path, err)
+		return
+	}
+
+	// if file .out exists, delete it
+	if _, err := os.Stat(path + ".out"); err == nil {
+		err = os.Remove(path + ".out")
+		if err != nil {
+			fmt.Printf("Error deleting file: %s (%s) ", path+".out", err)
+			return
+		}
+	}
+
+	// create or re a file output based on the input file
+	out, err := os.Create(path + ".out")
+	if err != nil {
+		fmt.Printf("Error creating file: %s (%s) ", path, err)
+		return
+	}
+	defer out.Close()
+
+	l := lexer.New(string(content))
+	p := parser.New(l)
+
+	// create the AST by parsing the tokens
+	program := p.ParseProgram()
+
+	if len(p.Errors()) != 0 {
+		out.WriteString("\n")
+		printParserErrors(out, p.Errors())
+		out.WriteString("\n")
+	}
+
+	comp := compiler.NewWithState(symbolTable, constants)
+	err = comp.Compile(program)
+	if err != nil {
+		fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+	}
+
+	code := comp.Bytecode()
+
+	out.WriteString("=========================================")
+	out.WriteString(" CODE ")
+	out.WriteString("=========================================\n")
+	out.WriteString(string(content))
+
+	out.WriteString("=========================================")
+	out.WriteString(" Constants ")
+	out.WriteString("=========================================\n")
+	for i, constant := range code.Constants {
+		fn, ok := constant.(*object.CompiledFunction)
+		if ok {
+			fmt.Fprintf(out, "CompiledFunction[%d] Instructions:\n", i)
+			out.WriteString(fn.Instructions.String())
+			out.WriteString("\n")
+			continue
+		}
+
+		fmt.Fprintf(out, "%d\t%s\n", i, constant.Inspect())
+
+	}
+
+	out.WriteString("\n")
+
+	out.WriteString("=========================================")
+	out.WriteString(" Instructions ")
+	out.WriteString("=========================================\n")
+	out.WriteString(code.Instructions.String())
+	// if the instruction is a compiled fuction, print the instructions
+}
+
 func RunFile(path string) {
 	file, err := os.Open(path)
 	if err != nil {

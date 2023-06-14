@@ -1,0 +1,28 @@
+global {
+  int x = 5;
+}
+
+add(int x,y) int {
+  add = x + y;
+}
+
+mult(int x,y) int {
+  mult = x * y;
+}
+
+main() bool {
+  local {
+    int res = 0;
+  }
+
+  res = add(2, 5*3);
+
+  # compute
+  res = add(mult(add(1, 2), 3), 4);
+
+  if (res > 10) {
+    # write("congratulations, result is higher than 10");
+  }
+
+  main = true
+}

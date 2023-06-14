@@ -7,4 +7,7 @@ run-ast:
 run-vm:
 	go build -o yail . && ./yail vm
 
-:PHONY: build repl-ast repl-vm
+test-cp:
+	go build -o yail . && ./run-cp.sh
+
+:PHONY: build repl-ast repl-vm test-cp
